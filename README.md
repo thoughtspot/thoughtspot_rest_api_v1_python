@@ -43,7 +43,7 @@ You create a TSRestApiV1 object with the `server_url` argument, then use the `se
 In all further examples, the `ts` variable represents a `TSRestApiV1` object after the `session_login()` method has been called successfully.
 
 ## Logging out of the REST API
-The `logout()` method of the ThoughtSpot class will send the API request to end your TS session. After you do this, you may want to del the ThoughtSpot object if you are doing a lot of other work to end the request.Session object:
+The `session_logout()` method of the ThoughtSpot class will send the API request to end your TS session. After you do this, you may want to del the ThoughtSpot object if you are doing a lot of other work to end the request.Session object:
     
     ts.session_logout()
     del ts
