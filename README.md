@@ -26,7 +26,7 @@ If you want to use the library as a reference for how a REST API endpoint is cal
 This will bring the `TSRestApiV1` class, as well as the following enumerations:  `MetadataNames`, `MetadataSorts`, `MetadataSubtypes`, `MetadataCategories`, `ShareModes`, `Privileges`.
 
 ## Logging into the REST API
-You create a TSRestApiV1 object with the `server_url` argument, then use the `login()` method with username and password to log in. After login succeeds, the TSRestApiV1 object has an open requests.Session object which maintains the necessary cookies to use the REST API continuously .
+You create a TSRestApiV1 object with the `server_url` argument, then use the `session_login()` method with username and password to log in. After login succeeds, the TSRestApiV1 object has an open requests. Session object which maintains the necessary cookies to use the REST API continuously .
 
 
     username = os.getenv('username')  # or type in yourself
