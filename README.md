@@ -17,20 +17,23 @@ The library is designed to work with the latest version of ThoughtSpot Cloud. It
 
 `cs_tools` is a package of command-line tools built by the ThoughtSpot professional services team, aimed at ThoughtSpot administrators. 
 
+### Learning from the source code
+If you want to use the library as a reference for how a REST API endpoint is called correctly, look at the `/src/thoughtspot_rest_api_v1/tsrestapiv1.py` file. It contains the definition of all the ENUMs and the TSRestApiV1 class.
+
 ## Importing the library
     from thoughtspot_rest_api_v1 import *
 
 This will bring the `TSRestApiV1` class, as well as the following enumerations:  `MetadataNames`, `MetadataSorts`, `MetadataSubtypes`, `MetadataCategories`, `ShareModes`, `Privileges`.
 
 ## Logging into the REST API
-You create a TSRestApiV1 object with the `server` argument, then use the `login()` method with username and password to log in. After login succeeds, the TSRestApiV1 object has an open requests.Session object which maintains the necessary cookies to use the REST API continuously .
+You create a TSRestApiV1 object with the `server_url` argument, then use the `login()` method with username and password to log in. After login succeeds, the TSRestApiV1 object has an open requests.Session object which maintains the necessary cookies to use the REST API continuously .
 
 
     username = os.getenv('username')  # or type in yourself
     password = os.getenv('password')  # or type in yourself
     server = os.getenv('server')      # or type in yourself
 
-    ts: TSRestApiV1 = TSRestApiV1(server=server)
+    ts: TSRestApiV1 = TSRestApiV1(server_url=server)
     try:
         ts.session_login(username=username, password=password)
     except requests.exceptions.HTTPError as e:
