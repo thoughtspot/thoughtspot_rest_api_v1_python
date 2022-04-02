@@ -11,9 +11,9 @@
 #   We have chosen to make it as simple to understand as possible. There are comments
 #   and notes written throughout to help the reader understand more.
 #
+from collections import OrderedDict
 from typing import Optional, Dict, List, Union
 import json
-from collections import OrderedDict
 
 import requests
 
@@ -93,9 +93,11 @@ class Privileges:
     CAN_INVOKE_CUSTOM_R_ANALYSIS = 'RANALYSIS'
     CANNOT_CREATE_OR_DELETE_PINBOARDS = 'DISABLE_PINBOARD_CREATION'
 
+
 class PermissionTypes:
     EFFECTIVE = 'EFFECTIVE'
     DEFINED = 'DEFINED'
+
 
 #
 # Method Naming Conventions: The methods are meant to be named after the endpoint naming. A '/' is replaced by an '_'
@@ -638,7 +640,6 @@ class TSRestApiV1:
     def get_sheets_from_metadata_details(metadata_details_response):
         return metadata_details_response['storables'][0]['reportContent']['sheets']
 
-
     # Tag Methods
 
     # Format for assign tags is that the object_guids List can take any object type, but then you must
@@ -801,7 +802,6 @@ class TSRestApiV1:
     @staticmethod
     def raise_tml_errors(response: requests.Response) -> Dict:
         if len(response.content) == 0:
-            #print(response.status_code)
             raise Exception('No response returned at all with status code {}'.format(response.status_code))
         else:
             j = response.json()
@@ -824,7 +824,6 @@ class TSRestApiV1:
                             return response.json()
                     else:
                         return response.json()
-
 
             else:
                 return response.json()
@@ -1095,7 +1094,6 @@ class TSRestApiV1:
         response = self.session.post(url=url, data=post_data)
         response.raise_for_status()
         return response.json()
-
 
     #
     # SESSION Methods
@@ -1406,8 +1404,17 @@ class TSRestApiV1:
         endpoint = 'connection/fetchConnection'
 
         url = self.non_public_base_url + endpoint
-        # Example of a config_json, which may vary per connection (use
-        config_json_example = '{"password":"","role":"SE_ROLE","warehouse":"SE_DEMO_WH","accountName":"thoughtspot_partner","user":"se_demo"}'
+        # Example of a config_json, which may vary per connection
+        #
+        # config_json_string_example = '''
+        #       {  "password": "",
+        #          "role": "SE_ROLE",
+        #          "warehouse": "SE_DEMO_WH",
+        #          "accountName": "thoughtspot_partner",
+        #          "user": "se_demo"
+        #       }
+        # '''
+        #
         post_data = {'id': connection_guid,
                      'config': config_json_string,
                      'includeColumns': str(include_columns).lower(),
@@ -1428,8 +1435,17 @@ class TSRestApiV1:
                   "schemaName": schema_name,
                   "tableName": table_name
                   }]
-        # Example of a config_json, which may vary per connection (use
-        config_json_example = '{"password":"","role":"SE_ROLE","warehouse":"SE_DEMO_WH","accountName":"thoughtspot_partner","user":"se_demo"}'
+        # Example of a config_json, which may vary per connection
+        #
+        # config_json_string_example = '''
+        #       {  "password": "",
+        #          "role": "SE_ROLE",
+        #          "warehouse": "SE_DEMO_WH",
+        #          "accountName": "thoughtspot_partner",
+        #          "user": "se_demo"
+        #       }
+        # '''
+        #
         post_data = {'connection_id': connection_guid,
                      'config': config_json_string,
                      'tables': json.dumps(tables),
@@ -1533,5 +1549,3 @@ class TSRestApiV1:
                           "externalDatabases": external_databases
                           }
         return final_response
-
-
