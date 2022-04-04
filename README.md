@@ -1,24 +1,47 @@
-# thoughtspot_rest_api_v1_python
-Simple Python implementation of V1 REST API
+*A simple Python implementation of ThoughtSpot's V1 REST API.*
 
-## Introduction
-thoughtspot_rest_api_v1 implements the ThoughtSpot V1 REST API as directly as possible. Each API endpoint is represented by a single method within the TSRestApiV1 class. The names of the methods and their arguments match up to the documented API endpoints as much as is practical, with a few minor changes to make certain argument names more obvious for an end user.
+`thoughtspot_rest_api_v1` implements the ThoughtSpot V1 REST API as directly as possible. Each API endpoint is represented by a single method within the `TSRestApiV1` class. Method and argument names closely match to the documented API endpoints, with a few minor changes are taken to make certain parameters more obvious for an end user. 
 
-The TSRestApiV1 class uses the *requests* library to create an internal requests.Session object when the REST API sign-in command is run. This fulfils the ThoughtSpot REST API V1 requirement for session cookie details to be passed in every request.
+`->` [Learning from the Source Code][jump-learning] </br>
+`->` [Getting Started][jump-getting-started] </br>
+`->` [Using `thoughtspot_rest_api_v1`][jump-tutorial] </br>
+`->` [Additional Libraries][jump-libraries] </br>
+
+---
+
+## Learning from the source code
+If you want to use the library as a reference for how a REST API endpoint is called correctly, look at the `/src/thoughtspot_rest_api_v1/tsrestapiv1.py` file. It contains the definition of all the ENUMs and the `TSRestApiV1` class.
+
+The `TSRestApiV1` class uses the *requests* library to create an internal requests.Session object when the REST API sign-in command is run. This fulfils the ThoughtSpot REST API V1 requirement for session cookie details to be passed in every request.
 
 Each method is implemented to be as self-contained as possible (other than using the shared session object), so you can use the library as an additional reference along with the V1 Playground (Swagger) to see exactly how any given call is implemented.
 
 The library is designed to work with the latest version of ThoughtSpot Cloud. It should also work with Software versions 7.1.1 and later, but the library is not versioned, so please check your documentation for available endpoints within the release you use if on a Software release.
 
-### Additional libraries
-`thoughtspot_tml` is a library for processing the ThoughtSpot Modeling Language (TML) files. You can use `thoughtspot_tml` to manipulate TML files from disk or exported via the REST API.
+---
 
-`ts_rest_api_and_tml_tools` is a convenience library that imports both `thoughtspot_rest_api_v1` and `thoughtspot_tml` and wraps them in more convenient and obvious packaging. It also contains many example scripts to do common workflows. In particular, there are many examples of SDLC use cases that involve REST API commands and TML manipulation.
+## Getting Started
 
-`cs_tools` is a package of command-line tools built by the ThoughtSpot professional services team, aimed at ThoughtSpot administrators. 
+To install ThoughtSpot Rest API V1, simply run this simple command in your terminal of choice:
 
-### Learning from the source code
-If you want to use the library as a reference for how a REST API endpoint is called correctly, look at the `/src/thoughtspot_rest_api_v1/tsrestapiv1.py` file. It contains the definition of all the ENUMs and the TSRestApiV1 class.
+```
+$ python -m pip install thoughtspot_rest_api_v1_python
+```
+
+### Getting the source code
+
+```
+$ git clone https://github.com/thoughtspot/thoughtspot_rest_api_v1_python.git
+```
+
+Once you have a copy of the source, you can embed it in your own Python package, or install it into your site-packages easily:
+
+```
+$ cd thoughtspot_rest_api_v1_python
+$ python -m pip install .
+```
+
+---
 
 ## Importing the library
     from thoughtspot_rest_api_v1 import *
@@ -103,4 +126,17 @@ The following example uses the `thoughtspot_tml` library, where each object has 
     new_guids = ts.guids_from_imported_tml(import_response)
     new_guid = new_guids[0]  # when only a single TML imported
 
+---
 
+### Additional libraries
+`thoughtspot_tml` is a library for processing the ThoughtSpot Modeling Language (TML) files. You can use `thoughtspot_tml` to manipulate TML files from disk or exported via the REST API.
+
+`ts_rest_api_and_tml_tools` is a convenience library that imports both `thoughtspot_rest_api_v1` and `thoughtspot_tml` and wraps them in more convenient and obvious packaging. It also contains many example scripts to do common workflows. In particular, there are many examples of SDLC use cases that involve REST API commands and TML manipulation.
+
+`cs_tools` is a package of command-line tools built by the ThoughtSpot Professional Services team, aimed at ThoughtSpot administrators. 
+
+
+[jump-learning]: <#learning-from-the-source-code> "jump: Learning"
+[jump-getting-started]: <#getting-started> "jump: Getting Started"
+[jump-tutorial]: <#importing-the-library> "jump: Intro Tutorial"
+[jump-libraries]: <#additional-libraries> "jump: More Libraries"
