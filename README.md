@@ -48,6 +48,23 @@ $ python -m pip install .
 
 This will bring the `TSRestApiV1` class, as well as the following enumerations:  `MetadataNames`, `MetadataSorts`, `MetadataSubtypes`, `MetadataCategories`, `ShareModes`, `Privileges`.
 
+### Modifying the TSRestApiV1 requests.Session object (SSL errors, etc.)
+The REST API commands are all handled via the `requests` module, using a `requests.Session` object. 
+
+The session object used by all methods is accessible via:
+
+    TSRestApiV1.session
+
+A common issue within organizations is SSL certificates not being available / included within the certificate store used by Python. One way around this issue is to use the `verify=False` argument in requests (this is not recommended, but may be the only easy path forward. Check with your security team and never use with ThoughtSpot Cloud or from outside your protected network).
+
+This will set the Session object to `verify=False` for all calls:
+
+    ts: TSRestApiV1 = TSRestApiV1(server_url=server)
+    ts.session.verify = False
+
+If you find there are other options you need to set on the Session object for your particular situation, you can use the same technique to apply other changes.
+
+
 ## Logging into the REST API
 You create a TSRestApiV1 object with the `server_url` argument, then use the `session_login()` method with username and password to log in. After login succeeds, the TSRestApiV1 object has an open requests. Session object which maintains the necessary cookies to use the REST API continuously .
 
