@@ -1400,6 +1400,25 @@ class TSRestApiV1:
         response.raise_for_status()
         # Returns a 204 when complete
 
+    def connection_detail(self, connection_guid: str, sort: str = 'MODIFIED', sort_ascending: bool = True,
+                          filter: Optional[str] = None, tagname: Optional[List[str]] = None, show_hidden: bool = False):
+        endpoint = 'connection/detail/{}'.format(connection_guid)
+
+        url = self.non_public_base_url + endpoint
+        url_params = {
+                     'sort': sort,
+                     'sort_ascending': str(sort_ascending).lower(),
+                     'show_hidden': str(show_hidden).lower()
+                     }
+        if filter is not None:
+            url_params['pattern'] = filter
+        if tagname is not None:
+            url_params['tagname'] = json.dumps(tagname)
+
+        response = self.session.get(url=url, params=url_params)
+        response.raise_for_status()
+        return response.json()
+
     def connection_fetch_connection(self, connection_guid, config_json_string, include_columns=False, authentication_type='SERVICE_ACCOUNT'):
         endpoint = 'connection/fetchConnection'
 
