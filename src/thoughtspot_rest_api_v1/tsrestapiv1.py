@@ -322,8 +322,23 @@ class TSRestApiV1:
     # DEPENDENCY methods
     #
 
+    def dependency_listdependents(self, object_type: str, guids: List[str], batchsize: int = -1):
+        endpoint = 'dependency/listdependents'
+
+        post_data = {
+            'type': object_type,
+            'id': json.dumps(guids),
+            'batchsize': str(batchsize),
+
+        }
+
+        url = self.base_url + endpoint
+        response = self.session.post(url=url, data=post_data)
+        response.raise_for_status()
+        return response.json()
+
     def dependency_listincomplete(self):
-        endpoint = 'depdendency/listincomplete'
+        endpoint = 'dependency/listincomplete'
         url = self.base_url + endpoint
         response = self.session.get(url=url)
         response.raise_for_status()
@@ -1100,7 +1115,7 @@ class TSRestApiV1:
     #
 
     # Home Pinboard Methods
-    def session_homepinboard__post(self, pinboard_guid: str, user_guid: str) -> Dict:
+    def session_homepinboard__post(self, pinboard_guid: str, user_guid: str):
         endpoint = 'session/homepinboard'
 
         post_data = {
@@ -1111,7 +1126,6 @@ class TSRestApiV1:
         url = self.base_url + endpoint
         response = self.session.post(url=url, data=post_data)
         response.raise_for_status()
-        return response.json()
 
     def session_homepinboard__get(self) -> Dict:
         endpoint = 'session/homepinboard'
@@ -1209,7 +1223,7 @@ class TSRestApiV1:
         response.raise_for_status()
         return response.json()
 
-    def user_updatepassword(self, username: str, current_password: str, new_password: str) -> Dict:
+    def user_updatepassword(self, username: str, current_password: str, new_password: str):
         endpoint = 'user/updatepassword'
 
         post_data = {
@@ -1221,7 +1235,20 @@ class TSRestApiV1:
         url = self.base_url + endpoint
         response = self.session.post(url=url, data=post_data)
         response.raise_for_status()
-        return response.json()
+
+    # This exists but since it requires auth_token, would only be useful within a browser session
+    # def user_resetpassword(self, user_guid: str, auth_token: str, new_password: str):
+    #    endpoint = 'user/resetpassword'
+    #
+    #    post_data = {
+    #        'userid': user_guid,
+    #        'auth_token': auth_token,
+    #        'password': new_password
+    #    }
+    #
+    #    url = self.base_url + endpoint
+    #    response = self.session.post(url=url, data=post_data)
+    #    response.raise_for_status()
 
     # Implementation of the user/sync endpoint, which is fairly complex and runs a risk
     # with the remove_deleted option set to true
@@ -1267,20 +1294,34 @@ class TSRestApiV1:
         return response.json()
 
     # NOTE: preferences and preferencesProto are a big ?
-    def user_updatepreference(self, user_guid: str, username: str, preferences: Dict, preferencesProto: str) -> Dict:
+    def user_updatepreference(self, user_guid: str, username: str, preferences: Dict,
+                              preferences_proto: Optional[str] = None):
         endpoint = 'user/updatepreference'
 
         post_data = {
             'userid': user_guid,
             'username': username,
             'preferences': json.dumps(preferences),
-            'preferencesProto': preferencesProto
         }
+        if preferences_proto is not None:
+            post_data['preferencesProto'] = preferences_proto
 
         url = self.base_url + endpoint
         response = self.session.post(url=url, data=post_data)
         response.raise_for_status()
-        return response.json()
+
+    def build_user_preferences(self, preferred_locale: Optional[str] = None, notify_on_share: Optional[bool] = None,
+                               analyst_onboarding_complete: Optional[bool] = None, show_walk_me: Optional[bool] = None):
+        preferences = {}
+        if preferred_locale is not None:
+            preferences['preferredLocale'] = preferred_locale
+        if notify_on_share is not None:
+            preferences['notifyOnShare'] = notify_on_share
+        if analyst_onboarding_complete is not None:
+            preferences['analystOnboardingComplete'] = analyst_onboarding_complete
+        if show_walk_me is not None:
+            preferences['showWalkMe'] = show_walk_me
+        return preferences
 
     # Retrieves all USER and USER_GROUP objects
     def user_list(self) -> Dict:
@@ -1381,6 +1422,128 @@ class TSRestApiV1:
         response.raise_for_status()
         return response.json()
 
+    #
+    # ADMIN methods, many concerning Custom Actions
+    #
+    def admin_configinfo(self):
+        endpoint = 'admin/configinfo'
+
+        url = self.base_url + endpoint
+
+        response = self.session.get(url=url)
+        response.raise_for_status()
+        return response.json()
+
+    def admin_configinfo_overrides(self):
+        endpoint = 'admin/configinfo/overrides'
+
+        url = self.base_url + endpoint
+
+        response = self.session.get(url=url)
+        response.raise_for_status()
+        return response.json()
+
+    def admin_configinfo_update(self, config_changes: Dict):
+        endpoint = 'admin/configinfo/update'
+
+        url = self.base_url + endpoint
+        post_data = {
+            'configchanges': json.dumps(config_changes)
+        }
+
+        response = self.session.post(url=url, data=post_data)
+        response.raise_for_status()
+
+    def admin_embed_actions(self, tags: Optional[List[str]] = None):
+        endpoint = 'admin/embed/actions'
+        url_params = {}
+        if tags is not None:
+            url_params['tags'] = json.dumps(tags)
+
+        url = self.base_url + endpoint
+        response = self.session.get(url=url, params=url_params)
+        response.raise_for_status()
+        return response.json()
+
+    def admin_embed_action(self, action_guid: str):
+        endpoint = 'admin/embed/actions/{}'.format(action_guid)
+
+        url = self.base_url + endpoint
+        response = self.session.get(url=url)
+        response.raise_for_status()
+        return response.json()
+
+    def admin_embed_action__post(self, embed_action_definition: Dict):
+        endpoint = 'admin/embed/actions'
+
+        url = self.base_url + endpoint
+        post_data = {
+            'embedaction': json.dumps(embed_action_definition)
+        }
+
+        response = self.session.post(url=url, data=post_data)
+        response.raise_for_status()
+
+        return response.json()
+
+    def admin_embed_action__put(self, action_guid: str, embed_action_definition: Dict):
+        endpoint = 'admin/embed/actions/{}'.format(action_guid)
+
+        url = self.base_url + endpoint
+        post_data = {
+            'embedaction': json.dumps(embed_action_definition)
+        }
+
+        response = self.session.post(url=url, data=post_data)
+        response.raise_for_status()
+
+        return response.json()
+
+    def admin_embed_action__delete(self, action_guid: str):
+        endpoint = 'admin/embed/actions/{}'.format(action_guid)
+
+        url = self.base_url + endpoint
+
+        response = self.session.delete(url=url)
+        response.raise_for_status()
+
+        return response.json()
+
+    def admin_embed_action_associations__post(self, action_guid: str, action_association: Dict):
+        endpoint = 'admin/embed/actions/{}/associations'.format(action_guid)
+
+        url = self.base_url + endpoint
+        post_data = {
+            'actionassociation': json.dumps(action_association)
+        }
+
+        response = self.session.post(url=url, data=post_data)
+        response.raise_for_status()
+
+        return response.json()
+
+    def admin_embed_action_associations__get(self, action_guid: str):
+        endpoint = 'admin/embed/actions/{}/associations'.format(action_guid)
+
+        url = self.base_url + endpoint
+
+        response = self.session.get(url=url)
+        response.raise_for_status()
+
+        return response.json()
+
+    def admin_embed_action_associations__delete(self, action_guid: str, action_association: Dict):
+        endpoint = 'admin/embed/actions/{}/associations'.format(action_guid)
+
+        url = self.base_url + endpoint
+        post_data = {
+            'actionassociation': json.dumps(action_association)
+        }
+
+        response = self.session.delete(url=url, data=post_data)
+        response.raise_for_status()
+
+        return response.json()
     #
     # Non-public endpoints
     # No guarantees for these undocumented endpoints to stay consistent
