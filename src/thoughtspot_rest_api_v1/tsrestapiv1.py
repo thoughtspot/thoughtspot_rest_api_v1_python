@@ -1563,6 +1563,7 @@ class TSRestApiV1:
         response.raise_for_status()
         # Returns a 204 when complete
 
+    # This is the metadata call that is used to display tables / worksheets etc. for a connection in the UI
     def connection_detail(self, connection_guid: str, sort: str = 'MODIFIED', sort_ascending: bool = True,
                           filter: Optional[str] = None, tagname: Optional[List[str]] = None, show_hidden: bool = False):
         endpoint = 'connection/detail/{}'.format(connection_guid)
@@ -1570,8 +1571,8 @@ class TSRestApiV1:
         url = self.non_public_base_url + endpoint
         url_params = {
                      'sort': sort,
-                     'sort_ascending': str(sort_ascending).lower(),
-                     'show_hidden': str(show_hidden).lower()
+                     'sortascending': str(sort_ascending).lower(),
+                     'showhidden': str(show_hidden).lower()
                      }
         if filter is not None:
             url_params['pattern'] = filter
