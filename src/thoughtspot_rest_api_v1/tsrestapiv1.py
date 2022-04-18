@@ -35,12 +35,18 @@ class MetadataNames:
     ANSWER = 'QUESTION_ANSWER_BOOK'
     TABLE = 'LOGICAL_TABLE'
     TAG = 'TAG'
+    VIEW = 'LOGICAL_TABLE'
+    COLUMN = 'LOGICAL_COLUMN'
+    JOIN = 'LOGICAL_RELATIONSHIP'
+    DATA_SOURCE = 'DATA_SOURCE'
 
 
 class MetadataSubtypes:
     WORKSHEET = 'WORKSHEET'
     TABLE = 'ONE_TO_ONE_LOGICAL'
-    VIEW = 'USER_DEFINED'
+    VIEW = 'AGGR_WORKSHEET'
+    USER_UPLOAD = 'USER_DEFINED'
+    PRIVATE_WORKSHEET = 'PRIVATE_WORKSHEET'
 
 
 class MetadataSorts:
@@ -682,6 +688,12 @@ class TSRestApiV1:
                                    category: Optional[str] = None, batchsize: int = -1, offset: int = -1) -> Dict:
         endpoint = 'metadata/listobjectheaders'
 
+        # Tables, Worksheets and Views all have the same object_type, with a sub-type to vary
+        # This code allows sending the Sub-Type into Object_type and still run correctly
+        if object_type in [MetadataSubtypes.TABLE, MetadataSubtypes.VIEW, MetadataSubtypes.WORKSHEET]:
+            subtypes = [object_type]
+            object_type = MetadataNames.TABLE
+
         url_params = {
             'type': object_type,
             'sort': sort.upper(),
@@ -745,6 +757,12 @@ class TSRestApiV1:
                       auto_created: Optional[bool] = None, show_hidden: Optional[bool] = False,
                       author_guid: Optional[str] = None):
         endpoint = 'metadata/list'
+
+        # Tables, Worksheets and Views all have the same object_type, with a sub-type to vary
+        # This code allows sending the Sub-Type into Object_type and still run correctly
+        if object_type in [MetadataSubtypes.TABLE, MetadataSubtypes.VIEW, MetadataSubtypes.WORKSHEET]:
+            subtypes = [object_type]
+            object_type = MetadataNames.TABLE
 
         url_params = {
             'type': object_type,

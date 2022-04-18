@@ -99,7 +99,7 @@ The ThoughtSpot API has internal namings for many features, which require lookin
 - Privileges: The name of the Privileges that Groups can have (and users can inherit) in ThoughtSpot
 
 ## TML operations
-One primary use case of the 
+One primary use case of the REST APIs is to import and export ThoughtSpot Modeling Language (TML) files.
 
 ### Retrieving the TML as a Python OrderedDict from REST API
 If you want to use the TML classes to programmatically adjust the returned TML, there is a `export_tml(guid)` method which retrieves the TML from the API in JSON format and then returns it as a Python OrderedDict.
@@ -144,6 +144,25 @@ The following example uses the `thoughtspot_tml` library, where each object has 
     new_guid = new_guids[0]  # when only a single TML imported
 
 ---
+
+## Metadata operations
+Doing any actions with the REST APIs requires knowing the GUIDs of the objects. The /metadata endpoints are incredibly flexible, allowing you to retrieve details about almost any object type from the same endpoints. This flexibility means you must set a number of arguments with each call, including using the internal names of the object types.
+
+### MetadataNames and MetadataSubtypes 
+Because the internal API names of the object types often do not reflect the names used in the current versions of ThoughtSpot, there are two ENUMs provided to map the 'product name' to the REST API string value: MetadataNames and MetadataSubtypes
+
+The REST API has a single object_type for Tables, Views, and Worksheets, and uses an additional 'sub_type' property if you need to distinguish between those objects. You will need to pass both the object_type and the sub_type to metadata calls to limit down:
+
+    objs = ts.tsrest.metadata_listobjectheaders(object_type=MetadataNames.WORKSHEET, subtypes=[MetadataSubtypes.WORKSHEET],
+                                                sort='MODIFIED', sort_ascending=False, category=category_filter, fetchids=object_guid_list)
+
+### metadata_listobjectheaders and metadata_list
+The metadata/listobjectheaders and metadata/list REST API endpoints do relatively the same thing, although there are slight differences in the responses from each call.
+
+The implementation is exactly as described in the documentation (https://developers.thoughtspot.com/docs/?pageid=metadata-api#object-header) with these changes for ease of use and clarity:
+
+ - 'object_type' argument will accept the sub_types for the data object types and automatically structure the REST API request appropriately
+ - 'filter' argument is the name given to the 'pattern' argument in the REST API command, as the name pattern seemed unclear to users
 
 ### Additional libraries
 `thoughtspot_tml` is a library for processing the ThoughtSpot Modeling Language (TML) files. You can use `thoughtspot_tml` to manipulate TML files from disk or exported via the REST API.
