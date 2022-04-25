@@ -685,7 +685,8 @@ class TSRestApiV1:
                                    sort: str = 'DEFAULT', sort_ascending: bool = True,
                                    filter: Optional[str] = None, fetchids: Optional[List[str]] = None,
                                    skipids: Optional[List[str]] = None, tagname: Optional[List[str]] = None,
-                                   category: Optional[str] = None, batchsize: int = -1, offset: int = -1) -> Dict:
+                                   category: Optional[str] = None, batchsize: int = -1, offset: int = -1,
+                                   auto_created: Optional[bool] = None) -> Dict:
         endpoint = 'metadata/listobjectheaders'
 
         # Tables, Worksheets and Views all have the same object_type, with a sub-type to vary
@@ -714,6 +715,8 @@ class TSRestApiV1:
             url_params['batchsize'] = batchsize
         if category is not None:
             url_params['category'] = category
+        if auto_created is not None:
+            url_params['auto_created'] = str(auto_created).lower()
 
         url = self.base_url + endpoint
         response = self.session.get(url=url, params=url_params)
@@ -894,6 +897,40 @@ class TSRestApiV1:
                 raise Exception()
         return tml_obj
 
+    # Method to retrieve the all of the associate objects and retrieve original object and a dict of name:guid mapping
+    def metadata_tml_export_with_associations_map(self, guid: str) -> (OrderedDict, Dict):
+        # Always returns a Python Dict, converted from a request to the API to receive in JSON
+        endpoint = 'metadata/tml/export'
+
+        post_data = {
+            'export_ids': json.dumps([guid]),
+            'formattype': 'JSON',
+            'export_associated': 'true'
+        }
+
+        url = self.base_url + endpoint
+        # TML import is distinguished by having an {'Accept': 'text/plain'} header on the POST
+        response = self.session.post(url=url, data=post_data, headers={'Accept': 'text/plain'})
+        response.raise_for_status()
+        # Extra parsing of some 'error responses' that come through in JSON response on HTTP 200
+        self.raise_tml_errors(response=response)
+
+        # TML API returns a JSON response, with the TML document
+        # object_pairs_hook forces an OrderedDict
+        tml_json_response = response.json(object_pairs_hook=OrderedDict)
+        objs = tml_json_response['object']
+
+        # The first object will be the requested object
+        tml_str = objs[0]['edoc']
+        tml_obj = json.loads(tml_str)
+
+        name_guid_map = {}
+
+        for obj in objs:
+            name_guid_map[obj['info']['name']] = obj['info']['id']
+
+        return tml_obj, name_guid_map
+
     def metadata_tml_export_string(self, guid: str, formattype: str = 'YAML', export_associated=False) -> str:
         # Intended for a direct pull with no conversion
         endpoint = 'metadata/tml/export'
@@ -925,6 +962,38 @@ class TSRestApiV1:
         # throw some sort of HTTP exception
         else:
             raise Exception()
+
+    def metadata_tml_export_string_with_associations_map(self, guid: str, formattype: str = 'YAML') -> (str, Dict):
+        # Intended for a direct pull with no conversion
+        endpoint = 'metadata/tml/export'
+        # allow JSON or YAML in any casing
+        formattype = formattype.upper()
+        post_data = {
+            'export_ids': json.dumps([guid]),
+            'formattype': formattype,
+            'export_associated': 'true'
+        }
+        url = self.base_url + endpoint
+
+        # TML import is distinguished by having an {'Accept': 'text/plain'} header on the POST
+        response = self.session.post(url=url, data=post_data, headers={'Accept': 'text/plain'})
+        response.raise_for_status()
+        # Extra parsing of some 'error responses' that come through in JSON response on HTTP 200
+        self.raise_tml_errors(response=response)
+
+        # TML API returns a JSON response, with the TML document
+        tml_json_response = response.json()
+        objs = tml_json_response['object']
+
+        # The TML is there in full under the 'edoc' section of the API JSON response
+        response_str = objs[0]['edoc']
+
+        name_guid_map = {}
+
+        for obj in objs:
+            name_guid_map[obj['info']['name']] = obj['info']['id']
+
+        return response_str, name_guid_map
 
     # TML import is distinguished by having an {'Accept': 'text/plain'} header on the POST
     def metadata_tml_import(
@@ -1167,15 +1236,20 @@ class TSRestApiV1:
     #   used from Authenticator Server with Secret Key retrieved in a secure manner only
     #   in memory
     #
-    # def session_auth_token(self, secret_key: str, username: str, access_level: str, object_id: str):
-    #     post_params = {
-    #         'secret_key': secret_key,
-    #         'username': username,
-    #         'access_level': access_level,
-    #         'id': object_id
-    #     }
-    #    response = self.post_to_endpoint('session/auth/token', post_data=post_params)
-    #    return response
+    def session_auth_token(self, secret_key: str, username: str, access_level: str, object_id: str):
+        endpoint = 'session/auth/token'
+
+        post_params = {
+             'secret_key': secret_key,
+             'username': username,
+             'access_level': access_level,
+             'id': object_id
+        }
+
+        url = self.base_url + endpoint
+
+        response = self.session.post(url=url, data=post_params)
+        return response
 
     #
     # USER Methods
