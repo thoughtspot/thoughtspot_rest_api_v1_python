@@ -118,6 +118,15 @@ formattype defaults to 'YAML' but can be set to 'JSON'.
 
 This method returns a Python str object, which can then be editing in memory or saved directly to disk. 
 
+### Download TML with Name-GUID map from export_associated=true
+TML files don't include the GUIDs of associated objects, but they are available in the headers of the response when `export_associated` is set to `true`.
+
+There are two functions that export both the TML and a Dict of structure `{'object_name' : 'guid' }`, which can be used to add the `FQN` property to the TML.
+
+    tml_od, name_guid_map = ts.metadata_tml_export_with_associations_map(guid=lb_guid)
+    tml_str, name_guid_map = ts.metadata_tml_export_string_with_associations_map(guid=lb_guid)
+
+To add the `FQN` properties from the dict mapping, you'll need to modify the TML as an object, so the export_string method is less useful than the version that exports the OrderedDict.
 
 ### Importing/Publishing TML back to ThoughtSpot Server
 Similar to `metadata_tml_export()`, `metadata_tml_import()` uses a Python OrderedDict as input (or a List containing OrderedDict objects for multiple import). The method converts the OrderedDict to JSON format internally for use in the REST API request body.
