@@ -511,13 +511,13 @@ class TSRestApiV1:
 
         post_data = {
             'name': group_name,
-            'displayname': display_name,
+            'display_name': display_name,
             'grouptype': group_type,
             'visibility': visibility
         }
 
         if privileges is not None:
-            post_data['privileges'] = json.dumps(privileges)
+            post_data['privileges'] = privileges
         if tenant_id is not None:
             post_data['tenantid'] = tenant_id
 
