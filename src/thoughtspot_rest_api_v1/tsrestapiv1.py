@@ -666,14 +666,19 @@ class TSRestApiV1:
     # Format for assign tags is that the object_guids List can take any object type, but then you must
     # have a second List for object_type with an entry for each of the corresponding object_guids in the list
     # So really it's like a [{guid: , type: }, {guid:, type: }] structure but split into two separate JSON lists
-    def metadata_assigntag(self, object_guids: List[str], object_type: List[str], tag_guids: List[str]) -> bool:
+    def metadata_assigntag(self, object_guids: List[str], object_type: List[str], tag_guids: Optional[List[str]] = None, tag_names: Optional[List[str]] = None) -> bool:
         endpoint = 'metadata/assigntag'
+        if (tag_guids == None and tag_names == None):
+            raise Exception("Either one of tag_guids or tag_names are mandatory.")
 
         post_data = {
             'id': json.dumps(object_guids),
-            'type': json.dumps(object_type),
-            'tagid': json.dumps(tag_guids)
+            'type': json.dumps(object_type)
         }
+        if (tag_guids != None):
+            post_data['tagid'] = json.dumps(tag_guids)
+        if (tag_names != None):
+            post_data['tagname'] = json.dumps(tag_names)
 
         url = self.base_url + endpoint
         response = self.session.post(url=url, data=post_data)
