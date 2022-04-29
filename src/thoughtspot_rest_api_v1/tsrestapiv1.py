@@ -104,6 +104,9 @@ class PermissionTypes:
     EFFECTIVE = 'EFFECTIVE'
     DEFINED = 'DEFINED'
 
+class SharingVisibility:
+    SHARABLE = 'DEFAULT'
+    NOT_SHARABLE = 'NON_SHARABLE'
 
 #
 # Method Naming Conventions: The methods are meant to be named after the endpoint naming. A '/' is replaced by an '_'
