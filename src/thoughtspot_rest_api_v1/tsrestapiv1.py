@@ -842,25 +842,23 @@ class TSRestApiV1:
         else:
             j = response.json()
             # JSON error response checking
+
+            # It is possible in a multiple file upload that some validated and others have errors
+
             if 'object' in j:
                 for k in j['object']:
                     if 'info' in k:
                         # Older versions wrapped the errors in 'info'
                         if k['info']['status']['status_code'] == 'ERROR':
                             # print(k['info']['status']['error_message'])
-                            raise SyntaxError(k['info']['status']['error_message'])
-                        else:
-                            return response.json()
+                            raise SyntaxError(j['object'])
                     # Recent versions return as 'response'
                     elif 'response' in k:
                         if k['response']['status']['status_code'] == 'ERROR':
                             # print(k['info']['status']['error_message'])
-                            raise SyntaxError(k['response']['status']['error_message'])
-                        else:
-                            return response.json()
-                    else:
-                        return response.json()
-
+                            raise SyntaxError(j['object'])
+                # If no errors are raised, just return the regular response
+                return response.json()
             else:
                 return response.json()
 
