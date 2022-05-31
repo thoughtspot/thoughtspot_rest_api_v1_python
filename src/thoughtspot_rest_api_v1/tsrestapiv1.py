@@ -1353,6 +1353,7 @@ class TSRestApiV1:
         endpoint = 'user/{}'.format(user_guid)
 
         post_data = {
+            'userid': user_guid
         }
         if content is not None:
             post_data['content'] = content
