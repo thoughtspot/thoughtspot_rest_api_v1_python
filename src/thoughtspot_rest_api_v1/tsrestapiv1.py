@@ -212,12 +212,10 @@ class TSRestApiV1:
         if ts_object_id is not None:
             json_post_data['tsObjectId'] = ts_object_id
 
-        response = self.session.post(url=url, json=json_post_data)
+        response = self.session.post(url=url, json=json_post_data, headers={'Accept-Language': 'en_US'})
 
         response.raise_for_status()
-        resp_json = response.json()
-
-        return resp_json['root']['token']
+        return response.json()
 
     #
     # Root level API methods found below, divided into logical separations
