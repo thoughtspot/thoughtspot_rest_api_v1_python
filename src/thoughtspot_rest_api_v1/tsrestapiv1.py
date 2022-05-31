@@ -193,7 +193,7 @@ class TSRestApiV1:
     # This is only the V2 API bearer token, not the Trusted Authentication token from V1
     def get_token_v2(self,  username: Optional[str] = None, password: Optional[str] = None,
                      secret_key: Optional[str] = None, token_expiry_duration: int = 300,
-                     access_level: str = "FULL", ts_object_id: Optional[str] = None) -> str:
+                     access_level: str = "FULL", ts_object_id: Optional[str] = None) -> Dict:
         endpoint = 'session/gettoken'
 
         url = self.v2_base_url + endpoint
