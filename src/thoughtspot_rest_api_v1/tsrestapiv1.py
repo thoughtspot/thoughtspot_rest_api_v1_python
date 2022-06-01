@@ -235,7 +235,7 @@ class TSRestApiV1:
     ) -> Dict:
         endpoint = 'pinboarddata'
 
-        post_data = {
+        url_params = {
             'id': pinboard_guid,
             'vizid': json.dumps(vizids),
             'batchsize': str(batch_size),
@@ -245,7 +245,7 @@ class TSRestApiV1:
         }
 
         url = self.base_url + endpoint
-        response = self.session.post(url=url, data=post_data)
+        response = self.session.post(url=url, params=url_params)
         response.raise_for_status()
 
         return response.json()
@@ -261,7 +261,7 @@ class TSRestApiV1:
     ) -> Dict:
         endpoint = 'searchdata'
 
-        post_data = {
+        url_params = {
             'query_string': query_string,
             'data_source_guid': data_source_guid,
             'batchsize': str(batch_size),
@@ -271,7 +271,7 @@ class TSRestApiV1:
         }
 
         url = self.base_url + endpoint
-        response = self.session.post(url=url, data=post_data)
+        response = self.session.post(url=url, params=url_params)
         response.raise_for_status()
         return response.json()
 
