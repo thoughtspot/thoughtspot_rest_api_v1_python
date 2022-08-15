@@ -128,14 +128,14 @@ class TSRestApiV1:
         self.server = server_url
 
         # REST API uses cookies to maintain the session, so you need to create an open Session
-        self.session = requests.Session()
+        self.requests_session = requests.Session()
 
         # X-Requested-By             is necessary for all calls.
         # Accept: application/json   isn't necessary with requests (default: Accept: */*) but might be in other frameworks
         #
         # This sets the header on any subsequent call
         self.api_headers = {'X-Requested-By': 'ThoughtSpot', 'Accept': 'application/json'}
-        self.session.headers.update(self.api_headers)
+        self.requests_session.headers.update(self.api_headers)
 
         # TS documentation shows the /tspublic/v1/ portion but it is always preceded by {server}/callosum/v1/
         self.base_url = '{server}/callosum/v1/tspublic/v1/'.format(server=self.server)
@@ -152,7 +152,7 @@ class TSRestApiV1:
         post_data = {'username': username, 'password': password, 'rememberme': 'true'}
 
         url = self.base_url + endpoint
-        response = self.session.post(url=url, data=post_data)
+        response = self.requests_session.post(url=url, data=post_data)
 
         # HTTP 204 - success, no content
         response.raise_for_status()
@@ -162,7 +162,7 @@ class TSRestApiV1:
         endpoint = 'session/logout'
 
         url = self.base_url + endpoint
-        response = self.session.post(url=url)
+        response = self.requests_session.post(url=url)
 
         # HTTP 204 - success, no content
         response.raise_for_status()
@@ -179,10 +179,10 @@ class TSRestApiV1:
         url = self.v2_base_url + endpoint
 
         if token is not None:
-            response = self.session.post(url=url, headers={"Authorization": "Bearer {}".format(token)})
+            response = self.requests_session.post(url=url, headers={"Authorization": "Bearer {}".format(token)})
         elif username is not None and password is not None:
             json_post_data = {'userName': username, 'password': password, 'rememberMe': 'true'}
-            response = self.session.post(url=url, json=json_post_data)
+            response = self.requests_session.post(url=url, json=json_post_data)
         else:
             raise Exception("If using username/password, must include both")
 
@@ -212,7 +212,7 @@ class TSRestApiV1:
         if ts_object_id is not None:
             json_post_data['tsObjectId'] = ts_object_id
 
-        response = self.session.post(url=url, json=json_post_data, headers={'Accept-Language': 'en_US'})
+        response = self.requests_session.post(url=url, json=json_post_data, headers={'Accept-Language': 'en_US'})
 
         response.raise_for_status()
         return response.json()
@@ -245,7 +245,7 @@ class TSRestApiV1:
         }
 
         url = self.base_url + endpoint
-        response = self.session.post(url=url, params=url_params)
+        response = self.requests_session.post(url=url, params=url_params)
         response.raise_for_status()
 
         return response.json()
@@ -271,7 +271,7 @@ class TSRestApiV1:
         }
 
         url = self.base_url + endpoint
-        response = self.session.post(url=url, params=url_params)
+        response = self.requests_session.post(url=url, params=url_params)
         response.raise_for_status()
         return response.json()
 
@@ -285,7 +285,7 @@ class TSRestApiV1:
     def connection_types(self) -> List:
         endpoint = 'connection/types'
         url = self.base_url + endpoint
-        response = self.session.get(url=url)
+        response = self.requests_session.get(url=url)
         response.raise_for_status()
         return response.json()
 
@@ -311,7 +311,7 @@ class TSRestApiV1:
             url_params['batchsize'] = batchsize
 
         url = self.base_url + endpoint
-        response = self.session.get(url=url, params=url_params)
+        response = self.requests_session.get(url=url, params=url_params)
         response.raise_for_status()
         return response.json()
 
@@ -331,7 +331,7 @@ class TSRestApiV1:
             url = self.base_url + endpoint
             # Not available on 7.1.1 and before releases
             post_data['createEmpty'] = str(create_without_tables).lower()
-        response = self.session.post(url=url, data=post_data)
+        response = self.requests_session.post(url=url, data=post_data)
         response.raise_for_status()
         return response.json()
 
@@ -353,7 +353,7 @@ class TSRestApiV1:
             url = self.base_url + endpoint
             # Not available on 7.1.1 and before releases
             post_data['createEmpty'] = str(create_without_tables).lower()
-        response = self.session.post(url=url, data=post_data)
+        response = self.requests_session.post(url=url, data=post_data)
         response.raise_for_status()
         return response.json()
 
@@ -390,14 +390,14 @@ class TSRestApiV1:
         }
 
         url = self.base_url + endpoint
-        response = self.session.post(url=url, data=post_data)
+        response = self.requests_session.post(url=url, data=post_data)
         response.raise_for_status()
         return response.json()
 
     def dependency_listincomplete(self):
         endpoint = 'dependency/listincomplete'
         url = self.base_url + endpoint
-        response = self.session.get(url=url)
+        response = self.requests_session.get(url=url)
         response.raise_for_status()
         return response.json()
 
@@ -409,7 +409,7 @@ class TSRestApiV1:
         }
 
         url = self.base_url + endpoint
-        response = self.session.get(url=url, params=url_params)
+        response = self.requests_session.get(url=url, params=url_params)
         response.raise_for_status()
         return response.json()
 
@@ -421,7 +421,7 @@ class TSRestApiV1:
         }
 
         url = self.base_url + endpoint
-        response = self.session.get(url=url, params=url_params)
+        response = self.requests_session.get(url=url, params=url_params)
         response.raise_for_status()
         return response.json()
 
@@ -433,7 +433,7 @@ class TSRestApiV1:
         }
 
         url = self.base_url + endpoint
-        response = self.session.get(url=url, params=url_params)
+        response = self.requests_session.get(url=url, params=url_params)
         response.raise_for_status()
         return response.json()
 
@@ -445,7 +445,7 @@ class TSRestApiV1:
         }
 
         url = self.base_url + endpoint
-        response = self.session.get(url=url, params=url_params)
+        response = self.requests_session.get(url=url, params=url_params)
         response.raise_for_status()
         return response.json()
 
@@ -457,7 +457,7 @@ class TSRestApiV1:
         }
 
         url = self.base_url + endpoint
-        response = self.session.get(url=url, params=url_params)
+        response = self.requests_session.get(url=url, params=url_params)
         response.raise_for_status()
         return response.json()
 
@@ -469,7 +469,7 @@ class TSRestApiV1:
         }
 
         url = self.base_url + endpoint
-        response = self.session.get(url=url, params=url_params)
+        response = self.requests_session.get(url=url, params=url_params)
         response.raise_for_status()
         return response.json()
 
@@ -518,7 +518,7 @@ class TSRestApiV1:
         # Override the Header for this specific call
         #   requires    Accept: application/octet-stream    (return the content as binary bytes)
         #
-        response = self.session.post(url=url, params=url_params, headers={'Accept': 'application/octet-stream'})
+        response = self.requests_session.post(url=url, params=url_params, headers={'Accept': 'application/octet-stream'})
 
         # Return value is in Bytes format, so other methods can do what they want with it
         return response.content
@@ -538,7 +538,7 @@ class TSRestApiV1:
 
         url = self.base_url + endpoint
         # Requires multipart/form-data
-        response = self.session.post(url=url, files=files)
+        response = self.requests_session.post(url=url, files=files)
         response.raise_for_status()
         return response.json()
 
@@ -551,7 +551,7 @@ class TSRestApiV1:
             url_params['name'] = name
 
         url = self.base_url + endpoint
-        response = self.session.get(url=url, params=url_params)
+        response = self.requests_session.get(url=url, params=url_params)
         response.raise_for_status()
         return response.json()
 
@@ -573,7 +573,7 @@ class TSRestApiV1:
             post_data['tenantid'] = tenant_id
 
         url = self.base_url + endpoint
-        response = self.session.post(url=url, data=post_data)
+        response = self.requests_session.post(url=url, data=post_data)
         response.raise_for_status()
         return response.json()
 
@@ -581,7 +581,7 @@ class TSRestApiV1:
         endpoint = 'group/{}'.format(group_guid)
 
         url = self.base_url + endpoint
-        response = self.session.delete(url=url)
+        response = self.requests_session.delete(url=url)
         response.raise_for_status()
         return True
 
@@ -594,7 +594,7 @@ class TSRestApiV1:
             post_data['content'] = content
 
         url = self.base_url + endpoint
-        response = self.session.put(url=url, data=post_data)
+        response = self.requests_session.put(url=url, data=post_data)
         response.raise_for_status()
         return response.json()
 
@@ -603,7 +603,7 @@ class TSRestApiV1:
         endpoint = 'group/{}/user/{}'.format(group_guid, user_guid)
 
         url = self.base_url + endpoint
-        response = self.session.post(url=url)
+        response = self.requests_session.post(url=url)
         response.raise_for_status()
         return response.json()
 
@@ -612,7 +612,7 @@ class TSRestApiV1:
         endpoint = 'group/{}/user/{}'.format(group_guid, user_guid)
 
         url = self.base_url + endpoint
-        response = self.session.delete(url=url)
+        response = self.requests_session.delete(url=url)
         response.raise_for_status()
         return True
 
@@ -620,7 +620,7 @@ class TSRestApiV1:
         endpoint = 'group/{}/users'.format(group_guid)
 
         url = self.base_url + endpoint
-        response = self.session.get(url=url)
+        response = self.requests_session.get(url=url)
         response.raise_for_status()
         return response.json()
 
@@ -631,7 +631,7 @@ class TSRestApiV1:
         }
 
         url = self.base_url + endpoint
-        response = self.session.post(url=url, params=url_params)
+        response = self.requests_session.post(url=url, params=url_params)
         response.raise_for_status()
         return response.json()
 
@@ -642,7 +642,7 @@ class TSRestApiV1:
         }
 
         url = self.base_url + endpoint
-        response = self.session.delete(url=url, params=url_params)
+        response = self.requests_session.delete(url=url, params=url_params)
         response.raise_for_status()
         return response.json()
 
@@ -657,7 +657,7 @@ class TSRestApiV1:
 
         url = self.base_url + endpoint
         # Requires multipart/form-data
-        response = self.session.post(url=url, files=files)
+        response = self.requests_session.post(url=url, files=files)
         response.raise_for_status()
         return response.json()
 
@@ -665,7 +665,7 @@ class TSRestApiV1:
     def group_listuser(self, group_guid: str) -> Dict:
         endpoint = 'group/listuser/{guid}'.format(guid=group_guid)
         url = self.base_url + endpoint
-        response = self.session.get(url=url)
+        response = self.requests_session.get(url=url)
         response.raise_for_status()
         return response.json()
 
@@ -676,7 +676,7 @@ class TSRestApiV1:
     def materialization_refreshview(self, guid: str) -> Dict:
         endpoint = 'materialization/refreshview/{guid}'.format(guid=guid)
         url = self.base_url + endpoint
-        response = self.session.post(url=url)
+        response = self.requests_session.post(url=url)
         response.raise_for_status()
         return response.json()
 
@@ -703,7 +703,7 @@ class TSRestApiV1:
         }
 
         url = self.base_url + endpoint
-        response = self.session.get(url=url, params=url_params)
+        response = self.requests_session.get(url=url, params=url_params)
         response.raise_for_status()
         return response.json()
 
@@ -727,7 +727,7 @@ class TSRestApiV1:
         }
 
         url = self.base_url + endpoint
-        response = self.session.post(url=url, data=post_data)
+        response = self.requests_session.post(url=url, data=post_data)
         response.raise_for_status()
         # Returns a 204 when it works right
         return True
@@ -770,7 +770,7 @@ class TSRestApiV1:
             url_params['auto_created'] = str(auto_created).lower()
 
         url = self.base_url + endpoint
-        response = self.session.get(url=url, params=url_params)
+        response = self.requests_session.get(url=url, params=url_params)
         response.raise_for_status()
         return response.json()
 
@@ -778,7 +778,7 @@ class TSRestApiV1:
         endpoint = 'metadata/listvizheaders'
         url_params = {'id': guid}
         url = self.base_url + endpoint
-        response = self.session.get(url=url, params=url_params)
+        response = self.requests_session.get(url=url, params=url_params)
         response.raise_for_status()
         return response.json()
 
@@ -797,7 +797,7 @@ class TSRestApiV1:
             url_params['pattern'] = filter
 
         url = self.base_url + endpoint
-        response = self.session.get(url=url, params=url_params)
+        response = self.requests_session.get(url=url, params=url_params)
         response.raise_for_status()
         return response.json()
 
@@ -848,7 +848,7 @@ class TSRestApiV1:
             url_params['author_guid'] = author_guid
 
         url = self.base_url + endpoint
-        response = self.session.get(url=url, params=url_params)
+        response = self.requests_session.get(url=url, params=url_params)
         response.raise_for_status()
         return response.json()
 
@@ -863,7 +863,7 @@ class TSRestApiV1:
         }
 
         url = self.base_url + endpoint
-        response = self.session.post(url=url, data=post_data)
+        response = self.requests_session.post(url=url, data=post_data)
         response.raise_for_status()
         return response.json()
 
@@ -876,7 +876,7 @@ class TSRestApiV1:
         }
 
         url = self.base_url + endpoint
-        response = self.session.delete(url=url, data=post_data)
+        response = self.requests_session.delete(url=url, data=post_data)
         response.raise_for_status()
         return True
 
@@ -925,7 +925,7 @@ class TSRestApiV1:
 
         url = self.base_url + endpoint
         # TML import is distinguished by having an {'Accept': 'text/plain'} header on the POST
-        response = self.session.post(url=url, data=post_data, headers={'Accept': 'text/plain'})
+        response = self.requests_session.post(url=url, data=post_data, headers={'Accept': 'text/plain'})
         response.raise_for_status()
         # Extra parsing of some 'error responses' that come through in JSON response on HTTP 200
         self.raise_tml_errors(response=response)
@@ -959,7 +959,7 @@ class TSRestApiV1:
 
         url = self.base_url + endpoint
         # TML import is distinguished by having an {'Accept': 'text/plain'} header on the POST
-        response = self.session.post(url=url, data=post_data, headers={'Accept': 'text/plain'})
+        response = self.requests_session.post(url=url, data=post_data, headers={'Accept': 'text/plain'})
         response.raise_for_status()
         # Extra parsing of some 'error responses' that come through in JSON response on HTTP 200
         self.raise_tml_errors(response=response)
@@ -993,7 +993,7 @@ class TSRestApiV1:
         url = self.base_url + endpoint
 
         # TML import is distinguished by having an {'Accept': 'text/plain'} header on the POST
-        response = self.session.post(url=url, data=post_data, headers={'Accept': 'text/plain'})
+        response = self.requests_session.post(url=url, data=post_data, headers={'Accept': 'text/plain'})
         response.raise_for_status()
         # Extra parsing of some 'error responses' that come through in JSON response on HTTP 200
         self.raise_tml_errors(response=response)
@@ -1025,7 +1025,7 @@ class TSRestApiV1:
         url = self.base_url + endpoint
 
         # TML import is distinguished by having an {'Accept': 'text/plain'} header on the POST
-        response = self.session.post(url=url, data=post_data, headers={'Accept': 'text/plain'})
+        response = self.requests_session.post(url=url, data=post_data, headers={'Accept': 'text/plain'})
         response.raise_for_status()
         # Extra parsing of some 'error responses' that come through in JSON response on HTTP 200
         self.raise_tml_errors(response=response)
@@ -1084,7 +1084,7 @@ class TSRestApiV1:
         url = self.base_url + endpoint
 
         # TML import is distinguished by having an {'Accept': 'text/plain'} header on the POST
-        response = self.session.post(url=url, data=post_data, headers={'Accept': 'text/plain'})
+        response = self.requests_session.post(url=url, data=post_data, headers={'Accept': 'text/plain'})
         response.raise_for_status()
         # Extra parsing of some 'error responses' that come through in JSON response on HTTP 200
         self.raise_tml_errors(response=response)
@@ -1106,7 +1106,7 @@ class TSRestApiV1:
         endpoint = 'partner/snowflake/user'
         post_data = {'body': json.dumps(body)}
         url = self.base_url + endpoint
-        response = self.session.post(url=url, data=post_data)
+        response = self.requests_session.post(url=url, data=post_data)
         response.raise_for_status()
         return response.json()
 
@@ -1162,7 +1162,7 @@ class TSRestApiV1:
             post_data['message'] = message
 
         url = self.base_url + endpoint
-        response = self.session.post(url=url, data=post_data)
+        response = self.requests_session.post(url=url, data=post_data)
         response.raise_for_status()
         return True
 
@@ -1197,7 +1197,7 @@ class TSRestApiV1:
             post_data['message'] = message
 
         url = self.base_url + endpoint
-        response = self.session.post(url=url, data=post_data)
+        response = self.requests_session.post(url=url, data=post_data)
         response.raise_for_status()
         return True
 
@@ -1213,7 +1213,7 @@ class TSRestApiV1:
         }
 
         url = self.base_url + endpoint
-        response = self.session.get(url=url, params=url_params)
+        response = self.requests_session.get(url=url, params=url_params)
         response.raise_for_status()
         return response.json()
 
@@ -1228,7 +1228,7 @@ class TSRestApiV1:
         }
 
         url = self.base_url + endpoint
-        response = self.session.get(url=url, params=url_params)
+        response = self.requests_session.get(url=url, params=url_params)
         response.raise_for_status()
         return response.json()
 
@@ -1242,7 +1242,7 @@ class TSRestApiV1:
         }
 
         url = self.base_url + endpoint
-        response = self.session.post(url=url, data=post_data)
+        response = self.requests_session.post(url=url, data=post_data)
         response.raise_for_status()
         return response.json()
 
@@ -1260,20 +1260,20 @@ class TSRestApiV1:
         }
 
         url = self.base_url + endpoint
-        response = self.session.post(url=url, data=post_data)
+        response = self.requests_session.post(url=url, data=post_data)
         response.raise_for_status()
 
     def session_homepinboard__get(self) -> Dict:
         endpoint = 'session/homepinboard'
         url = self.base_url + endpoint
-        response = self.session.get(url=url)
+        response = self.requests_session.get(url=url)
         response.raise_for_status()
         return response.json()
 
     def session_homepinboard__delete(self) -> bool:
         endpoint = 'session/homepinboard'
         url = self.base_url + endpoint
-        response = self.session.delete(url=url)
+        response = self.requests_session.delete(url=url)
         response.raise_for_status()
         return True
 
@@ -1297,7 +1297,7 @@ class TSRestApiV1:
 
         url = self.base_url + endpoint
 
-        response = self.session.post(url=url, data=post_params)
+        response = self.requests_session.post(url=url, data=post_params)
         return response
 
     #
@@ -1313,7 +1313,7 @@ class TSRestApiV1:
             url_params['name'] = name
 
         url = self.base_url + endpoint
-        response = self.session.get(url=url, params=url_params)
+        response = self.requests_session.get(url=url, params=url_params)
         response.raise_for_status()
         return response.json()
 
@@ -1337,7 +1337,7 @@ class TSRestApiV1:
             post_data['tenantid'] = tenant_id
 
         url = self.base_url + endpoint
-        response = self.session.post(url=url, data=post_data)
+        response = self.requests_session.post(url=url, data=post_data)
         response.raise_for_status()
         return response.json()
 
@@ -1345,7 +1345,7 @@ class TSRestApiV1:
         endpoint = 'user/{}'.format(user_guid)
 
         url = self.base_url + endpoint
-        response = self.session.delete(url=url)
+        response = self.requests_session.delete(url=url)
         response.raise_for_status()
         return True
 
@@ -1360,7 +1360,7 @@ class TSRestApiV1:
             post_data['password'] = password
 
         url = self.base_url + endpoint
-        response = self.session.put(url=url, data=post_data)
+        response = self.requests_session.put(url=url, data=post_data)
         response.raise_for_status()
         return response.json()
 
@@ -1374,7 +1374,7 @@ class TSRestApiV1:
         }
 
         url = self.base_url + endpoint
-        response = self.session.post(url=url, data=post_data)
+        response = self.requests_session.post(url=url, data=post_data)
         response.raise_for_status()
 
     # This exists but since it requires auth_token, would only be useful within a browser session
@@ -1413,7 +1413,7 @@ class TSRestApiV1:
         }
 
         url = self.base_url + endpoint
-        response = self.session.post(url=url, data=None, files=files)
+        response = self.requests_session.post(url=url, data=None, files=files)
         response.raise_for_status()
         return response.json()
 
@@ -1430,7 +1430,7 @@ class TSRestApiV1:
             url_params['objectid'] = json.dumps(object_guids)
 
         url = self.base_url + endpoint
-        response = self.session.post(url=url, params=url_params)
+        response = self.requests_session.post(url=url, params=url_params)
         response.raise_for_status()
         return response.json()
 
@@ -1448,7 +1448,7 @@ class TSRestApiV1:
             post_data['preferencesProto'] = preferences_proto
 
         url = self.base_url + endpoint
-        response = self.session.post(url=url, data=post_data)
+        response = self.requests_session.post(url=url, data=post_data)
         response.raise_for_status()
 
     def build_user_preferences(self, preferred_locale: Optional[str] = None, notify_on_share: Optional[bool] = None,
@@ -1468,7 +1468,7 @@ class TSRestApiV1:
     def user_list(self) -> Dict:
         endpoint = 'user/list'
         url = self.base_url + endpoint
-        response = self.session.get(url=url)
+        response = self.requests_session.get(url=url)
         response.raise_for_status()
         return response.json()
 
@@ -1481,14 +1481,14 @@ class TSRestApiV1:
         }
 
         url = self.base_url + endpoint
-        response = self.session.put(url=url, data=post_data)
+        response = self.requests_session.put(url=url, data=post_data)
         response.raise_for_status()
         return response.json()
 
     def user_groups__get(self, user_guid: str):
         endpoint = 'user/{}/groups'.format(user_guid)
         url = self.base_url + endpoint
-        response = self.session.get(url=url)
+        response = self.requests_session.get(url=url)
         response.raise_for_status()
         return response.json()
 
@@ -1501,7 +1501,7 @@ class TSRestApiV1:
             'groupids': json.dumps(group_guids),
         }
 
-        response = self.session.post(url=url, params=url_params)
+        response = self.requests_session.post(url=url, params=url_params)
         response.raise_for_status()
         return response.json()
 
@@ -1514,7 +1514,7 @@ class TSRestApiV1:
             'groupids': json.dumps(group_guids),
         }
 
-        response = self.session.put(url=url, params=url_params)
+        response = self.requests_session.put(url=url, params=url_params)
         response.raise_for_status()
         return response.json()
 
@@ -1527,7 +1527,7 @@ class TSRestApiV1:
             'groupids': json.dumps(group_guids),
         }
 
-        response = self.session.delete(url=url, params=url_params)
+        response = self.requests_session.delete(url=url, params=url_params)
         response.raise_for_status()
         return response.json()
 
@@ -1542,7 +1542,7 @@ class TSRestApiV1:
             post_data['username'] = json.dumps(usernames)
         if user_guids is not None:
             post_data['userid'] = json.dumps(user_guids)
-        response = self.session.post(url=url, data=post_data)
+        response = self.requests_session.post(url=url, data=post_data)
         response.raise_for_status()
 
     #
@@ -1559,7 +1559,7 @@ class TSRestApiV1:
         if to_epoch is not None:
             url_params['toEpoch'] = to_epoch
 
-        response = self.session.get(url=url, params=url_params)
+        response = self.requests_session.get(url=url, params=url_params)
         response.raise_for_status()
         return response.json()
 
@@ -1571,7 +1571,7 @@ class TSRestApiV1:
 
         url = self.base_url + endpoint
 
-        response = self.session.get(url=url)
+        response = self.requests_session.get(url=url)
         response.raise_for_status()
         return response.json()
 
@@ -1580,7 +1580,7 @@ class TSRestApiV1:
 
         url = self.base_url + endpoint
 
-        response = self.session.get(url=url)
+        response = self.requests_session.get(url=url)
         response.raise_for_status()
         return response.json()
 
@@ -1592,7 +1592,7 @@ class TSRestApiV1:
             'configchanges': json.dumps(config_changes)
         }
 
-        response = self.session.post(url=url, data=post_data)
+        response = self.requests_session.post(url=url, data=post_data)
         response.raise_for_status()
 
     def admin_embed_actions(self, tags: Optional[List[str]] = None):
@@ -1602,7 +1602,7 @@ class TSRestApiV1:
             url_params['tags'] = json.dumps(tags)
 
         url = self.base_url + endpoint
-        response = self.session.get(url=url, params=url_params)
+        response = self.requests_session.get(url=url, params=url_params)
         response.raise_for_status()
         return response.json()
 
@@ -1610,7 +1610,7 @@ class TSRestApiV1:
         endpoint = 'admin/embed/actions/{}'.format(action_guid)
 
         url = self.base_url + endpoint
-        response = self.session.get(url=url)
+        response = self.requests_session.get(url=url)
         response.raise_for_status()
         return response.json()
 
@@ -1622,7 +1622,7 @@ class TSRestApiV1:
             'embedaction': json.dumps(embed_action_definition)
         }
 
-        response = self.session.post(url=url, data=post_data)
+        response = self.requests_session.post(url=url, data=post_data)
         response.raise_for_status()
 
         return response.json()
@@ -1635,7 +1635,7 @@ class TSRestApiV1:
             'embedaction': json.dumps(embed_action_definition)
         }
 
-        response = self.session.post(url=url, data=post_data)
+        response = self.requests_session.post(url=url, data=post_data)
         response.raise_for_status()
 
         return response.json()
@@ -1645,7 +1645,7 @@ class TSRestApiV1:
 
         url = self.base_url + endpoint
 
-        response = self.session.delete(url=url)
+        response = self.requests_session.delete(url=url)
         response.raise_for_status()
 
         return response.json()
@@ -1658,7 +1658,7 @@ class TSRestApiV1:
             'actionassociation': json.dumps(action_association)
         }
 
-        response = self.session.post(url=url, data=post_data)
+        response = self.requests_session.post(url=url, data=post_data)
         response.raise_for_status()
 
         return response.json()
@@ -1668,7 +1668,7 @@ class TSRestApiV1:
 
         url = self.base_url + endpoint
 
-        response = self.session.get(url=url)
+        response = self.requests_session.get(url=url)
         response.raise_for_status()
 
         return response.json()
@@ -1681,7 +1681,7 @@ class TSRestApiV1:
             'actionassociation': json.dumps(action_association)
         }
 
-        response = self.session.delete(url=url, data=post_data)
+        response = self.requests_session.delete(url=url, data=post_data)
         response.raise_for_status()
 
         return response.json()
@@ -1700,7 +1700,7 @@ class TSRestApiV1:
             'includeddisabled': str(included_disabled).lower()
         }
 
-        response = self.session.post(url=url, data=post_data)
+        response = self.requests_session.post(url=url, data=post_data)
         response.raise_for_status()
         # Returns a 204 when complete
 
@@ -1720,7 +1720,7 @@ class TSRestApiV1:
         if tagname is not None:
             url_params['tagname'] = json.dumps(tagname)
 
-        response = self.session.get(url=url, params=url_params)
+        response = self.requests_session.get(url=url, params=url_params)
         response.raise_for_status()
         return response.json()
 
@@ -1745,7 +1745,7 @@ class TSRestApiV1:
                      'authentication_type': authentication_type
                      }
 
-        response = self.session.post(url=url, data=post_data)
+        response = self.requests_session.post(url=url, data=post_data)
         response.raise_for_status()
         return response.json()
 
@@ -1776,7 +1776,7 @@ class TSRestApiV1:
                      'authentication_type': authentication_type
                      }
 
-        response = self.session.post(url=url, data=post_data)
+        response = self.requests_session.post(url=url, data=post_data)
         response.raise_for_status()
         return response.json()
 
