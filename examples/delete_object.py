@@ -1,8 +1,7 @@
 import os
 import requests.exceptions
 
-#from  thoughtspot_rest_api_v1 import *
-from src.thoughtspot_rest_api_v1.tsrestapiv1 import *
+from thoughtspot_rest_api_v1 import *
 
 # This script uses the internal metadata/delete API endpoint, which will be unnecessary once the V2 API introduces
 # a public form of delete. But it may be of use now

@@ -764,7 +764,8 @@ class TSRestApiV1:
 
         # Tables, Worksheets and Views all have the same object_type, with a sub-type to vary
         # This code allows sending the Sub-Type into Object_type and still run correctly
-        if object_type in [MetadataSubtypes.TABLE, MetadataSubtypes.VIEW, MetadataSubtypes.WORKSHEET]:
+        if object_type in [MetadataSubtypes.TABLE, MetadataSubtypes.VIEW, MetadataSubtypes.WORKSHEET,
+                           MetadataSubtypes.SQL_VIEW]:
             subtypes = [object_type]
             object_type = MetadataNames.TABLE
 
@@ -836,7 +837,8 @@ class TSRestApiV1:
 
         # Tables, Worksheets and Views all have the same object_type, with a sub-type to vary
         # This code allows sending the Sub-Type into Object_type and still run correctly
-        if object_type in [MetadataSubtypes.TABLE, MetadataSubtypes.VIEW, MetadataSubtypes.WORKSHEET]:
+        if object_type in [MetadataSubtypes.TABLE, MetadataSubtypes.VIEW, MetadataSubtypes.WORKSHEET,
+                           MetadataSubtypes.SQL_VIEW]:
             subtypes = [object_type]
             object_type = MetadataNames.TABLE
 
