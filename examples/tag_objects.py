@@ -21,7 +21,7 @@ except requests.exceptions.HTTPError as e:
 lb_guids = ['{guid_1}', '{guid_2}']
 
 # Get tag GUIDs from a list of names
-tags_response = ts.metadata_listobjectheaders(object_type=MetadataNames.TAG)
+tags_response = ts.metadata_listobjectheaders(object_type=TSTypes.TAG)
 tag_names_to_get_guid = ['Tag 1', 'Tag 2']
 tag_guids = []
 
@@ -30,4 +30,4 @@ for t in tags_response:
         tag_guids.append(t['id'])
 
 # Which are equivalent to using metadata/assigntag with the specific object_type
-ts.metadata_assigntag(object_guids=lb_guids, object_type=MetadataNames.LIVEBOARD, tag_guids=tag_guids)
+ts.metadata_assigntag(object_guids=lb_guids, object_type=TSTypes.LIVEBOARD, tag_guids=tag_guids)
