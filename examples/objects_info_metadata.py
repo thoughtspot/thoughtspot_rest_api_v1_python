@@ -1,8 +1,8 @@
 import os
 import requests.exceptions
 
-from thoughtspot_rest_api_v1 import *
-
+# from thoughtspot_rest_api_v1 import *
+from src.thoughtspot_rest_api_v1.tsrestapiv1 import *
 
 # Details about objects within ThoughtSpot all are accessed through 'metadata/' endpoints, which can be used
 # for almost every object type
@@ -108,7 +108,7 @@ for obj in tables["headers"]:
     print(obj)
 # The actual REST API has a 'type' and 'subtype' to specify the data objects, but the library
 # will do the correct pattern when you use the TSTypes enum above. You could do this if you'd rather:
-tables = ts.metadata_list(object_type=MetadataNames.TABLE, subtypes=[MetadataSubtypes.TABLE])
+tables = ts.metadata_list(object_type=MetadataTypes.TABLE, subtypes=[MetadataSubtypes.TABLE])
 
 worksheets = ts.metadata_list(object_type=TSTypes.WORKSHEET)
 

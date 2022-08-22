@@ -53,14 +53,14 @@ The REST API commands are all handled via the `requests` module, using a `reques
 
 The session object used by all methods is accessible via:
 
-    TSRestApiV1.session
+    TSRestApiV1.requests_session
 
 A common issue within organizations is SSL certificates not being available / included within the certificate store used by Python. One way around this issue is to use the `verify=False` argument in requests (this is not recommended, but may be the only easy path forward. Check with your security team and never use with ThoughtSpot Cloud or from outside your protected network).
 
 This will set the Session object to `verify=False` for all calls:
 
     ts: TSRestApiV1 = TSRestApiV1(server_url=server)
-    ts.session.verify = False
+    ts.requests_session.verify = False
 
 If you find there are other options you need to set on the Session object for your particular situation, you can use the same technique to apply other changes.
 
@@ -91,12 +91,14 @@ The `session_logout()` method of the ThoughtSpot class will send the API request
 ## ENUM data structures
 The ThoughtSpot API has internal namings for many features, which require looking up in the reference guide. To help out, the tsrestapiv1.py file defines several ENUM style classes:
 
-- MetadataNames: The namings used in the 'type' parameter of the /metadata/ endpoint calls, with simplified names that matches the names in the UI and standard ThoughtSpot documentation. For example, MetadataNames.GROUP = 'USER_GROUP'
-- MetadataSubtypes: The available options for the 'subtype' argument used for certain metadata calls
+- TSTypes: Combines MetadataNames and MetadataSubtypes into a single set of unique values, so that you don't need to worry about when to use Subtypes. The implementations of the /metadata/ endpoints read the values from this ENUM and issue the correct REST API command
 - MetadataCategories: Contains the options for the argument called 'category' in metadata calls
 - MetadataSorts: Contains the available sort options for the argument called 'sort' in metadata calls
 - ShareModes: The modes used in the JSON of the /security/share endpoint
 - Privileges: The name of the Privileges that Groups can have (and users can inherit) in ThoughtSpot
+- MetadataTypes: The namings used in the 'type' parameter of the /metadata/ endpoint calls, with simplified names that matches the names in the UI and standard ThoughtSpot documentation. For example, MetadataTypes.GROUP = 'USER_GROUP'
+- MetadataSubtypes: The available options for the 'subtype' argument used for certain metadata calls
+
 
 ## TML operations
 One primary use case of the REST APIs is to import and export ThoughtSpot Modeling Language (TML) files.

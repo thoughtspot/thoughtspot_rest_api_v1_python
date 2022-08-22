@@ -18,7 +18,7 @@ import json
 import requests
 
 
-class MetadataNames:
+class MetadataTypes:
     """
     Value provided as the 'type' parameter in the
     /metadata/ endpoint calls.
@@ -40,6 +40,7 @@ class MetadataNames:
     JOIN = 'LOGICAL_RELATIONSHIP'
     DATA_SOURCE = 'DATA_SOURCE'
     SQL_VIEW = 'LOGICAL_TABLE'
+
 
 
 class MetadataSubtypes:
@@ -71,7 +72,7 @@ class TSTypes:
     USER_UPLOAD = 'USER_DEFINED'
 
 
-class MetadataSorts:
+class Sorts:
     DEFAULT = 'DEFAULT'
     NAME = 'NAME'
     DISPLAY_NAME = 'DISPLAY_NAME'
@@ -80,7 +81,7 @@ class MetadataSorts:
     MODIFIED = 'MODIFIED'
 
 
-class MetadataCategories:
+class Categories:
     ALL = 'ALL'
     MY = 'MY'
     FAVORITE = 'FAVORITE'
@@ -125,6 +126,12 @@ class Privileges:
 class PermissionTypes:
     EFFECTIVE = 'EFFECTIVE'
     DEFINED = 'DEFINED'
+
+
+# Compatibility
+MetadataNames = MetadataTypes
+MetadataSorts = Sorts
+MetadataCategories = Categories
 
 
 #
@@ -767,7 +774,7 @@ class TSRestApiV1:
         if object_type in [MetadataSubtypes.TABLE, MetadataSubtypes.VIEW, MetadataSubtypes.WORKSHEET,
                            MetadataSubtypes.SQL_VIEW]:
             subtypes = [object_type]
-            object_type = MetadataNames.TABLE
+            object_type = MetadataTypes.TABLE
 
         url_params = {
             'type': object_type,
@@ -840,7 +847,7 @@ class TSRestApiV1:
         if object_type in [MetadataSubtypes.TABLE, MetadataSubtypes.VIEW, MetadataSubtypes.WORKSHEET,
                            MetadataSubtypes.SQL_VIEW]:
             subtypes = [object_type]
-            object_type = MetadataNames.TABLE
+            object_type = MetadataTypes.TABLE
 
         url_params = {
             'type': object_type,
