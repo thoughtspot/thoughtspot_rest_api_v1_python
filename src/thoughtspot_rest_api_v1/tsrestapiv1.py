@@ -1393,7 +1393,6 @@ class TSRestApiV1:
         url = self.base_url + endpoint
         response = self.requests_session.put(url=url, data=post_data)
         response.raise_for_status()
-        return response.json()
 
     def user_updatepassword(self, username: str, current_password: str, new_password: str):
         endpoint = 'user/updatepassword'
@@ -1547,7 +1546,6 @@ class TSRestApiV1:
 
         response = self.requests_session.put(url=url, params=url_params)
         response.raise_for_status()
-        return response.json()
 
     # Adds to existing group membership?
     def user_groups__delete(self, user_guid: str, group_guids: List[str]):
@@ -1560,7 +1558,6 @@ class TSRestApiV1:
 
         response = self.requests_session.delete(url=url, params=url_params)
         response.raise_for_status()
-        return response.json()
 
     def user_session_invalidate(self, usernames: Optional[List[str]] = None, user_guids: Optional[List[str]] = None):
         if usernames is None and user_guids is None:
