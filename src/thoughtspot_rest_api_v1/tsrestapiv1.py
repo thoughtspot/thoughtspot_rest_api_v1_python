@@ -748,16 +748,16 @@ class TSRestApiV1:
     # So really it's like a [{guid: , type: }, {guid:, type: }] structure but split into two separate JSON lists
     def metadata_assigntag(self, object_guids: List[str], object_type: List[str], tag_guids: Optional[List[str]] = None, tag_names: Optional[List[str]] = None) -> bool:
         endpoint = 'metadata/assigntag'
-        if (tag_guids == None and tag_names == None):
+        if tag_guids is None and tag_names is None:
             raise Exception("Either one of tag_guids or tag_names are mandatory.")
 
         post_data = {
             'id': json.dumps(object_guids),
             'type': json.dumps(object_type)
         }
-        if (tag_guids != None):
+        if tag_guids is not None:
             post_data['tagid'] = json.dumps(tag_guids)
-        if (tag_names != None):
+        if tag_names is not None:
             post_data['tagname'] = json.dumps(tag_names)
 
         url = self.base_url + endpoint
