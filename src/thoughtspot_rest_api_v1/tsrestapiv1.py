@@ -42,7 +42,6 @@ class MetadataTypes:
     SQL_VIEW = 'LOGICAL_TABLE'
 
 
-
 class MetadataSubtypes:
     WORKSHEET = 'WORKSHEET'
     TABLE = 'ONE_TO_ONE_LOGICAL'
@@ -143,11 +142,10 @@ MetadataCategories = Categories
 #
 class TSRestApiV1:
     """
-    The main TSRestV1 class implements all of the baseline API methods while
-    the internal classes for individual object types (.user, .group, etc.)
-    define specific use cases of the overall API footprint (for example, there
-    are specific calls for Pinboards and Worksheets that call to the single
-    metadata/listobjectheaders endpoint with the appropriate parameters)
+    The main TSRestV1 class implements all of the baseline API methods
+    as close to the documentation as possible within Pythonic expectations
+    Other than sharing a requests.Session with the appropriate settings, each method
+    is written to be relatively self-contained, for those wishing to re-implement in their own code
     """
     def __init__(self, server_url: str):
         # Protect from extra end slash on URL
