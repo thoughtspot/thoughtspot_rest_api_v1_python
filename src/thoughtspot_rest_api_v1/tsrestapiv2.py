@@ -4,12 +4,26 @@ import json
 
 import requests
 
+
+class ReportTypes:
+    PDF = 'PDF'
+    XLSX = 'XLSX'
+    CSV = 'CSV'
+    PNG = 'PNG'
+
+
+class TSTypesV2:
+    LIVEBOARD = 'LIVEBOARD'
+    ANSWER = 'ANSWER'
+    DATAOBJECT = 'DATAOBJECT'
+    COLUMN = 'COLUMN'
+
+
 #
 # Very simple implementation of V2 REST API
 # There will eventually be a standard Python SDK
 # Only intended for features in V2 that are not in V1, while the V2 API is being finalized
 #
-
 
 class TSRestApiV2:
     """
@@ -118,7 +132,7 @@ class TSRestApiV2:
 
     def data_answer_data(self, guid: str, offset: int = None, batch_number: int = None,
                          batch_size: int = None, format_type: str = None):
-        endpoint = 'session/gettoken'
+        endpoint = 'data/answer'
 
         url = self.base_url + endpoint
 
@@ -137,3 +151,230 @@ class TSRestApiV2:
 
         response.raise_for_status()
         return response.json()
+
+    def data_answer_query_sql(self, guid: str):
+        endpoint = 'data/answer/querysql'
+
+        url = self.base_url + endpoint
+
+        # Current spec calls for a GET with a -d argument in cURL, but the id= argument is not JSON, just plain
+        response = self.requests_session.get(url=url, data="id=".format(guid))
+
+        response.raise_for_status()
+        return response.json()
+
+    def data_liveboard_query_sql(self, guid: str, viz_ids: Optional[List[str]] = None):
+        endpoint = 'data/liveboard/querysql'
+
+        url = self.base_url + endpoint
+
+        # Current spec calls for a GET with a -d argument in cURL, but the id= argument is not JSON, just plain
+        response = self.requests_session.get(url=url, data="id=".format(guid))
+
+        response.raise_for_status()
+        return response.json()
+
+    #
+    # /report/ endpoints
+    #
+
+    def report_answer(self, guid: str, report_type: str = 'PDF'):
+        endpoint = 'report/answer'
+
+        url = self.base_url + endpoint
+
+        json_post_data = {'id': guid,
+                          'type': report_type
+                          }
+
+        response = self.requests_session.post(url=url, json=json_post_data)
+
+        return response.raw
+
+    def report_liveboard(self, guid: str,
+                         report_type: str = 'PDF',
+                         viz_ids: Optional[List[str]] = None,
+                         one_visualization_per_page: bool = False,
+                         landscape_or_portrait: str = 'LANDSCAPE',
+                         cover_page: bool = True,
+                         logo: bool = True,
+                         page_numbers: bool = False,
+                         filter_page: bool = True,
+                         truncate_tables: bool = False,
+                         footer_text: str = None,
+                         ):
+        endpoint = 'report/liveboard'
+
+        url = self.base_url + endpoint
+
+        json_post_data = {'id': guid,
+                          'type': report_type,
+                          'vizId': viz_ids
+                          }
+        if report_type == 'PDF':
+            json_post_data['pdfOptions'] = {
+                'orientation'
+            }
+
+        response = self.requests_session.post(url=url, json=json_post_data)
+
+        return response.raw
+
+    #
+    # /security/ endpoints
+    #
+
+    def security_permission_tsobject(self, guid: str, object_type: str, include_dependents: bool = False):
+        endpoint = 'security/permission/tsobject'
+
+        url = self.base_url + endpoint
+
+        json_post_data = {
+            'id': guid,
+            'type': object_type,
+            'includeDependent': include_dependents
+        }
+
+        response = self.requests_session.post(url=url, json=json_post_data)
+
+        response.raise_for_status()
+        return response.json()
+
+    def security_permission_principal(self,
+                                      user_or_group_guid: Optional[str] = None,
+                                      username_or_group_name: Optional[str] = None):
+        endpoint = 'security/permission/principal'
+
+        url = self.base_url + endpoint
+        if user_or_group_guid is not None:
+            json_post_data = {
+                'id': user_or_group_guid
+            }
+        elif username_or_group_name is not None:
+            json_post_data = {
+                'name': username_or_group_name
+            }
+        else:
+            raise SyntaxError('Must specify either user_or_group_guid or username_or_group_name argument')
+
+        response = self.requests_session.post(url=url, json=json_post_data)
+
+        response.raise_for_status()
+        return response.json()
+
+    def security_permission_tsobject_search(self, guid: str, object_type: str, include_dependents: bool = False):
+        endpoint = 'security/permission/tsobject/search'
+
+        url = self.base_url + endpoint
+
+        json_post_data = {
+            'id': guid,
+            'type': object_type,
+            'includeDependent': include_dependents
+        }
+
+        response = self.requests_session.post(url=url, json=json_post_data)
+
+        response.raise_for_status()
+        return response.json()
+
+    def security_permission_principal_search(self,
+                                      user_or_group_guid: Optional[str] = None,
+                                      username_or_group_name: Optional[str] = None):
+        endpoint = 'security/permission/principal/search'
+
+        url = self.base_url + endpoint
+        if user_or_group_guid is not None:
+            json_post_data = {
+                'id': user_or_group_guid
+            }
+        elif username_or_group_name is not None:
+            json_post_data = {
+                'name': username_or_group_name
+            }
+        else:
+            raise SyntaxError('Must specify either user_or_group_guid or username_or_group_name argument')
+
+        response = self.requests_session.post(url=url, json=json_post_data)
+
+        response.raise_for_status()
+        return response.json()
+
+    #
+    # /admin/ endpoints
+    #
+
+    def admin_changeauthor(self, guids: List[str], from_username: Optional[str] = None,
+                           from_user_guid: Optional[str] = None, to_username: Optional[str] = None,
+                           to_user_guid: Optional[str] = None):
+        endpoint = 'admin/changeauthor'
+
+        url = self.base_url + endpoint
+
+        json_post_data = {
+            'tsObjectId': guids,
+        }
+        if from_username is not None:
+            json_post_data['fromUser'] = {'name': from_username}
+        elif from_user_guid is not None:
+            json_post_data['fromUser'] = {'id': from_user_guid}
+        else:
+            raise SyntaxError("Must include one of from_username or from_user_guid")
+
+        if to_username is not None:
+            json_post_data['toUser'] = {'name': to_username}
+        elif to_user_guid is not None:
+            json_post_data['toUser'] = {'id': to_user_guid}
+        else:
+            raise SyntaxError("Must include one of to_username or to_user_guid")
+
+        response = self.requests_session.put(url=url, json=json_post_data)
+
+        response.raise_for_status()
+        return True
+
+    def admin_assignauthor(self, guids: List[str], to_username: Optional[str] = None,
+                           to_user_guid: Optional[str] = None):
+        endpoint = 'admin/assignauthor'
+
+        url = self.base_url + endpoint
+
+        json_post_data = {
+            'tsObjectId': guids,
+        }
+
+        if to_username is not None:
+            json_post_data['name'] = to_username
+        elif to_user_guid is not None:
+            json_post_data['id'] = to_user_guid
+        else:
+            raise SyntaxError("Must include one of to_username or to_user_guid")
+
+        response = self.requests_session.put(url=url, json=json_post_data)
+
+        response.raise_for_status()
+        return True
+
+    def admin_forcelogout(self, usernames: Optional[List[str]] = None, user_guids: Optional[List[str]] = None):
+        endpoint = 'admin/forcelogout'
+
+        url = self.base_url + endpoint
+
+        users_list = []
+        if usernames is not None:
+            for username in usernames:
+                users_list.append({'name': username})
+        elif user_guids is not None:
+            for user_guid in user_guids:
+                users_list.append({'id': user_guid})
+        else:
+            raise SyntaxError("Must include one of usernames or user_guids")
+
+        json_post_data = {
+            'user': users_list
+        }
+
+        response = self.requests_session.post(url=url, json=json_post_data)
+
+        response.raise_for_status()
+        return True
