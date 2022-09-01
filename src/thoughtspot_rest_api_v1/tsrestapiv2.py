@@ -287,9 +287,12 @@ class TSRestApiV2:
         return True
 
     #
-    # /data/ endpoints
+    # /connection/ endpoints
     #
 
+    #
+    # /data/ endpoints
+    #
     def data_answer_data(self, guid: str, offset: int = None, batch_number: int = None,
                          batch_size: int = None, format_type: str = None):
         endpoint = 'data/answer'
@@ -327,6 +330,7 @@ class TSRestApiV2:
         response.raise_for_status()
         return response.json()
 
+    # Needs testing because the url param format is to have repeated use of 'vizId'
     def data_liveboard_query_sql(self, guid: str, viz_ids: Optional[List[str]] = None):
         endpoint = 'data/liveboard/querysql'
 
@@ -361,7 +365,6 @@ class TSRestApiV2:
     def report_liveboard(self, guid: str,
                          report_type: str = 'PDF',
                          viz_ids: Optional[List[str]] = None,
-                         one_visualization_per_page: bool = False,
                          landscape_or_portrait: str = 'LANDSCAPE',
                          cover_page: bool = True,
                          logo: bool = True,
@@ -370,6 +373,7 @@ class TSRestApiV2:
                          truncate_tables: bool = False,
                          footer_text: str = None,
                          ):
+        # one_visualization_per_page: bool = False,  -- appears to be missing from V2 API vs. V1
         endpoint = 'report/liveboard'
 
         url = self.base_url + endpoint
@@ -380,7 +384,13 @@ class TSRestApiV2:
                           }
         if report_type == 'PDF':
             json_post_data['pdfOptions'] = {
-                'orientation'
+                'orientation': landscape_or_portrait,
+                'truncateTables': truncate_tables,
+                'includeLogo': logo,
+                'footerText': footer_text,
+                'includePageNumber': page_numbers,
+                'includeCoverPage': cover_page,
+                'includeFilterPage': filter_page
             }
 
         response = self.requests_session.post(url=url, json=json_post_data)
@@ -396,13 +406,13 @@ class TSRestApiV2:
 
         url = self.base_url + endpoint
 
-        json_post_data = {
+        url_params = {
             'id': guid,
             'type': object_type,
             'includeDependent': include_dependents
         }
 
-        response = self.requests_session.post(url=url, json=json_post_data)
+        response = self.requests_session.get(url=url, params=url_params)
 
         response.raise_for_status()
         return response.json()
@@ -414,21 +424,21 @@ class TSRestApiV2:
 
         url = self.base_url + endpoint
         if user_or_group_guid is not None:
-            json_post_data = {
+            url_params = {
                 'id': user_or_group_guid
             }
         elif username_or_group_name is not None:
-            json_post_data = {
+            url_params = {
                 'name': username_or_group_name
             }
         else:
             raise SyntaxError('Must specify either user_or_group_guid or username_or_group_name argument')
 
-        response = self.requests_session.post(url=url, json=json_post_data)
+        response = self.requests_session.get(url=url, params=url_params)
 
         response.raise_for_status()
         return response.json()
-
+'''
     def security_permission_tsobject_search(self, guid: str, object_type: str, include_dependents: bool = False):
         endpoint = 'security/permission/tsobject/search'
 
@@ -466,7 +476,7 @@ class TSRestApiV2:
 
         response.raise_for_status()
         return response.json()
-
+'''
     #
     # /admin/ endpoints
     #
