@@ -127,6 +127,166 @@ class TSRestApiV2:
     #
 
     #
+    #
+    # /metadata/ endpoints
+    #
+    #
+
+    #
+    # /metadata/tag endpoints
+    #
+    def metadata_tag(self, tag_name: Optional[str] = None, tag_guid: Optional[str] = None):
+        endpoint = 'metadata/tag'
+
+        url = self.base_url + endpoint
+        if tag_guid is not None:
+            url_params = {
+                'id': tag_guid
+            }
+        elif tag_name is not None:
+            url_params = {
+                'name': tag_name
+            }
+        else:
+            raise SyntaxError('Must specify either tag_guid or tag_name argument')
+
+        response = self.requests_session.get(url=url, params=url_params)
+
+        response.raise_for_status()
+        return response.json()
+
+    def metadata_tag_create(self, tag_name: str, color_hex_code: Optional[str] = None):
+        endpoint = 'metadata/tag/create'
+
+        url = self.base_url + endpoint
+
+        json_post_data = {'name': tag_name}
+        if color_hex_code is not None:
+            json_post_data['color'] = color_hex_code
+
+        response = self.requests_session.post(url=url, json=json_post_data)
+
+        response.raise_for_status()
+        return response.json()
+
+    def metadata_tag_update(self, tag_guid: str, tag_name: Optional[str] = None, color_hex_code: Optional[str] = None):
+        endpoint = 'metadata/tag/update'
+
+        url = self.base_url + endpoint
+
+        if tag_name is None and color_hex_code is None:
+            raise SyntaxError('One of tag_name or color_hex_code must have a value')
+
+        json_post_data = {'id': tag_guid}
+
+        if tag_name is not None:
+            json_post_data['name'] = tag_name
+        if color_hex_code is not None:
+            json_post_data['color'] = color_hex_code
+
+        response = self.requests_session.put(url=url, json=json_post_data)
+
+        response.raise_for_status()
+        return True
+
+    def metadata_tag_delete(self, tag_guid: Optional[str] = None, tag_name: Optional[str] = None):
+        endpoint = 'metadata/tag/delete'
+
+        url = self.base_url + endpoint
+
+        if tag_guid is not None:
+            url_params = {
+                'id': tag_guid
+            }
+        elif tag_name is not None:
+            url_params = {
+                'name': tag_name
+            }
+        else:
+            raise SyntaxError('Must specify either tag_guid or tag_name argument')
+
+        response = self.requests_session.delete(url=url, params=url_params)
+
+        response.raise_for_status()
+        return True
+
+    # Documentation calls for a List of Dicts with their types for tsObject
+    # We provide a simple List of GUIDs and specifying one type as more common use case,
+    # with ts_object_mixed_types available for the full structure
+    def metadata_tag_assign(self, tag_guid: Optional[str] = None, tag_name: Optional[str] = None,
+                            object_guid_list: Optional[List[str]] = None, object_type: Optional[str] = None,
+                            ts_object_mixed_types: Optional[List[Dict]] = None
+                            ):
+        endpoint = 'metadata/tag/assign'
+
+        url = self.base_url + endpoint
+
+        if tag_guid is not None:
+            json_post_data = {
+                'id': tag_guid
+            }
+        elif tag_name is not None:
+            json_post_data = {
+                'name': tag_name
+            }
+        else:
+            raise SyntaxError('Must specify either tag_guid or tag_name argument')
+
+        # If user passes in the data structure
+        if ts_object_mixed_types is not None:
+            json_post_data['tsObject'] = ts_object_mixed_types
+        else:
+            if object_guid_list is None and object_type is None:
+                raise SyntaxError('Must pass both object_guid_list or object_type together or ts_object_mixed_types')
+            objects_list = []
+            for guid in object_guid_list:
+                objects_list.append({'id' : guid, 'type': object_type})
+            json_post_data['tsObject'] = objects_list
+
+        response = self.requests_session.put(url=url, json=json_post_data)
+
+        response.raise_for_status()
+        return True
+
+    # Documentation calls for a List of Dicts with their types for tsObject
+    # We provide a simple List of GUIDs and specifying one type as more common use case,
+    # with ts_object_mixed_types available for the full structure
+    def metadata_tag_unassign(self, tag_guid: Optional[str] = None, tag_name: Optional[str] = None,
+                              object_guid_list: Optional[List[str]] = None, object_type: Optional[str] = None,
+                              ts_object_mixed_types: Optional[List[Dict]] = None
+                              ):
+        endpoint = 'metadata/tag/unassign'
+
+        url = self.base_url + endpoint
+
+        if tag_guid is not None:
+            json_post_data = {
+                'id': tag_guid
+            }
+        elif tag_name is not None:
+            json_post_data = {
+                'name': tag_name
+            }
+        else:
+            raise SyntaxError('Must specify either tag_guid or tag_name argument')
+
+        # If user passes in the data structure
+        if ts_object_mixed_types is not None:
+            json_post_data['tsObject'] = ts_object_mixed_types
+        else:
+            if object_guid_list is None and object_type is None:
+                raise SyntaxError('Must pass both object_guid_list or object_type together or ts_object_mixed_types')
+            objects_list = []
+            for guid in object_guid_list:
+                objects_list.append({'id' : guid, 'type': object_type})
+            json_post_data['tsObject'] = objects_list
+
+        response = self.requests_session.put(url=url, json=json_post_data)
+
+        response.raise_for_status()
+        return True
+
+    #
     # /data/ endpoints
     #
 
@@ -157,8 +317,12 @@ class TSRestApiV2:
 
         url = self.base_url + endpoint
 
-        # Current spec calls for a GET with a -d argument in cURL, but the id= argument is not JSON, just plain
-        response = self.requests_session.get(url=url, data="id=".format(guid))
+        # Current spec calls for a GET with a -d argument in cURL, but this translates to a URL param not body
+        url_params = {
+            'id': guid
+        }
+
+        response = self.requests_session.get(url=url, params=url_params)
 
         response.raise_for_status()
         return response.json()
@@ -167,9 +331,12 @@ class TSRestApiV2:
         endpoint = 'data/liveboard/querysql'
 
         url = self.base_url + endpoint
-
-        # Current spec calls for a GET with a -d argument in cURL, but the id= argument is not JSON, just plain
-        response = self.requests_session.get(url=url, data="id=".format(guid))
+        # Current spec calls for a GET with a -d argument in cURL, but this translates to a URL param not body
+        url_params = {
+            'id': guid,
+            'vizId': viz_ids
+        }
+        response = self.requests_session.get(url=url, params=url_params)
 
         response.raise_for_status()
         return response.json()
@@ -279,8 +446,8 @@ class TSRestApiV2:
         return response.json()
 
     def security_permission_principal_search(self,
-                                      user_or_group_guid: Optional[str] = None,
-                                      username_or_group_name: Optional[str] = None):
+                                             user_or_group_guid: Optional[str] = None,
+                                             username_or_group_name: Optional[str] = None):
         endpoint = 'security/permission/principal/search'
 
         url = self.base_url + endpoint
