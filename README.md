@@ -46,7 +46,9 @@ $ python -m pip install .
 ## Importing the library
     from thoughtspot_rest_api_v1 import *
 
-This will bring the `TSRestApiV1` class, as well as the following enumerations:  `MetadataNames`, `MetadataSorts`, `MetadataSubtypes`, `MetadataCategories`, `ShareModes`, `Privileges`.
+This will bring the `TSRestApiV1` class, as well as the following enumerations:  `TSTypes`, `MetadataNames`, `MetadataSorts`, `MetadataSubtypes`, `MetadataCategories`, `ShareModes`, `Privileges`.
+
+There is also a `TSRestApiV2` class, with enumerations: `TSTypesV2`, `ReportTypes`, to use the subset of REST API V2 capabilities that do not exist in the V1 API.
 
 ### Modifying the TSRestApiV1 requests.Session object (SSL errors, etc.)
 The REST API commands are all handled via the `requests` module, using a `requests.Session` object. 
@@ -66,7 +68,7 @@ If you find there are other options you need to set on the Session object for yo
 
 
 ## Logging into the REST API
-You create a TSRestApiV1 object with the `server_url` argument, then use the `session_login()` method with username and password to log in. After login succeeds, the TSRestApiV1 object has an open requests. Session object which maintains the necessary cookies to use the REST API continuously .
+You create a TSRestApiV1 object with the `server_url` argument, then use the `session_login()` method with username and password to log in. After login succeeds, the TSRestApiV1 object has an open requests.Session object which maintains the necessary cookies to use the REST API continuously .
 
 
     username = os.getenv('username')  # or type in yourself
@@ -99,6 +101,20 @@ The ThoughtSpot API has internal namings for many features, which require lookin
 - MetadataTypes: The namings used in the 'type' parameter of the /metadata/ endpoint calls, with simplified names that matches the names in the UI and standard ThoughtSpot documentation. For example, MetadataTypes.GROUP = 'USER_GROUP'
 - MetadataSubtypes: The available options for the 'subtype' argument used for certain metadata calls
 
+## Logging into REST API V2
+You create a TSRestApiV2 object with the `server_url` argument, then use the `session_login()` method with username and password to log in. After login succeeds, the TSRestApiV2 object has an open requests.Session object which maintains the necessary cookies to use the REST API continuously, which is used by any methods on the TSRestApiV2 object. Additionally, the `session_login()` method returns the requests.Session object so you can issue any V2 REST API commands directly using requests, for those that have not been implemented 
+
+
+    username = os.getenv('username')  # or type in yourself
+    password = os.getenv('password')  # or type in yourself
+    server = os.getenv('server')      # or type in yourself
+
+    ts: TSRestApiV2 = TSRestApiV2(server_url=server)
+    try:
+        v2_session = ts.session_login(username=username, password=password)
+    except requests.exceptions.HTTPError as e:
+        print(e)
+        print(e.response.content)
 
 ## TML operations
 One primary use case of the REST APIs is to import and export ThoughtSpot Modeling Language (TML) files.
