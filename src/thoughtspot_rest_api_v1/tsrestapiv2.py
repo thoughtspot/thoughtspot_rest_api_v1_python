@@ -286,6 +286,21 @@ class TSRestApiV2:
         response.raise_for_status()
         return True
 
+    def metadata_delete(self, object_type: str, guids: List[str], ):
+        endpoint = 'metadata/delete'
+
+        url = self.base_url + endpoint
+
+        # Current spec calls for a GET with a -d argument in cURL, but this translates to a URL param not body
+        url_params = {
+            'type': object_type,
+            'id': guids
+        }
+
+        response = self.requests_session.delete(url=url, params=url_params)
+
+        response.raise_for_status()
+        return True
     #
     # /connection/ endpoints
     #

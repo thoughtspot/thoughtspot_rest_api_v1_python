@@ -53,7 +53,7 @@ group_id = group['headers'][0]['id']
 
 # Users in a Group
 print("\nUsers in Group - ID {}".format(group_id))
-users_in_group = ts.group_users__get(group_guid=group_id)
+users_in_group = ts.group_users_get(group_guid=group_id)
 print(users_in_group)
 for u in users_in_group:
 
