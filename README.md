@@ -1,5 +1,7 @@
 *A simple Python implementation of ThoughtSpot's V1 REST API.*
 
+NOTE: *The 1.2.0 release renamed a few methods to remove a double-underscore (those that ended in "__post" or "__get" now are "_post()" or "_get()" etc. . If you encounter errors, please update your code by removing the extra underscore* 
+
 `thoughtspot_rest_api_v1` implements the ThoughtSpot V1 REST API as directly as possible. Each API endpoint is represented by a single method within the `TSRestApiV1` class. Method and argument names closely match to the documented API endpoints, with a few minor changes are taken to make certain parameters more obvious for an end user. 
 
 `->` [Learning from the Source Code][jump-learning] </br>
