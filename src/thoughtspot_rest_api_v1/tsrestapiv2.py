@@ -358,9 +358,10 @@ class TSRestApiV2:
                           'type': report_type
                           }
 
-        response = self.requests_session.post(url=url, json=json_post_data)
-
-        return response.raw
+        response = self.requests_session.post(url=url, json=json_post_data,
+                                              headers={'Accept': 'application/octet-stream'})
+        response.raise_for_status()
+        return response.content
 
     def report_liveboard(self, guid: str,
                          report_type: str = 'PDF',
@@ -393,9 +394,10 @@ class TSRestApiV2:
                 'includeFilterPage': filter_page
             }
 
-        response = self.requests_session.post(url=url, json=json_post_data)
-
-        return response.raw
+        response = self.requests_session.post(url=url, json=json_post_data,
+                                              headers={'Accept': 'application/octet-stream'})
+        response.raise_for_status()
+        return response.content
 
     #
     # /security/ endpoints
