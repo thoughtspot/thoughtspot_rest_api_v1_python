@@ -569,7 +569,7 @@ class TSRestApiV1:
         response.raise_for_status()
         return response.json()
 
-    def group__get(self, group_guid: Optional[str] = None, name: Optional[str] = None) -> Union[Dict, List]:
+    def group_get(self, group_guid: Optional[str] = None, name: Optional[str] = None) -> Union[Dict, List]:
         endpoint = 'group'
         url_params = {}
         if group_guid is not None:
@@ -582,9 +582,9 @@ class TSRestApiV1:
         response.raise_for_status()
         return response.json()
 
-    def group__post(self, group_name: str, display_name: str, privileges: Optional[List[str]],
-                    group_type: str = 'LOCAL_GROUP',
-                    tenant_id: Optional[str] = None, visibility: str = 'DEFAULT'):
+    def group_post(self, group_name: str, display_name: str, privileges: Optional[List[str]],
+                   group_type: str = 'LOCAL_GROUP',
+                   tenant_id: Optional[str] = None, visibility: str = 'DEFAULT'):
         endpoint = 'group'
 
         post_data = {
@@ -604,7 +604,7 @@ class TSRestApiV1:
         response.raise_for_status()
         return response.json()
 
-    def group__delete(self, group_guid: str):
+    def group_delete(self, group_guid: str):
         endpoint = 'group/{}'.format(group_guid)
 
         url = self.base_url + endpoint
@@ -612,7 +612,7 @@ class TSRestApiV1:
         response.raise_for_status()
         return True
 
-    def group__put(self, group_guid: str, content):
+    def group_put(self, group_guid: str, content):
         endpoint = 'group/{}'.format(group_guid)
 
         post_data = {
@@ -626,7 +626,7 @@ class TSRestApiV1:
         return response.json()
 
     # Add a User to a Group
-    def group_user__post(self, group_guid: str, user_guid: str):
+    def group_user_post(self, group_guid: str, user_guid: str):
         endpoint = 'group/{}/user/{}'.format(group_guid, user_guid)
 
         url = self.base_url + endpoint
@@ -635,7 +635,7 @@ class TSRestApiV1:
         return response.json()
 
     # Remove user from a group
-    def group_user__delete(self, group_guid: str, user_guid: str):
+    def group_user_delete(self, group_guid: str, user_guid: str):
         endpoint = 'group/{}/user/{}'.format(group_guid, user_guid)
 
         url = self.base_url + endpoint
@@ -643,7 +643,7 @@ class TSRestApiV1:
         response.raise_for_status()
         return True
 
-    def group_users__get(self, group_guid: str):
+    def group_users_get(self, group_guid: str):
         endpoint = 'group/{}/users'.format(group_guid)
 
         url = self.base_url + endpoint
@@ -651,7 +651,7 @@ class TSRestApiV1:
         response.raise_for_status()
         return response.json()
 
-    def group_users__post(self, group_guid: str, user_guids: List[str]):
+    def group_users_post(self, group_guid: str, user_guids: List[str]):
         endpoint = 'group/{}/users'.format(group_guid)
         url_params = {
             'userids': json.dumps(user_guids)
@@ -662,7 +662,7 @@ class TSRestApiV1:
         response.raise_for_status()
         return response.json()
 
-    def group_users__delete(self, group_guid: str, user_guids: List[str]):
+    def group_users_delete(self, group_guid: str, user_guids: List[str]):
         endpoint = 'group/{}/users'.format(group_guid)
         url_params = {
             'userids': json.dumps(user_guids)
@@ -1285,7 +1285,7 @@ class TSRestApiV1:
     #
 
     # Home Pinboard Methods
-    def session_homepinboard__post(self, pinboard_guid: str, user_guid: str):
+    def session_homepinboard_post(self, pinboard_guid: str, user_guid: str):
         endpoint = 'session/homepinboard'
 
         post_data = {
@@ -1297,14 +1297,14 @@ class TSRestApiV1:
         response = self.requests_session.post(url=url, data=post_data)
         response.raise_for_status()
 
-    def session_homepinboard__get(self) -> Dict:
+    def session_homepinboard_get(self) -> Dict:
         endpoint = 'session/homepinboard'
         url = self.base_url + endpoint
         response = self.requests_session.get(url=url)
         response.raise_for_status()
         return response.json()
 
-    def session_homepinboard__delete(self) -> bool:
+    def session_homepinboard_delete(self) -> bool:
         endpoint = 'session/homepinboard'
         url = self.base_url + endpoint
         response = self.requests_session.delete(url=url)
@@ -1338,7 +1338,7 @@ class TSRestApiV1:
     # USER Methods
     #
 
-    def user__get(self, user_id: Optional[str] = None, name: Optional[str] = None) -> Union[Dict, List]:
+    def user_get(self, user_id: Optional[str] = None, name: Optional[str] = None) -> Union[Dict, List]:
         endpoint = 'user/'
         url_params = {}
         if user_id is not None:
@@ -1351,7 +1351,7 @@ class TSRestApiV1:
         response.raise_for_status()
         return response.json()
 
-    def user__post(self, username: str, password: str, display_name: str, properties: Optional,
+    def user_post(self, username: str, password: str, display_name: str, properties: Optional,
                   groups: Optional[List[str]] = None, user_type: str = 'LOCAL_USER',
                   tenant_id: Optional[str] = None, visibility: str = 'DEFAULT'):
         endpoint = 'user'
@@ -1375,7 +1375,7 @@ class TSRestApiV1:
         response.raise_for_status()
         return response.json()
 
-    def user__delete(self, user_guid: str):
+    def user_delete(self, user_guid: str):
         endpoint = 'user/{}'.format(user_guid)
 
         url = self.base_url + endpoint
@@ -1383,7 +1383,7 @@ class TSRestApiV1:
         response.raise_for_status()
         return True
 
-    def user__put(self, user_guid: str, content, password: Optional[str]):
+    def user_put(self, user_guid: str, content, password: Optional[str]):
         endpoint = 'user/{}'.format(user_guid)
 
         post_data = {
@@ -1519,7 +1519,7 @@ class TSRestApiV1:
         response.raise_for_status()
         return response.json()
 
-    def user_groups__get(self, user_guid: str):
+    def user_groups_get(self, user_guid: str):
         endpoint = 'user/{}/groups'.format(user_guid)
         url = self.base_url + endpoint
         response = self.requests_session.get(url=url)
@@ -1527,7 +1527,7 @@ class TSRestApiV1:
         return response.json()
 
     # Replaces all group membership?
-    def user_groups__post(self, user_guid: str, group_guids: List[str]):
+    def user_groups_post(self, user_guid: str, group_guids: List[str]):
         endpoint = 'user/{}/groups'.format(user_guid)
 
         url = self.base_url + endpoint
@@ -1540,7 +1540,7 @@ class TSRestApiV1:
         return response.json()
 
     # Adds to existing group membership?
-    def user_groups__put(self, user_guid: str, group_guids: List[str]):
+    def user_groups_put(self, user_guid: str, group_guids: List[str]):
         endpoint = 'user/{}/groups'.format(user_guid)
 
         url = self.base_url + endpoint
@@ -1552,7 +1552,7 @@ class TSRestApiV1:
         response.raise_for_status()
 
     # Adds to existing group membership?
-    def user_groups__delete(self, user_guid: str, group_guids: List[str]):
+    def user_groups_delete(self, user_guid: str, group_guids: List[str]):
         endpoint = 'user/{}/groups'.format(user_guid)
 
         url = self.base_url + endpoint
@@ -1646,7 +1646,7 @@ class TSRestApiV1:
         response.raise_for_status()
         return response.json()
 
-    def admin_embed_action__post(self, embed_action_definition: Dict):
+    def admin_embed_action_post(self, embed_action_definition: Dict):
         endpoint = 'admin/embed/actions'
 
         url = self.base_url + endpoint
@@ -1659,7 +1659,7 @@ class TSRestApiV1:
 
         return response.json()
 
-    def admin_embed_action__put(self, action_guid: str, embed_action_definition: Dict):
+    def admin_embed_action_put(self, action_guid: str, embed_action_definition: Dict):
         endpoint = 'admin/embed/actions/{}'.format(action_guid)
 
         url = self.base_url + endpoint
@@ -1672,7 +1672,7 @@ class TSRestApiV1:
 
         return response.json()
 
-    def admin_embed_action__delete(self, action_guid: str):
+    def admin_embed_action_delete(self, action_guid: str):
         endpoint = 'admin/embed/actions/{}'.format(action_guid)
 
         url = self.base_url + endpoint
@@ -1682,7 +1682,7 @@ class TSRestApiV1:
 
         return response.json()
 
-    def admin_embed_action_associations__post(self, action_guid: str, action_association: Dict):
+    def admin_embed_action_associations_post(self, action_guid: str, action_association: Dict):
         endpoint = 'admin/embed/actions/{}/associations'.format(action_guid)
 
         url = self.base_url + endpoint
@@ -1695,7 +1695,7 @@ class TSRestApiV1:
 
         return response.json()
 
-    def admin_embed_action_associations__get(self, action_guid: str):
+    def admin_embed_action_associations_get(self, action_guid: str):
         endpoint = 'admin/embed/actions/{}/associations'.format(action_guid)
 
         url = self.base_url + endpoint
@@ -1705,7 +1705,7 @@ class TSRestApiV1:
 
         return response.json()
 
-    def admin_embed_action_associations__delete(self, action_guid: str, action_association: Dict):
+    def admin_embed_action_associations_delete(self, action_guid: str, action_association: Dict):
         endpoint = 'admin/embed/actions/{}/associations'.format(action_guid)
 
         url = self.base_url + endpoint
