@@ -335,11 +335,11 @@ class TSRestApiV2:
         endpoint = 'data/liveboard/querysql'
 
         url = self.base_url + endpoint
-        # Current spec calls for a GET with a -d argument in cURL, but this translates to a URL param not body
         url_params = {
-            'id': guid,
-            'vizId': viz_ids
+            'id': guid
         }
+        if viz_ids is not None:
+            url_params['vizId'] = viz_ids
         response = self.requests_session.get(url=url, params=url_params)
 
         response.raise_for_status()
@@ -438,45 +438,8 @@ class TSRestApiV2:
 
         response.raise_for_status()
         return response.json()
-'''
-    def security_permission_tsobject_search(self, guid: str, object_type: str, include_dependents: bool = False):
-        endpoint = 'security/permission/tsobject/search'
 
-        url = self.base_url + endpoint
 
-        json_post_data = {
-            'id': guid,
-            'type': object_type,
-            'includeDependent': include_dependents
-        }
-
-        response = self.requests_session.post(url=url, json=json_post_data)
-
-        response.raise_for_status()
-        return response.json()
-
-    def security_permission_principal_search(self,
-                                             user_or_group_guid: Optional[str] = None,
-                                             username_or_group_name: Optional[str] = None):
-        endpoint = 'security/permission/principal/search'
-
-        url = self.base_url + endpoint
-        if user_or_group_guid is not None:
-            json_post_data = {
-                'id': user_or_group_guid
-            }
-        elif username_or_group_name is not None:
-            json_post_data = {
-                'name': username_or_group_name
-            }
-        else:
-            raise SyntaxError('Must specify either user_or_group_guid or username_or_group_name argument')
-
-        response = self.requests_session.post(url=url, json=json_post_data)
-
-        response.raise_for_status()
-        return response.json()
-'''
     #
     # /admin/ endpoints
     #
@@ -555,3 +518,44 @@ class TSRestApiV2:
 
         response.raise_for_status()
         return True
+
+
+'''
+    def security_permission_tsobject_search(self, guid: str, object_type: str, include_dependents: bool = False):
+        endpoint = 'security/permission/tsobject/search'
+
+        url = self.base_url + endpoint
+
+        json_post_data = {
+            'id': guid,
+            'type': object_type,
+            'includeDependent': include_dependents
+        }
+
+        response = self.requests_session.post(url=url, json=json_post_data)
+
+        response.raise_for_status()
+        return response.json()
+
+    def security_permission_principal_search(self,
+                                             user_or_group_guid: Optional[str] = None,
+                                             username_or_group_name: Optional[str] = None):
+        endpoint = 'security/permission/principal/search'
+
+        url = self.base_url + endpoint
+        if user_or_group_guid is not None:
+            json_post_data = {
+                'id': user_or_group_guid
+            }
+        elif username_or_group_name is not None:
+            json_post_data = {
+                'name': username_or_group_name
+            }
+        else:
+            raise SyntaxError('Must specify either user_or_group_guid or username_or_group_name argument')
+
+        response = self.requests_session.post(url=url, json=json_post_data)
+
+        response.raise_for_status()
+        return response.json()
+'''
