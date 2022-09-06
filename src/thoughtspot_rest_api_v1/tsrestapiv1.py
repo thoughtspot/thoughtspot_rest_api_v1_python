@@ -127,6 +127,12 @@ class PermissionTypes:
     DEFINED = 'DEFINED'
 
 
+class GroupVisibility:
+    DEFAULT = 'DEFAULT'
+    SHARABLE = 'DEFAULT'
+    NON_SHARABLE = 'NON_SHARABLE'
+
+
 # Compatibility
 MetadataNames = MetadataTypes
 MetadataSorts = Sorts
@@ -886,6 +892,16 @@ class TSRestApiV1:
         response.raise_for_status()
         return response.json()
 
+    # Helper method to find a GUID from a name
+    def metadata_list_find_guid(self, object_type: str, name: str):
+        objects = self.metadata_list(object_type=object_type, filter=name)
+        # Filter is case-insensitive and the equivalent of a wild-card, so need to look for exact match
+        # on the response
+        for o in objects['headers']:
+            if o['name'] == name:
+                return o['id']
+        raise LookupError()
+
     # Favorite Methods
     def metadata_markasfavoritefor(self, user_guid: str, object_guids: List[str], object_type: str) -> Dict:
         endpoint = 'metadata/markunmarkfavoritefor'
@@ -1166,6 +1182,19 @@ class TSRestApiV1:
             permissions_dict[l1][guid] = {'shareMode': share_mode}
         return permissions_dict
 
+    # Helper to create share permissions
+    def create_share_permissions(self, read_only_users_or_groups_guids: Optional[List[str]] = (),
+                                 edit_access_users_or_groups_guids: Optional[List[str]] = (),
+                                 remove_access_users_or_groups_groups: Optional[List[str]] = ()) -> Dict:
+        permissions_dict = self.get_sharing_permissions_dict()
+        for a in read_only_users_or_groups_guids:
+            self.add_permission_to_dict(permissions_dict=permissions_dict, guid=a, share_mode=ShareModes.READ_ONLY)
+        for a in edit_access_users_or_groups_guids:
+            self.add_permission_to_dict(permissions_dict=permissions_dict, guid=a, share_mode=ShareModes.EDIT)
+        for a in remove_access_users_or_groups_groups:
+            self.add_permission_to_dict(permissions_dict=permissions_dict, guid=a, share_mode=ShareModes.NO_ACCESS)
+        return permissions_dict
+
     # Share any object type
     # Requires a Permissions Dict, which can be generated and modified with the two static methods above
     def security_share(
@@ -1182,7 +1211,9 @@ class TSRestApiV1:
             email_shares = []
 
         endpoint = 'security/share'
-
+        if shared_object_type in [MetadataSubtypes.TABLE, MetadataSubtypes.VIEW, MetadataSubtypes.WORKSHEET,
+                                  MetadataSubtypes.SQL_VIEW]:
+            shared_object_type = MetadataTypes.TABLE
         post_data = {
             'type': shared_object_type,
             'id': json.dumps(shared_object_guids),
