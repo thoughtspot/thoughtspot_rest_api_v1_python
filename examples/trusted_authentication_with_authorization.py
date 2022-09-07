@@ -15,8 +15,8 @@ import random
 from dotenv import load_dotenv
 load_dotenv()
 
-# from thoughtspot_rest_api_v1 import *
-from src.thoughtspot_rest_api_v1.tsrestapiv1 import *
+from thoughtspot_rest_api_v1 import *
+# from src.thoughtspot_rest_api_v1.tsrestapiv1 import *
 
 #
 # Simple JSON format for defining user details including groups. You will need to determine how to get these details
