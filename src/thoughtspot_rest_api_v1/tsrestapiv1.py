@@ -1350,15 +1350,18 @@ class TSRestApiV1:
     #   used from Authenticator Server with Secret Key retrieved in a secure manner only
     #   in memory
     #
-    def session_auth_token(self, secret_key: str, username: str, access_level: str, object_id: str):
+    def session_auth_token(self, secret_key: str, username: str, access_level: str = 'FULL',
+                           object_guid: Optional[str] = None):
         endpoint = 'session/auth/token'
 
         post_params = {
              'secret_key': secret_key,
              'username': username,
              'access_level': access_level,
-             'id': object_id
+
         }
+        if object_guid is not None:
+            post_params['id'] = object_guid
 
         url = self.base_url + endpoint
 

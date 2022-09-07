@@ -118,7 +118,7 @@ def web_request(request):
     response = user_details
     user_username = get_username(response)
 
-    # Check 1: See if username exists in ThoughtSpot
+    # Step 1: See if username exists in ThoughtSpot, if not, create user
     try:
         users_in_ts = ts.user_get(name=user_username)
     # Attempt to re-login wtih the service account and send the REST API request again
@@ -149,62 +149,54 @@ def web_request(request):
         user_full_name = get_user_full_name(response)
         user_email = get_user_email(response)
 
-        new_user_guid = create_user(rest_api_obj=ts, username=user_username, display_name=user_full_name,
+        user_guid = create_user(rest_api_obj=ts, username=user_username, display_name=user_full_name,
                                     email=user_email, groups_guid=[])
-        # If the user is new, we know they aren't in any groups so can do a pure add
-        if groups_for_user > 0:
-            # Get the GUIDs for the desired group names
-            group_guid_list = []
-            group_names_that_exist = []
-            for group in all_groups:
-                if group['name'] in groups_for_user:
-                    group_guid_list.append(group['id'])
-                    group_names_that_exist.append(group)
-
-            # If you need to create arbitrary groups on the fly (for RLS)
-            # go through and create, then add to the group_guid_list
-            groups_to_create = []
-            for group in groups_for_user:
-                if group not in group_names_that_exist:
-                    groups_to_create.append(group)
-
-            for group in groups_to_create:
-                # This is presuming for auto-created groups that group_name and display_name are identical
-                # If they are not, you need to do more complex lookup so that you have both values here
-                new_group_guid = ts.group_post(group_name=group, display_name=group, privileges=[],
-                                               visibility=GroupVisibility.NON_SHARABLE)
-                group_guid_list.append(new_group_guid)
-
-            try:
-                # POST only adds the user to the specified groups, vs. PUT which resets ALL of that user's groups
-                # Depending on how you've configured, you might change to PUT to reset user to desired state
-                ts.user_groups_post(user_guid=new_user_guid, group_guids=group_guid_list)
-            except requests.exceptions.HTTPError:
-                # print some type of error to log
-                # Return an HTTP error response to the front-end, rather than login token
-                return ErrorResponseToBrowser
-
-
-    # Username already exists
     else:
-
         user = users_in_ts[0]
+        user_guid = user['id']
 
-        # Check 2: Does user belong to the appropriate groups?
-        assigned_groups = user['assignedGroups']
-        inherited_groups = user['inheritedGroups']
-        all_user_groups_guids = {}
-        for group in assigned_groups:
-            all_user_groups_guids[group] = ""
-        for group in inherited_groups:
-            all_user_groups_guids[group] = ""
-        all_user_groups_guids_list = list(all_user_groups_guids.keys())
+    # Step 2: Add user to groups, create groups if they don't exist (if that is your desired behavior)
+    if groups_for_user > 0:
+        # Get the GUIDs for the desired group names
+        group_guid_list = []
+        group_names_that_exist = []
+        for group in all_groups:
+            if group['name'] in groups_for_user:
+                group_guid_list.append(group['id'])
+                group_names_that_exist.append(group)
+
+        # If you need to create arbitrary groups on the fly (for RLS)
+        # go through and create, then add to the group_guid_list
+        groups_to_create = []
         for group in groups_for_user:
+            if group not in group_names_that_exist:
+                groups_to_create.append(group)
 
+        for group in groups_to_create:
+            # This is presuming for auto-created groups that group_name and display_name are identical
+            # If they are not, you need to do more complex lookup so that you have both values here
+            new_group_guid = ts.group_post(group_name=group, display_name=group, privileges=[],
+                                           visibility=GroupVisibility.NON_SHARABLE)
+            group_guid_list.append(new_group_guid)
 
-#
-# WIP
-#
+        try:
+            # POST only adds the user to the specified groups, vs. PUT which resets ALL of that user's groups
+            # Depending on how you've configured, you might change to PUT to reset user to desired state
+            ts.user_groups_post(user_guid=user_guid, group_guids=group_guid_list)
+        except requests.exceptions.HTTPError:
+            # print some type of error to log
+            # Return an HTTP error response to the front-end, rather than login token
+            return ErrorResponseToBrowser
 
+    # Step 3: Request trusted token and return to the browser
+    try:
+        trusted_token = ts.session_auth_token(secret_key=secret_key, username=user_username, access_level='FULL')
+    except requests.exceptions.HTTPError:
+        # print some type of error to log
+        # Return an HTTP error response to the front-end, rather than login token
+        return ErrorResponseToBrowser
+
+    # This will depend on the framework (WIP, will show in Flask eventually)
+    return_token_to_browser(trusted_token)
 
 
