@@ -15,11 +15,12 @@ Short example of how to find tags and assign them to objects. V2 has APIs for ta
 ## transfer_object_ownership.py
 Transferring content ownership is only achieved via API, but can be very useful.
 
-# Not ported yet
-### audit_object_access.py
+## audit_object_access.py
 Set of examples using the TS Cloud REST APIs to retrieve sharing permissions on various objects.
 
-Combines several different metadata commands to get all the human-readable names necessary for a person to audit the sharing capabilties.
+Combines several different metadata commands to get all the human-readable names necessary for a person to audit the sharing capabilities.
+
+# Not ported yet
 
 ### import_tables_rest_api_example.py
 Advanced script for using the REST API to bring in all tables from a given schema, rather than having to select them all via the UI. 
