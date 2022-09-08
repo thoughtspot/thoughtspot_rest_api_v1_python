@@ -8,10 +8,36 @@ from thoughtspot_rest_api_v1 import *
 # Transfer Ownership command requires knowing the existing owner, so this takes
 # the GUID inputs, finds the owners, and constructs the minimum number of ownership transfer commands
 #
+# Account to transfer content to
+transfer_to_username = 'service.account'
 
 username = os.getenv('username')  # or type in yourself
 password = os.getenv('password')  # or type in yourself
 server = os.getenv('server')        # or type in yourself
+
+#
+# REST API V2 features a transfer without knowing the object owner
+#
+ts: TSRestApiV2 = TSRestApiV2(server_url=server)
+try:
+    ts.session_login(username=username, password=password)
+except requests.exceptions.HTTPError as e:
+    print(e)
+    print(e.response.content)
+
+# Determine the set of GUIDs however you like
+guids_to_transfer = ['{guid_1}', '{guid_2}']
+# admin/assignauthor
+ts.admin_assignauthor(guids=guids_to_transfer, to_username=transfer_to_username)
+
+# admin/changeauthor still exists to do the equivalent of user/transfer/ownership in V1
+
+exit()
+#
+# REST API V1 version, if V2 API is not available
+# Requires knowing who owns the objects are owned by to transfer them, so has a process for looking up owner of GUIDs
+# None of that is necessary in V2, as you can see from the brevity of the code above vs. below
+#
 
 ts: TSRestApiV1 = TSRestApiV1(server_url=server)
 try:
@@ -20,13 +46,11 @@ except requests.exceptions.HTTPError as e:
     print(e)
     print(e.response.content)
 
-# Service account username
-transfer_to_username = 'service.account'
-
 
 # Process to get the GUIDs of the objects to transfer may vary
 # This is basically pseudo-code
 # Metadata requests require knowing the object type, so it makes sense to split the response
+#
 def get_guids_by_object_type():
     # However you determine which objects, packaged them up by types
     guid_return = { TSTypes.LIVEBOARD : [] ,
