@@ -20,11 +20,9 @@ Set of examples using the TS Cloud REST APIs to retrieve sharing permissions on 
 
 Combines several different metadata commands to get all the human-readable names necessary for a person to audit the sharing capabilities.
 
-# Not ported yet
-
-### import_tables_rest_api_example.py
+## import_tables_rest_api_example.py
 Advanced script for using the REST API to bring in all tables from a given schema, rather than having to select them all via the UI. 
 
-You may instead want to generate TML for the Table objects, then import the TML (gives more control over options). See tml_and_sdlc/tml_from_scratch.py for code to perform that action.
+You may instead want to generate TML for the Table objects, then import the TML (gives more control over options). See https://github.com/thoughtspot/ts_rest_api_and_tml_tools/tree/main/examples/tml_and_sdlc in  for code to perform actions using TML.
 
-Currently has only been tested on Snowflake connections.
+Currently this script has only been tested on Snowflake connections, so some details might need to change for other connection types.
