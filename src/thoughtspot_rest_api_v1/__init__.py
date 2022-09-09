@@ -4,4 +4,5 @@ from .tsrestapiv1 import (
     ShareModes, Privileges, PermissionTypes, MetadataTypes, MetadataSubtypes, GroupVisibility
 )
 from .tsrestapiv2 import TSRestApiV2, ReportTypes, TSTypesV2
+from .details_objects import *
 from ._version import __version__
