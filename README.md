@@ -97,13 +97,13 @@ The `session_logout()` method of the ThoughtSpot class will send the API request
 ## ENUM data structures
 The ThoughtSpot API has internal namings for many features, which require looking up in the reference guide. To help out, the tsrestapiv1.py file defines several ENUM style classes:
 
-- TSTypes: Combines MetadataNames and MetadataSubtypes into a single set of unique values, so that you don't need to worry about when to use Subtypes. The implementations of the /metadata/ endpoints read the values from this ENUM and issue the correct REST API command
-- MetadataCategories: Contains the options for the argument called 'category' in metadata calls
-- MetadataSorts: Contains the available sort options for the argument called 'sort' in metadata calls
-- ShareModes: The modes used in the JSON of the /security/share endpoint
-- Privileges: The name of the Privileges that Groups can have (and users can inherit) in ThoughtSpot
-- MetadataTypes: The namings used in the 'type' parameter of the /metadata/ endpoint calls, with simplified names that matches the names in the UI and standard ThoughtSpot documentation. For example, MetadataTypes.GROUP = 'USER_GROUP'
-- MetadataSubtypes: The available options for the 'subtype' argument used for certain metadata calls
+- `TSTypes`: Combines MetadataNames and MetadataSubtypes into a single set of unique values, so that you don't need to worry about when to use Subtypes. The implementations of the /metadata/ endpoints read the values from this ENUM and issue the correct REST API command
+- `MetadataCategories`: Contains the options for the argument called 'category' in metadata calls
+- `MetadataSorts`: Contains the available sort options for the argument called 'sort' in metadata calls
+- `ShareModes`: The modes used in the JSON of the /security/share endpoint
+- `Privileges`: The name of the Privileges that Groups can have (and users can inherit) in ThoughtSpot
+- `MetadataTypes`: The namings used in the 'type' parameter of the /metadata/ endpoint calls, with simplified names that matches the names in the UI and standard ThoughtSpot documentation. For example, MetadataTypes.GROUP = 'USER_GROUP'
+- `MetadataSubtypes`: The available options for the 'subtype' argument used for certain metadata calls
 
 ## Logging into REST API V2
 You create a TSRestApiV2 object with the `server_url` argument, then use the `session_login()` method with username and password to log in. After login succeeds, the TSRestApiV2 object has an open requests.Session object which maintains the necessary cookies to use the REST API continuously, which is used by any methods on the TSRestApiV2 object. Additionally, the `session_login()` method returns the requests.Session object so you can issue any V2 REST API commands directly using requests, for those that have not been implemented 
