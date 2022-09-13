@@ -235,11 +235,39 @@ How to use:
     user_inherited_groups = user_details.inherited_groups()
 
 Some of the properties that were previously only accessible from the `metadata/details` response may be available from endpoints in the V2 REST API, so it is worth checking there first before working with the details responses.
+ 
 
 ### Connection details 
 Connections, representing basic connection details of the external data sources ThoughtSpot connects to, have their own set of endpoints in `/connection/` outside of the `/metadata/` endpoints. 
 
 There are few of these endpoints used by ThoughtSpot's UI but not currently ported and documented to the `/v1/public/` endpoints that have been implemented as part of this library to help bridge customers until public endpoints with the details have been made available.
+
+### Dependent Objects API calls
+
+
+## User and Group operations
+The `/user/` and `/group/` endpoints contain CRUD operation endpoints for these two object types (while other objects are created via TML import and export). They allow you to sync users and groups to other systems.
+
+Following REST API principles, many of the endpoints themselves are the same but use different HTTP verbs to achieve different actions. The TSRestApiV1 methods distinguish these following the naming pattern of {fixed_endpoint_separated_by_underscores}_{http_verb} i.e. `POST /group/{groupid}/users` becomes `group_users_post()` while the PUT version of the same endpoint becomes `group_users_put()`
+
+### Metadata operations
+`GET /group/` and `GET /user/` are equivalent to using `metadata/listobjectheaders`, they are just convenience methods to get the same exact result. However, there are additional endpoints that provide more specific information that is difficult to determine otherwise.
+
+`GET /group/listuser/{groupid}`, `GET /group/{groupid}/users/` , `GET /group/{groupid}/groups`, and `GET /user/{userid}/groups` each give a specific insight into the relationship between groups and users, starting from an individual group or user's perspective. They can save a huge amount of time when auditing how your system is configured or why certain privileges / access control is working in a particular way.
+
+
+
+### CRUD operations
+As much as possible, the parameters within the endpoints or as part of the POST/PUT bodies have been mapped directly to methods with arguments matching the definitions in the documentation. Differences may occur such as using `guid` in place of `id` per Python's spec, or making arguments plural or singular when the API argument is named the opposite way.
+
+The response is always the full JSON response from the API unless the API does not return a JSON response. You will need to parse the response to get essential details (such as the new GUID assigned to the newly created object)
+
+Example:
+
+    new_group = ts.group_post(group_name='group_1', display_name='Group 1', privileges=[Privileges.CAN_DOWNLOAD_DATA, Privileges.HAS_SPOTIQ_PRIVILEGE])
+    new_group_guid = new_group['headers']['id']
+
+
 
 ## Additional libraries
 `thoughtspot_tml` is a library for processing the ThoughtSpot Modeling Language (TML) files. You can use `thoughtspot_tml` to manipulate TML files from disk or exported via the REST API.
