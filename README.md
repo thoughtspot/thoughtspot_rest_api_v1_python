@@ -12,7 +12,7 @@ NOTE: *The 1.2.0 release renamed a few methods to remove a double-underscore (th
 ---
 
 ## Learning from the source code
-If you want to use the library as a reference for how a REST API endpoint is called correctly, look at the `/src/thoughtspot_rest_api_v1/tsrestapiv1.py` file. It contains the definition of all the ENUMs and the `TSRestApiV1` class.
+If you want to use the library as a reference for how a REST API endpoint is called correctly, look at the `/src/thoughtspot_rest_api_v1/tsrestapiv1.py` file. It contains the definition of all the ENUMs and the `TSRestApiV1` class. Similarly, the `TSRestApiV2` class is defined in the `/src/thoughtspot_rest_api_v1/tsrestapiv2.py` file.
 
 The `TSRestApiV1` class uses the *requests* library to create an internal requests.Session object when the REST API sign-in command is run. This fulfils the ThoughtSpot REST API V1 requirement for session cookie details to be passed in every request.
 
@@ -51,6 +51,8 @@ $ python -m pip install .
 This will bring the `TSRestApiV1` class, as well as the following enumerations:  `TSTypes`, `MetadataNames`, `MetadataSorts`, `MetadataSubtypes`, `MetadataCategories`, `ShareModes`, `Privileges`.
 
 There is also a `TSRestApiV2` class, with enumerations: `TSTypesV2`, `ReportTypes`, to use the subset of REST API V2 capabilities that do not exist in the V1 API.
+
+The `UserDetails`, `GroupsDetails` and `LiveboardDetails` classes are also imported automatically from `details_objects.py` to provide easy access to useful properties from the very complex responses from the `metadata/details` endpoint.
 
 ### Modifying the TSRestApiV1 requests.Session object (SSL errors, etc.)
 The REST API commands are all handled via the `requests` module, using a `requests.Session` object. 
@@ -175,23 +177,44 @@ The following example uses the `thoughtspot_tml` library, where each object has 
 ---
 
 ## Metadata operations
-Doing any actions with the REST APIs requires knowing the GUIDs of the objects. The /metadata endpoints are incredibly flexible, allowing you to retrieve details about almost any object type from the same endpoints. This flexibility means you must set a number of arguments with each call, including using the internal names of the object types.
+Doing any actions with the REST APIs requires knowing the GUIDs of the objects. The `/metadata/` endpoints are incredibly flexible, allowing you to retrieve details about almost any object type from the same endpoints. This flexibility means you must set a number of arguments with each call, including using the internal names of the object types.
 
-### MetadataNames and MetadataSubtypes 
-Because the internal API names of the object types often do not reflect the names used in the current versions of ThoughtSpot, there are two ENUMs provided to map the 'product name' to the REST API string value: MetadataNames and MetadataSubtypes
+### TSTypes, MetadataTypes and MetadataSubtypes and other ENUMs
+Because the internal API identifiers of the object types in V1 often do not reflect the names used in the current versions of ThoughtSpot, there are ENUMs provided within the library to map the 'product name' to the REST API string value: TSTypes, MetadataTypes, and MetadataSubtypes. 
 
-The REST API has a single object_type for Tables, Views, and Worksheets, and uses an additional 'sub_type' property if you need to distinguish between those objects. You will need to pass both the object_type and the sub_type to metadata calls to limit down:
+The REST API has a single object_type for Tables, Views, and Worksheets, and uses an additional 'sub_type' property if you need to distinguish between those objects. 
 
-    objs = ts.tsrest.metadata_listobjectheaders(object_type=MetadataNames.WORKSHEET, subtypes=[MetadataSubtypes.WORKSHEET],
-                                                sort='MODIFIED', sort_ascending=False, category=category_filter, fetchids=object_guid_list)
+Because of the complexity of remembering to add the sub-type, the `TSTypes` ENUM should be used - it uses the sub-types of the data objects rather than the type. The implementation of all of the `metadata` endpoints works even if a sub-type is passed into the `object_type` argument. 
+
+This allows you to do:
+
+    objs = ts.metadata_listobjectheaders(object_type=TSTypes.WORKSHEET, sort='MODIFIED', sort_ascending=False, category=category_filter, fetchids=object_guid_list)
+
+whereas otherwise you would need to specify both type and sub-type for a Worksheet or other data object
+
+    objs = ts.metadata_listobjectheaders(object_type=MetadataTypes.WORKSHEET, subtypes=[MetadataSubtypes.WORKSHEET], sort='MODIFIED', sort_ascending=False, category=category_filter, fetchids=object_guid_list)
 
 ### metadata_listobjectheaders and metadata_list
-The metadata/listobjectheaders and metadata/list REST API endpoints do relatively the same thing, although there are slight differences in the responses from each call.
+The `metadata/listobjectheaders` and `metadata/list` REST API endpoints do relatively the same thing, although there are slight differences in the responses from each call.
 
 The implementation is exactly as described in the documentation (https://developers.thoughtspot.com/docs/?pageid=metadata-api#object-header) with these changes for ease of use and clarity:
 
  - 'object_type' argument will accept the sub_types for the data object types and automatically structure the REST API request appropriately
  - 'filter' argument is the name given to the 'pattern' argument in the REST API command, as the name pattern seemed unclear to users
+
+`metadata/list` returns a slightly more complex object than `metadata/listobjectheaders`. To get the same list of objects from `metadata/list`, use the `headers` key from the response:
+
+    objs = ts.metadata_listobjectheaders(object_type=TSTypes.WORKSHEET, sort='MODIFIED', sort_ascending=False)
+
+    for obj in objs:
+        # parse the objects
+
+vs. 
+
+    response = ts.metadata_list(object_type=TSTypes.WORKSHEET, sort='MODIFIED', sort_ascending=False)
+    objs = response['headers']
+    for obj in objs:
+        # parse the objects
 
 ### Additional libraries
 `thoughtspot_tml` is a library for processing the ThoughtSpot Modeling Language (TML) files. You can use `thoughtspot_tml` to manipulate TML files from disk or exported via the REST API.
