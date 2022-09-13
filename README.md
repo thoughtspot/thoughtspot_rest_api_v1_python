@@ -180,7 +180,7 @@ The following example uses the `thoughtspot_tml` library, where each object has 
 Doing any actions with the REST APIs requires knowing the GUIDs of the objects. The `/metadata/` endpoints are incredibly flexible, allowing you to retrieve details about almost any object type from the same endpoints. This flexibility means you must set a number of arguments with each call, including using the internal names of the object types.
 
 ### TSTypes, MetadataTypes and MetadataSubtypes and other ENUMs
-Because the internal API identifiers of the object types in V1 often do not reflect the names used in the current versions of ThoughtSpot, there are ENUMs provided within the library to map the 'product name' to the REST API string value: TSTypes, MetadataTypes, and MetadataSubtypes. 
+Because the internal API identifiers of the object types in V1 often do not reflect the names used in the current versions of ThoughtSpot, there are ENUMs provided within the library to map the 'product name' to the REST API string value: `TSTypes`, `MetadataTypes`, and `MetadataSubtypes`. 
 
 The REST API has a single object_type for Tables, Views, and Worksheets, and uses an additional 'sub_type' property if you need to distinguish between those objects. 
 
@@ -193,6 +193,8 @@ This allows you to do:
 whereas otherwise you would need to specify both type and sub-type for a Worksheet or other data object
 
     objs = ts.metadata_listobjectheaders(object_type=MetadataTypes.WORKSHEET, subtypes=[MetadataSubtypes.WORKSHEET], sort='MODIFIED', sort_ascending=False, category=category_filter, fetchids=object_guid_list)
+
+Other ENUMs include: `Sorts`, `Categories`, `ShareModes`, `Privileges`, `PermissionTypes`, and `GroupVisibility`. Often the keys for these enums is no different than the string values themselves, but they provide easy access to the full set of values when using auto-complete in your IDE.
 
 ### metadata_listobjectheaders and metadata_list
 The `metadata/listobjectheaders` and `metadata/list` REST API endpoints do relatively the same thing, although there are slight differences in the responses from each call.
@@ -216,7 +218,30 @@ vs.
     for obj in objs:
         # parse the objects
 
-### Additional libraries
+### metadata_details and Details classes
+`metadata_details` returns the full internal object model of a given object, which is typically a very large and complex response to parse.
+
+The Details classes defined in `details_objects.py` can wrap around the response with easy methods to retrieve useful properties from this response.
+
+How to use:
+
+    details_response = ts.metadata_details(object_type=TSTypes.GROUP, object_guids=['{guid}'])
+    group_details = GroupDetails(details_obj=details_response[0])
+    privs = group_details.privileges()
+    
+    details_response = ts.metadata_details(object_type=TSTypes.USER, object_guids=['{guid}'])
+    user_details = UserDetails(details_obj=details_response[0])
+    user_created = user_details.created_timestamp()
+    user_inherited_groups = user_details.inherited_groups()
+
+Some of the properties that were previously only accessible from the `metadata/details` response may be available from endpoints in the V2 REST API, so it is worth checking there first before working with the details responses.
+
+### Connection details 
+Connections, representing basic connection details of the external data sources ThoughtSpot connects to, have their own set of endpoints in `/connection/` outside of the `/metadata/` endpoints. 
+
+There are few of these endpoints used by ThoughtSpot's UI but not currently ported and documented to the `/v1/public/` endpoints that have been implemented as part of this library to help bridge customers until public endpoints with the details have been made available.
+
+## Additional libraries
 `thoughtspot_tml` is a library for processing the ThoughtSpot Modeling Language (TML) files. You can use `thoughtspot_tml` to manipulate TML files from disk or exported via the REST API.
 
 `ts_rest_api_and_tml_tools` is a convenience library that imports both `thoughtspot_rest_api_v1` and `thoughtspot_tml` and wraps them in more convenient and obvious packaging. It also contains many example scripts to do common workflows. In particular, there are many examples of SDLC use cases that involve REST API commands and TML manipulation.
