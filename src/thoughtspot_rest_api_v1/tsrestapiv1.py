@@ -1385,7 +1385,7 @@ class TSRestApiV1:
         response.raise_for_status()
         return response.json()
 
-    def user_post(self, username: str, password: str, display_name: str, properties: Optional,
+    def user_post(self, username: str, password: str, display_name: str, properties: Optional[Dict] = None,
                   groups: Optional[List[str]] = None, user_type: str = 'LOCAL_USER',
                   tenant_id: Optional[str] = None, visibility: str = 'DEFAULT'):
         endpoint = 'user'

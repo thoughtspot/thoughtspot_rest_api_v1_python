@@ -15,8 +15,8 @@ import random
 from dotenv import load_dotenv
 load_dotenv()
 
-from thoughtspot_rest_api_v1 import *
-# from src.thoughtspot_rest_api_v1.tsrestapiv1 import *
+#from thoughtspot_rest_api_v1 import *
+from src.thoughtspot_rest_api_v1.tsrestapiv1 import *
 
 #
 # Simple JSON format for defining user details including groups. You will need to determine how to get these details
@@ -100,7 +100,7 @@ def create_user(rest_api_obj: TSRestApiV1, username, display_name, email, groups
     user_password = ''.join(random.choice(letters) for i in range(20))
 
     new_user_guid = rest_api_obj.user_post(username=username, password=user_password, display_name=display_name,
-                                           groups=groups_guid)
+                                           properties=None, groups=groups_guid)
     if email is not None:
         rest_api_obj.user_email(user_guid=new_user_guid, user_email=email)
 

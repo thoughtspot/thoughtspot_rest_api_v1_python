@@ -27,7 +27,7 @@ The library is designed to work with the latest version of ThoughtSpot Cloud. It
 To install ThoughtSpot Rest API V1, simply run this simple command in your terminal of choice:
 
 ```
-$ python -m pip install thoughtspot_rest_api_v1_python
+$ python3 -m pip install thoughtspot_rest_api_v1_python
 ```
 
 ### Getting the source code
@@ -40,7 +40,7 @@ Once you have a copy of the source, you can embed it in your own Python package,
 
 ```
 $ cd thoughtspot_rest_api_v1_python
-$ python -m pip install .
+$ python3 -m pip install --upgrade
 ```
 
 ---
@@ -251,11 +251,18 @@ The `/user/` and `/group/` endpoints contain CRUD operation endpoints for these 
 Following REST API principles, many of the endpoints themselves are the same but use different HTTP verbs to achieve different actions. The TSRestApiV1 methods distinguish these following the naming pattern of {fixed_endpoint_separated_by_underscores}_{http_verb} i.e. `POST /group/{groupid}/users` becomes `group_users_post()` while the PUT version of the same endpoint becomes `group_users_put()`
 
 ### Metadata operations
-`GET /group/` and `GET /user/` are equivalent to using `metadata/listobjectheaders`, they are just convenience methods to get the same exact result. However, there are additional endpoints that provide more specific information that is difficult to determine otherwise.
+`GET /group/` and `GET /user/` are equivalent to using `metadata/listobjectheaders`, they are just convenience methods to get the same exact result, with ability to filter directly by name. However, there are additional endpoints that provide more specific information that is difficult to determine otherwise.
 
 `GET /group/listuser/{groupid}`, `GET /group/{groupid}/users/` , `GET /group/{groupid}/groups`, and `GET /user/{userid}/groups` each give a specific insight into the relationship between groups and users, starting from an individual group or user's perspective. They can save a huge amount of time when auditing how your system is configured or why certain privileges / access control is working in a particular way.
 
+For example, if you want to know the set of users assigned to a group, you would do:
 
+    group_name = 'Group A'
+    group = ts.group_get(name=group_name)
+    group_guid = group['header']['id']
+    users_in_group = ts.group_users_get(group_guid=group_guid)
+    for user in users_in_group:
+        # do something with user headers
 
 ### CRUD operations
 As much as possible, the parameters within the endpoints or as part of the POST/PUT bodies have been mapped directly to methods with arguments matching the definitions in the documentation. Differences may occur such as using `guid` in place of `id` per Python's spec, or making arguments plural or singular when the API argument is named the opposite way.
