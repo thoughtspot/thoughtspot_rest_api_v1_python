@@ -289,6 +289,24 @@ The method `ts.session_auth_token()` is used to request the login token for a tr
 
 The example script `examples/trusted_authentication_with_authorization.py` shows how to combine various metadata and CRUD operations with the request for the trusted authorization login token. 
 
+## Data and export APIs
+In the V1 REST API, the Liveboard PDF Export endpoint lives under `/export/` while the Liveboard Data and Search Data endpoints which export data in JSON format live in the top level. 
+
+These same features have been relocated in the V2 REST API under `/report/` and `/data/` endpoints.
+
+    try:
+        liveboard_pdf = ts.export_pinboard_pdf(pinboard_id=first_liveboard_id, footer_text="Viz by the foot",
+                                               cover_page=False, filter_page=False, landscape_or_portrait='PORTRAIT')
+        new_file_name = "../Test PDF.pdf"
+        with open(new_file_name, 'bw') as fh:
+            fh.write(liveboard_pdf)
+    except requests.exceptions.HTTPError as e:
+        print(e)
+
+`examples/liveboard_pdf_export.py` shows how to use to get binary object exporys and save them to disk, although you could do further processing of those objects in memory. 
+
+
+
 ## Additional libraries
 `thoughtspot_tml` is a library for processing the ThoughtSpot Modeling Language (TML) files. You can use `thoughtspot_tml` to manipulate TML files from disk or exported via the REST API.
 
