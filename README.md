@@ -282,6 +282,11 @@ In general, anything intended as part of the Trusted Authentication workflow fro
 
 
 ### Trusted authentication token requests
+The method `ts.session_auth_token()` is used to request the login token for a trusted auth flow. This should only be used by a back-end service, with the `secret_key` from the ThoughtSpot instance stored and accessed via a secure method (up to you how best to do this). You also must develop the process to securely determine the username of the user logged into the embedding application (see https://developers.thoughtspot.com/docs/?pageid=trusted-auth for full documentation):
+    
+    user_from_request = get_username_from_secure_request(request)
+    token = ts.session_auth_token(secret_key=securely_accessed_secret_key, username=user_from_request)
+
 The example script `examples/trusted_authentication_with_authorization.py` shows how to combine various metadata and CRUD operations with the request for the trusted authorization login token. 
 
 ## Additional libraries
