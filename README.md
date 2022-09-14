@@ -275,6 +275,14 @@ Example:
     new_group_guid = new_group['headers']['id']
 
 
+## /session/ endpoints
+The `/session/` REST API endpoints are mixed between those intended to be used from the end user's browser (like `/session/login/token`) and others used in back-end processes to help facilitate SSO and session management. 
+
+In general, anything intended as part of the Trusted Authentication workflow from the browser should be handled by the Visual Embed SDK, and once that session is established, other methods like `POST /session/homepinboard` or `POST /session/logout` can be sent from the browser to achieve integration with the embedding application.
+
+
+### Trusted authentication token requests
+The example script `examples/trusted_authentication_with_authorization.py` shows how to combine various metadata and CRUD operations with the request for the trusted authorization login token. 
 
 ## Additional libraries
 `thoughtspot_tml` is a library for processing the ThoughtSpot Modeling Language (TML) files. You can use `thoughtspot_tml` to manipulate TML files from disk or exported via the REST API.
