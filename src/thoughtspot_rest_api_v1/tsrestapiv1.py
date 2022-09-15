@@ -1486,7 +1486,7 @@ class TSRestApiV1:
         return response.json()
 
     def user_transfer_ownership(self, current_owner_username: str, new_owner_username: str,
-                                object_guids: Optional[List[str]] = None) -> Dict:
+                                object_guids: Optional[List[str]] = None) -> bool:
         endpoint = 'user/transfer/ownership'
 
         url_params = {
@@ -1500,7 +1500,7 @@ class TSRestApiV1:
         url = self.base_url + endpoint
         response = self.requests_session.post(url=url, params=url_params)
         response.raise_for_status()
-        return response.json()
+        return True
 
     # NOTE: preferences and preferencesProto are a big ?
     def user_updatepreference(self, user_guid: str, username: str, preferences: Dict,
