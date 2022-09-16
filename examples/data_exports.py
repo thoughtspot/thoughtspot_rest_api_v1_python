@@ -40,7 +40,7 @@ for viz_data in viz_data_response:
 # It uses a data source object, but not any existing Liveboard or Answer
 
 ds_guid = '{dsGuid}'  # typically a Worksheet, but could be Table or View
-tml_search_string = ''
+tml_search_string = '[Product Name] [Sales] by [Region]'
 search_data_response = ts.searchdata(query_string=tml_search_string, data_source_guid=ds_guid)
 
 
