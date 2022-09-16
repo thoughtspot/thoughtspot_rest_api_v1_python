@@ -274,6 +274,33 @@ Example:
     new_group = ts.group_post(group_name='group_1', display_name='Group 1', privileges=[Privileges.CAN_DOWNLOAD_DATA, Privileges.HAS_SPOTIQ_PRIVILEGE])
     new_group_guid = new_group['headers']['id']
 
+## Sharing / object access : /security/ endpoints
+Object access in ThoughtSpot is controlled by Sharing. Objects are owned by their `author` (this is different from any `owner` property you might see in API responses) and can only be accessed by others if they are shared.
+
+### Sharing an object
+The `/security/share` endpoint is used to share objects with users and groups, which becomes `security_share()` of the `TSRestApiV11` class. 
+
+You can specify if the user or group has READ_ONLY or EDIT access through the `permissions=` argument, but it is relatively complex object format. For that reason, the library provides the `create_shared_permissions()` helper method to get the object with the right format to send into the permissions= argument:
+
+    perms = ts.create_share_permissions(read_only_users_or_groups_guids=read_only_guids, 
+                                        edit_access_users_or_groups_guids=edit_guids)
+    ts.security_share(shared_object_type=TSTypes.LIVEBOARD, shared_object_guids=[lb_guid], permissions=perms)
+
+You can also remove sharing from an object, using the third optional argument of `create_share_permissions(remove_access_users_or_groups=)`:
+
+    guids_to_remove_sharing_from = ['{groupGuid6}', '{groupGuid7}']
+    remove_perms = ts.create_share_permissions(remove_access_users_or_groups_groups=guids_to_remove_sharing_from)
+    ts.security_share(shared_object_type=TSTypes.LIVEBOARD, shared_object_guids=[lb_guid],
+                      permissions=remove_perms)
+
+You can share an individual viz from a Liveboard rather than the whole Liveboard using `security_shareviz()`. There is not multiple levels of permissions on a shared viz:
+
+    viz_guid = '{vizGuid}'
+    ts.security_shareviz(shared_object_type=TSTypes.LIVEBOARD, pinboard_guid=lb_guid, viz_guid=viz_guid, 
+                         principal_ids=read_only_guids)
+
+### Auditing permissions
+
 
 ## /session/ endpoints
 The `/session/` REST API endpoints are mixed between those intended to be used from the end user's browser (like `/session/login/token`) and others used in back-end processes to help facilitate SSO and session management. 
