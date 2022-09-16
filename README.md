@@ -290,7 +290,9 @@ The method `ts.session_auth_token()` is used to request the login token for a tr
 The example script `examples/trusted_authentication_with_authorization.py` shows how to combine various metadata and CRUD operations with the request for the trusted authorization login token. 
 
 ## Data and export APIs
-In the V1 REST API, the Liveboard PDF Export endpoint lives under `/export/` while the Liveboard Data and Search Data endpoints which export data in JSON format live in the top level. 
+In the V1 REST API, the Liveboard PDF Export endpoint lives under `/export/` while the Liveboard Data and Search Data endpoints which export data in JSON format live in the top level. In V2, the Data endpoints live under the `/data/` higher level endpoint. 
+
+Thus the methods are `ts.pinboarddata()` and `ts.searchdata()` on the `TSRestApiV1` class, while the equivalent in V2 for saved Answers is `data_answer_data()`. 
 
 These same features have been relocated in the V2 REST API under `/report/` and `/data/` endpoints.
 
@@ -305,7 +307,14 @@ These same features have been relocated in the V2 REST API under `/report/` and 
 
 `examples/liveboard_pdf_export.py` shows how to use to get binary object exports and save them to disk, although you could do further processing of those objects in memory. 
 
-The Data APIs return back results in a JSON format. In V1, 
+The Data APIs return back the data from a saved object or an arbitrary TML search string in a JSON format. Please see `examples/data_exports.py` for the various options and how to work with the result sets.
+
+    lb_guid = '{lbGuid}'
+    viz_on_lb_guid = '{vizGuid}'  # For retrieving from one specific viz
+
+    lb_data_response = ts.pinboarddata(pinboard_guid=lb_guid)
+
+    viz_data_response = ts.pinboarddata(pinboard_guid=lb_guid, vizids=[viz_on_lb_guid])
 
 
 ## Additional libraries
