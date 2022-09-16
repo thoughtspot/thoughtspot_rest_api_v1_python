@@ -299,8 +299,25 @@ You can share an individual viz from a Liveboard rather than the whole Liveboard
     ts.security_shareviz(shared_object_type=TSTypes.LIVEBOARD, pinboard_guid=lb_guid, viz_guid=viz_guid, 
                          principal_ids=read_only_guids)
 
-### Auditing permissions
+### Auditing permissions on an object
+The set of sharing set on an object is referred to as permissions. There are several similar endpoints in the V1 REST API for determining permissions: `security_metadata_permissions()`, `security_metadata_permissions_by_id()` and `security_effectivepermissionbulk()`. 
 
+Please see the REST API documentation to understand the main differences, but in essence `security_metadata_permissions()` can retrieve multiple objects of the same type, while `security_metadata_permissions_by_id()` only brings back one object at a time. Both have a `permission_type=` argument that can take the values in the `PermissionTypes` ENUM, either `EFFECTIVE` or `DEFINED`
+
+    ts.security_metadata_permissions_by_id(object_type=TSTypes.LIVEBOARD, object_guid=lb_guid, dependent_share=False,
+                                           permission_type=PermissionTypes.EFFECTIVE)
+
+  
+`security_effectivepermissionbulk()` allows you to specify objects of multiple types using a more complex Dict for the `ids_by_type=` argument, but it does not let you choose between the PermissionTypes the way the other endpoints do:
+
+    ts.security_effectivepermissionbulk(ids_by_type={MetadataTypes.LIVEBOARD: ['{lbGuid1}'], 
+                                                     MetadataTypes.ANSWER: ['{aGuid1}']}
+                                        )
+
+These endpoints have been simplified in REST API V2 into `security_permission_tsobject()` to get the set of users and groups who can see/edit the object, and `ts_security_permission_principal()` to see what content of a given type the user or group has access to:
+
+    ts2.security_permission_principal(username_or_group_name='auser@domain.com')  # alternatively username_or_group_guid=
+    ts2.security_permission_tsobject(guid=lb_guid, object_type=TSTypesV2.LIVEBOARD, include_dependents=False)
 
 ## /session/ endpoints
 The `/session/` REST API endpoints are mixed between those intended to be used from the end user's browser (like `/session/login/token`) and others used in back-end processes to help facilitate SSO and session management. 
