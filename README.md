@@ -303,8 +303,9 @@ These same features have been relocated in the V2 REST API under `/report/` and 
     except requests.exceptions.HTTPError as e:
         print(e)
 
-`examples/liveboard_pdf_export.py` shows how to use to get binary object exporys and save them to disk, although you could do further processing of those objects in memory. 
+`examples/liveboard_pdf_export.py` shows how to use to get binary object exports and save them to disk, although you could do further processing of those objects in memory. 
 
+The Data APIs return back results in a JSON format. In V1, 
 
 
 ## Additional libraries
