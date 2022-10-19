@@ -1344,8 +1344,6 @@ class TSRestApiV1:
 
     # NOTE:
     #
-    #   session/login/token is not implemented here, it is intended for a browser login
-    #
     #   The below shows an implementation of session/auth/token but it should only be
     #   used from Authenticator Server with Secret Key retrieved in a secure manner only
     #   in memory
@@ -1368,6 +1366,22 @@ class TSRestApiV1:
         response = self.requests_session.post(url=url, data=post_params)
         return response
 
+    # session/login/token is typically only used within the browser and handled by the Visual Embed SDK,
+    # provided here for testing
+    def session_login_token_post(self, username: str, auth_token: str, redirect_url: str):
+        endpoint = 'session/login/token'
+
+        post_params = {
+             'username': username,
+             'auth_token': auth_token,
+             'redirect_url': redirect_url,  # need to url encode
+
+        }
+
+        url = self.base_url + endpoint
+
+        response = self.requests_session.post(url=url, data=post_params)
+        return response
     #
     # USER Methods
     #
