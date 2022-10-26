@@ -301,9 +301,39 @@ class TSRestApiV2:
 
         response.raise_for_status()
         return True
+
     #
     # /connection/ endpoints
     #
+    def connection_removetable(self, connection_guid: str, table_guids: Optional[List[str]] = None,
+                               table_names: Optional[List[str]] = None):
+        endpoint = 'connection/removetable'
+
+        url = self.base_url + endpoint
+
+        if table_guids is None and table_names is None:
+            raise SyntaxError('Must specify either table_guids or table_names argument')
+        # Current spec calls for a GET with a -d argument in cURL, but this translates to a URL param not body
+        json_post_data = {
+            'id': connection_guid
+        }
+
+        table_argument = []
+        if table_guids is not None:
+            for g in table_guids:
+                elem = {"id": g}
+                table_argument.append(elem)
+        if table_names is not None:
+            for g in table_names:
+                elem = {"name": g}
+                table_argument.append(elem)
+        json_post_data['table'] = table_argument
+
+        response = self.requests_session.put(url=url, json=json_post_data)
+
+        response.raise_for_status()
+        return True
+
 
     #
     # /data/ endpoints
