@@ -27,7 +27,7 @@ The library is designed to work with the latest version of ThoughtSpot Cloud. It
 To install ThoughtSpot Rest API V1, simply run this simple command in your terminal of choice:
 
 ```
-$ python3 -m pip install thoughtspot_rest_api_v1_python
+$ python3 -m pip install thoughtspot_rest_api_v1
 ```
 
 ### Getting the source code
