@@ -123,6 +123,14 @@ You create a TSRestApiV2 object with the `server_url` argument, then use the `se
 ## TML operations
 One primary use case of the REST APIs is to import and export ThoughtSpot Modeling Language (TML) files.
 
+### Disabling FQN export
+ThoughtSpot 8.9 adds the 'export_fqn' option to the `/metadata/tml/export` endpoint, which includes the GUID references to all related objects in an exported TML file. Because this is very useful, the library defaults to including the argument set to true in all TML Export methods.
+
+Older versions of ThoughtSpot will not support this option, so there is a global `can_export_fqn` flag to disable it. Set it to False if you are encountering errors and are on a version prior to 8.9:
+    
+    ts: TSRestApiV1 = TSRestApiV1(server_url=server)
+    ts.can_export_fqn = False
+
 ### Retrieving the TML as a Python OrderedDict from REST API
 If you want to use the TML classes to programmatically adjust the returned TML, there is a `export_tml(guid)` method which retrieves the TML from the API in JSON format and then returns it as a Python OrderedDict.
 

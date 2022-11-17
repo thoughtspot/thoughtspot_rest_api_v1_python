@@ -176,6 +176,9 @@ class TSRestApiV1:
         # V2 REST API for basic implementation
         self.v2_base_url = '{server}/tspublic/rest/v2/'.format(server=self.server)
 
+        # Flag for whether the version implements the export_fqn option of metadata/tml/export
+        self.can_export_fqn = True
+
     #
     # Session management calls
     # - up here vs. in the SESSION section below (because these two are required)
@@ -963,7 +966,7 @@ class TSRestApiV1:
             else:
                 return response.json()
 
-    def metadata_tml_export(self, guid: str, export_associated=False) -> OrderedDict:
+    def metadata_tml_export(self, guid: str, export_associated=False, export_fqn=True) -> OrderedDict:
         # Always returns a Python Dict, converted from a request to the API to receive in JSON
         endpoint = 'metadata/tml/export'
 
@@ -972,6 +975,9 @@ class TSRestApiV1:
             'formattype': 'JSON',
             'export_associated': str(export_associated).lower()
         }
+        # Added in version 8.9, can be set to skip for older releases
+        if self.can_export_fqn is True:
+            post_data['export_fqn'] = str(export_fqn).lower()
 
         url = self.base_url + endpoint
         # TML import is distinguished by having an {'Accept': 'text/plain'} header on the POST
@@ -997,7 +1003,7 @@ class TSRestApiV1:
         return tml_obj
 
     # Method to retrieve the all of the associate objects and retrieve original object and a dict of name:guid mapping
-    def metadata_tml_export_with_associations_map(self, guid: str) -> (OrderedDict, Dict):
+    def metadata_tml_export_with_associations_map(self, guid: str, export_fqn=True) -> (OrderedDict, Dict):
         # Always returns a Python Dict, converted from a request to the API to receive in JSON
         endpoint = 'metadata/tml/export'
 
@@ -1006,6 +1012,9 @@ class TSRestApiV1:
             'formattype': 'JSON',
             'export_associated': 'true'
         }
+        # Added in version 8.9, can be set to skip for older releases
+        if self.can_export_fqn is True:
+            post_data['export_fqn'] = str(export_fqn).lower()
 
         url = self.base_url + endpoint
         # TML import is distinguished by having an {'Accept': 'text/plain'} header on the POST
@@ -1030,7 +1039,8 @@ class TSRestApiV1:
 
         return tml_obj, name_guid_map
 
-    def metadata_tml_export_string(self, guid: str, formattype: str = 'YAML', export_associated=False) -> str:
+    def metadata_tml_export_string(self, guid: str, formattype: str = 'YAML',
+                                   export_associated=False, export_fqn=True) -> str:
         # Intended for a direct pull with no conversion
         endpoint = 'metadata/tml/export'
         # allow JSON or YAML in any casing
@@ -1040,6 +1050,9 @@ class TSRestApiV1:
             'formattype': formattype,
             'export_associated': str(export_associated).lower()
         }
+        # Added in version 8.9, can be set to skip for older releases
+        if self.can_export_fqn is True:
+            post_data['export_fqn'] = str(export_fqn).lower()
         url = self.base_url + endpoint
 
         # TML import is distinguished by having an {'Accept': 'text/plain'} header on the POST
@@ -1062,7 +1075,8 @@ class TSRestApiV1:
         else:
             raise Exception()
 
-    def metadata_tml_export_string_with_associations_map(self, guid: str, formattype: str = 'YAML') -> (str, Dict):
+    def metadata_tml_export_string_with_associations_map(self, guid: str, formattype: str = 'YAML',
+                                                         export_fqn=True) -> (str, Dict):
         # Intended for a direct pull with no conversion
         endpoint = 'metadata/tml/export'
         # allow JSON or YAML in any casing
@@ -1072,6 +1086,9 @@ class TSRestApiV1:
             'formattype': formattype,
             'export_associated': 'true'
         }
+        # Added in version 8.9, can be set to skip for older releases
+        if self.can_export_fqn is True:
+            post_data['export_fqn'] = str(export_fqn).lower()
         url = self.base_url + endpoint
 
         # TML import is distinguished by having an {'Accept': 'text/plain'} header on the POST
