@@ -1117,7 +1117,8 @@ class TSRestApiV1:
         tml: Union[Dict, List[Dict]],
         create_new_on_server: bool = False,
         validate_only: bool = False,
-        formattype: str = 'JSON'
+        formattype: str = 'JSON',
+        enable_block_tml_metadata_sync: Optional[bool] = None
     ) -> Dict:
         endpoint = 'metadata/tml/import'
         # allow JSON or YAML in any casing
@@ -1147,6 +1148,8 @@ class TSRestApiV1:
             'import_policy': import_policy,
             'force_create': str(create_new_on_server).lower()
         }
+        if enable_block_tml_metadata_sync is not None:
+            post_data['enable_block_tml_metadata_sync'] = str(enable_block_tml_metadata_sync).lower()
 
         url = self.base_url + endpoint
 
