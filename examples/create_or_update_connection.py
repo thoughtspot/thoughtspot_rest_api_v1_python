@@ -34,12 +34,15 @@ for conn_type in conn_types:
 
 # The actual properties of the connection are set using the connection metadata
 # https://developers.thoughtspot.com/docs/?pageid=connections-api#connection-metadata
-connection_metadata = {
+connection_config = {
     'accountName': 'myAccountName',
     'user': 'myUser',
     'password': securely_retrieve_connection_pw(),
     'role': 'yourRole',
     'warehouse': 'SnowflakeWarehouse'
+}
+connection_metadata = {
+    "configuration": connection_config
 }
 # Convert the dict into a JSON string
 conn_json = json.dumps(connection_metadata)
