@@ -60,14 +60,14 @@ class TSRestApiV2:
     #
     def auth_session_login(self,  username: Optional[str] = None, password: Optional[str] = None,
                       remember_me: bool = True,
-                      token: Optional[str] = None) -> requests.Session:
+                      bearer_token: Optional[str] = None) -> requests.Session:
         endpoint = 'auth/session/login'
 
         url = self.base_url + endpoint
 
-        if token is not None:
+        if bearer_token is not None:
             response = self.requests_session.post(url=url,
-                                                  headers={"Authorization": "Bearer {}".format(token)},
+                                                  headers={"Authorization": "Bearer {}".format(bearer_token)},
                                                   json={'remember_me': str(remember_me).lower()})
         elif username is not None and password is not None:
             json_post_data = {
