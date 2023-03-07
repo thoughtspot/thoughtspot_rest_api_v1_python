@@ -38,6 +38,7 @@ class TSRestApiV2:
             server_url = server_url[0:-1]
 
         self.server = server_url
+        self.api_version = '2.0'
 
         # REST API uses cookies to maintain the session, so you need to create an open Session
         self.requests_session = requests.Session()
@@ -50,23 +51,30 @@ class TSRestApiV2:
         self.requests_session.headers.update(self.api_headers)
 
         # TS documentation shows the /tspublic/v2/ portion but it is always preceded by {server}/callosum/v2/
-        self.base_url = '{server}/tspublic/rest/v2/'.format(server=self.server)
-        self.non_public_base_url = '{server}/callosum/v1/'.format(server=self.server)
+        self.base_url = '{server}/api/rest/{version}/'.format(server=self.server, version=self.api_version)
+        # self.non_public_base_url = '{server}/callosum/v1/'.format(server=self.server)
 
     #
     # Session management calls
     # - up here vs. in the SESSION section below (because these two are required)
     #
-    def session_login(self,  username: Optional[str] = None, password: Optional[str] = None,
+    def auth_session_login(self,  username: Optional[str] = None, password: Optional[str] = None,
+                      remember_me: bool = True,
                       token: Optional[str] = None) -> requests.Session:
-        endpoint = 'session/login'
+        endpoint = 'auth/session/login'
 
         url = self.base_url + endpoint
 
         if token is not None:
-            response = self.requests_session.post(url=url, headers={"Authorization": "Bearer {}".format(token)})
+            response = self.requests_session.post(url=url,
+                                                  headers={"Authorization": "Bearer {}".format(token)},
+                                                  json={'remember_me': str(remember_me).lower()})
         elif username is not None and password is not None:
-            json_post_data = {'userName': username, 'password': password, 'rememberMe': 'true'}
+            json_post_data = {
+                'username': username,
+                'password': password,
+                'remember_me': str(remember_me).lower()
+            }
             response = self.requests_session.post(url=url, json=json_post_data)
         else:
             raise Exception("If using username/password, must include both")
@@ -75,8 +83,8 @@ class TSRestApiV2:
         response.raise_for_status()
         return self.requests_session
 
-    def session_logout(self) -> bool:
-        endpoint = 'session/logout'
+    def auth_session_logout(self) -> bool:
+        endpoint = 'auth/session/logout'
 
         url = self.base_url + endpoint
         response = self.requests_session.post(url=url)
@@ -85,8 +93,31 @@ class TSRestApiV2:
         response.raise_for_status()
         return True
 
-    # This is only the V2 API bearer token, not the Trusted Authentication token from V1
-    def get_token(self, username: Optional[str] = None, password: Optional[str] = None,
+    # V2 API Bearer token can be used with V1 /session/login/token for Trusted Auth flow
+    # or used with each API call (no session object) or used with V2 /auth/session/login to create session
+    def auth_token_full(self, username: Optional[str] = None, password: Optional[str] = None,
+                        secret_key: Optional[str] = None, validity_time_in_sec: int = 300,
+                        auto_create: bool = False ) -> Dict:
+        endpoint = 'auth/token/full'
+
+        url = self.base_url + endpoint
+
+        json_post_data = {'validity_time_in_sec': validity_time_in_sec}
+
+        if secret_key is not None:
+            json_post_data['secret_key'] = secret_key
+        elif username is not None and password is not None:
+            json_post_data['username'] = username
+            json_post_data['password'] = password
+        else:
+            raise Exception("If using username/password, must include both")
+
+        response = self.requests_session.post(url=url, json=json_post_data)
+
+        response.raise_for_status()
+        return response.json()
+
+    def auth_token_object(self, username: Optional[str] = None, password: Optional[str] = None,
                   secret_key: Optional[str] = None, token_expiry_duration: int = 300,
                   access_level: str = "FULL", ts_object_id: Optional[str] = None) -> Dict:
         endpoint = 'session/gettoken'
@@ -112,8 +143,8 @@ class TSRestApiV2:
         response.raise_for_status()
         return response.json()
 
-    def session_revoke_token(self) -> bool:
-        endpoint = 'session/revoketoken'
+    def auth_token_revoke(self) -> bool:
+        endpoint = 'auth/token/revoke'
 
         url = self.base_url + endpoint
         response = self.requests_session.post(url=url)
@@ -124,7 +155,28 @@ class TSRestApiV2:
 
     #
     # Generic wrappers for the basic HTTP methods
+    # Theoretically, you can just get bearer token and issue any command with endpoint and request
+    # vs. using any of the other endpoint wrapper methods
     #
+    def get_request(self, endpoint):
+        url = self.base_url + endpoint
+        response = self.requests_session.get(url=url)
+        response.raise_for_status()
+        return response.json()
+
+    def post_request(self, endpoint, request_dict=None):
+        url = self.base_url + endpoint
+        if request_dict is not None:
+            response = self.requests_session.post(url=url, json=request_dict)
+        else:
+            response = self.requests_session.post(url=url)
+
+        response.raise_for_status()
+        # Most should return a JSON response, but things like deletes may just be 204s
+        try:
+            return response.json()
+        except requests.exceptions.JSONDecodeError:
+            return True
 
     #
     #
