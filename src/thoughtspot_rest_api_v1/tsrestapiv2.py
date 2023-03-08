@@ -50,17 +50,30 @@ class TSRestApiV2:
         self.api_headers = {'X-Requested-By': 'ThoughtSpot', 'Accept': 'application/json', 'Accept-Language': 'en_US'}
         self.requests_session.headers.update(self.api_headers)
 
+        # Will be set after initial request
+        self.__bearer_token = None
+
         # TS documentation shows the /tspublic/v2/ portion but it is always preceded by {server}/callosum/v2/
         self.base_url = '{server}/api/rest/{version}/'.format(server=self.server, version=self.api_version)
         # self.non_public_base_url = '{server}/callosum/v1/'.format(server=self.server)
+
+    @property
+    def bearer_token(self):
+        return self.__bearer_token
+
+    @bearer_token.setter
+    def bearer_token(self, bearer_token):
+        self.__bearer_token = bearer_token
+        self.api_headers['Authorization'] = 'Bearer {}'.format(bearer_token)
+        self.requests_session.headers.update(self.api_headers)
 
     #
     # Session management calls
     # - up here vs. in the SESSION section below (because these two are required)
     #
     def auth_session_login(self,  username: Optional[str] = None, password: Optional[str] = None,
-                      remember_me: bool = True,
-                      bearer_token: Optional[str] = None) -> requests.Session:
+                           remember_me: bool = True,
+                           bearer_token: Optional[str] = None) -> requests.Session:
         endpoint = 'auth/session/login'
 
         url = self.base_url + endpoint
