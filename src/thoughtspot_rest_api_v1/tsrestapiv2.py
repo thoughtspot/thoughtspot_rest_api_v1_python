@@ -108,22 +108,40 @@ class TSRestApiV2:
 
     # V2 API Bearer token can be used with V1 /session/login/token for Trusted Auth flow
     # or used with each API call (no session object) or used with V2 /auth/session/login to create session
-    def auth_token_full(self, username: Optional[str] = None, password: Optional[str] = None,
+    def auth_token_full(self, username: str, password: Optional[str] = None, org_id: Optional[int] = None,
                         secret_key: Optional[str] = None, validity_time_in_sec: int = 300,
-                        auto_create: bool = False ) -> Dict:
+                        auto_create: bool = False, display_name: Optional[str] = None,
+                        email: Optional[str] = None, group_identifiers: Optional[List[str]] = None) -> Dict:
         endpoint = 'auth/token/full'
 
         url = self.base_url + endpoint
 
-        json_post_data = {'validity_time_in_sec': validity_time_in_sec}
+        json_post_data = {
+            'username': username,
+            'validity_time_in_sec': validity_time_in_sec
+        }
 
         if secret_key is not None:
             json_post_data['secret_key'] = secret_key
+
         elif username is not None and password is not None:
-            json_post_data['username'] = username
             json_post_data['password'] = password
         else:
             raise Exception("If using username/password, must include both")
+
+        if org_id is not None:
+            json_post_data['org_id'] = org_id
+
+        # User provisioning options
+        if auto_create is True:
+            if display_name is not None and email is not None:
+                json_post_data['auto_create'] = True
+                json_post_data['display_name'] = display_name
+                json_post_data['email'] = email
+                if group_identifiers is not None:
+                    json_post_data['group_identifiers'] = group_identifiers
+            else:
+                raise Exception("If using auto_create=True, must include display_name and email")
 
         response = self.requests_session.post(url=url, json=json_post_data)
 
@@ -131,19 +149,19 @@ class TSRestApiV2:
         return response.json()
 
     def auth_token_object(self, username: Optional[str] = None, password: Optional[str] = None,
-                  secret_key: Optional[str] = None, token_expiry_duration: int = 300,
-                  access_level: str = "FULL", ts_object_id: Optional[str] = None) -> Dict:
-        endpoint = 'session/gettoken'
+                          secret_key: Optional[str] = None, token_expiry_duration: int = 300,
+                          ts_object_id: Optional[str] = None) -> Dict:
+        endpoint = 'auth/token/object'
 
         url = self.base_url + endpoint
 
-        json_post_data = {'accessLevel': access_level,
+        json_post_data = {
                           'tokenExpiryDuration': token_expiry_duration}
 
         if secret_key is not None:
             json_post_data['secretKey'] = secret_key
         elif username is not None and password is not None:
-            json_post_data['userName'] = username
+            json_post_data['username'] = username
             json_post_data['password'] = password
         else:
             raise Exception("If using username/password, must include both")
