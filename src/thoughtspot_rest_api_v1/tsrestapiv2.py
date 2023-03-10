@@ -148,26 +148,42 @@ class TSRestApiV2:
         response.raise_for_status()
         return response.json()
 
-    def auth_token_object(self, username: Optional[str] = None, password: Optional[str] = None,
-                          secret_key: Optional[str] = None, token_expiry_duration: int = 300,
-                          ts_object_id: Optional[str] = None) -> Dict:
+    def auth_token_object(self, username: str, object_id: str, password: Optional[str] = None,
+                          org_id: Optional[int] = None,
+                          secret_key: Optional[str] = None, validity_time_in_sec: int = 300,
+                          auto_create: bool = False, display_name: Optional[str] = None,
+                           email: Optional[str] = None, group_identifiers: Optional[List[str]] = None) -> Dict:
         endpoint = 'auth/token/object'
 
         url = self.base_url + endpoint
 
         json_post_data = {
-                          'tokenExpiryDuration': token_expiry_duration}
+            'username': username,
+            'object_id': object_id
+            'validity_time_in_sec': validity_time_in_sec
+        }
 
         if secret_key is not None:
-            json_post_data['secretKey'] = secret_key
+            json_post_data['secret_key'] = secret_key
+
         elif username is not None and password is not None:
-            json_post_data['username'] = username
             json_post_data['password'] = password
         else:
             raise Exception("If using username/password, must include both")
 
-        if ts_object_id is not None:
-            json_post_data['tsObjectId'] = ts_object_id
+        if org_id is not None:
+            json_post_data['org_id'] = org_id
+
+        # User provisioning options
+        if auto_create is True:
+            if display_name is not None and email is not None:
+                json_post_data['auto_create'] = True
+                json_post_data['display_name'] = display_name
+                json_post_data['email'] = email
+                if group_identifiers is not None:
+                    json_post_data['group_identifiers'] = group_identifiers
+            else:
+                raise Exception("If using auto_create=True, must include display_name and email")
 
         response = self.requests_session.post(url=url, json=json_post_data)
 
