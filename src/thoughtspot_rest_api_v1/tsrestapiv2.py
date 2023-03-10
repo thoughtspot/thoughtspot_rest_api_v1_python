@@ -159,7 +159,7 @@ class TSRestApiV2:
 
         json_post_data = {
             'username': username,
-            'object_id': object_id
+            'object_id': object_id,
             'validity_time_in_sec': validity_time_in_sec
         }
 
