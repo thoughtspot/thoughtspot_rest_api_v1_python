@@ -211,10 +211,10 @@ class TSRestApiV2:
         response.raise_for_status()
         return response.json()
 
-    def post_request(self, endpoint, request_dict=None):
+    def post_request(self, endpoint, request=None):
         url = self.base_url + endpoint
-        if request_dict is not None:
-            response = self.requests_session.post(url=url, json=request_dict)
+        if request is not None:
+            response = self.requests_session.post(url=url, json=request)
         else:
             response = self.requests_session.post(url=url)
 
@@ -225,6 +225,65 @@ class TSRestApiV2:
         except requests.exceptions.JSONDecodeError:
             return True
 
+    def post_request_binary(self, endpoint, request=None):
+        pass
+
+    #
+    # Principles of individual endpoint implementations:
+    # Naming follows the endpoint with _ replacing /
+    # Endpoint is embedded within the method
+    # If the endpoint URL itself takes an id, the id will be second argument
+    # If the POST request takes simple required arguments, they will be made arguments of the method
+    # If the possible arguments take complex structures or are highly variable, there will be a requestt argument
+    #
+
+    #
+    # /users/ endpoints
+    #
+    def users_search(self, request: Dict):
+        endpoint = 'users/search'
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def users_create(self, request: Dict):
+        endpoint = 'users/create'
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def users_update(self, user_identifier: str, request: Dict):
+        endpoint = 'users/{}/update'.format(user_identifier)
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def users_delete(self, user_identifier: str):
+        endpoint = 'users/{}/update'.format(user_identifier)
+        return self.post_request(endpoint=endpoint)
+
+    def users_import(self, request: Dict):
+        endpoint = 'users/import'
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def users_change_password(self, user_identifier: str, current_password: str, new_password: str):
+        endpoint = 'users/change-password'
+        request = {
+            'user_identifier': user_identifier,
+            'current_password': current_password,
+            'new_password': new_password
+        }
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def users_reset_password(self, user_identifier: str, new_password: str):
+        endpoint = 'users/reset-password'
+        request = {
+            'user_identifier': user_identifier,
+            'new_password': new_password
+        }
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def users_force_logout(self, user_identifiers: List[str]):
+        endpoint = 'users/force-logout'
+        request = {
+            'user_identifiers': user_identifiers
+        }
+        return self.post_request(endpoint=endpoint, request=request)
+
     #
     #
     # /metadata/ endpoints
@@ -234,6 +293,12 @@ class TSRestApiV2:
     #
     # /metadata/tag endpoints
     #
+    def tags_create(self, request_dict):
+        endpoint = 'tags/create'
+        return self.post_request(endpoint=endpoint, request=request_dict)
+
+
+'''
     def metadata_tag(self, tag_name: Optional[str] = None, tag_guid: Optional[str] = None):
         endpoint = 'metadata/tag'
 
@@ -288,8 +353,8 @@ class TSRestApiV2:
         response.raise_for_status()
         return True
 
-    def metadata_tag_delete(self, tag_guid: Optional[str] = None, tag_name: Optional[str] = None):
-        endpoint = 'metadata/tag/delete'
+    def tags_delete(self, tag_guid: Optional[str] = None, tag_name: Optional[str] = None):
+        endpoint = 'tags/delete'
 
         url = self.base_url + endpoint
 
@@ -664,9 +729,8 @@ class TSRestApiV2:
 
         response.raise_for_status()
         return True
+        
 
-
-'''
     def security_permission_tsobject_search(self, guid: str, object_type: str, include_dependents: bool = False):
         endpoint = 'security/permission/tsobject/search'
 
