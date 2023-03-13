@@ -328,7 +328,7 @@ class TSRestApiV2:
         return self.post_request(endpoint=endpoint, request=request)
 
     def orgs_delete(self, org_identifier: str):
-        endpoint = 'orgs/{}/update'.format(org_identifier)
+        endpoint = 'orgs/{}/delete'.format(org_identifier)
         return self.post_request(endpoint=endpoint)
     #
     #
@@ -339,9 +339,134 @@ class TSRestApiV2:
     #
     # /metadata/tag endpoints
     #
-    def tags_create(self, request_dict):
+    def tags_search(self, tag_identifier: Optional[str] = None, color: Optional[str] = None):
+        endpoint = 'tags/search'
+        if tag_identifier is None and color is None:
+            raise Exception("Must provide tag_identifier or color")
+        request = {}
+        if tag_identifier is not None:
+            request['tag_identifier'] = tag_identifier
+        if color is not None:
+            request['color'] = color
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def tags_create(self, name: str, color: str):
         endpoint = 'tags/create'
-        return self.post_request(endpoint=endpoint, request=request_dict)
+        request = {
+            'name': name,
+            'color': color
+        }
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def tags_update(self, tag_identifier: str, name: str, color: str):
+        endpoint = 'tags/{}/update'.format(tag_identifier)
+        request = {
+            'name': name,
+            'color': color
+        }
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def tags_delete(self, tag_identifier: str):
+        endpoint = 'tags/{}/delete'.format(tag_identifier)
+        return self.post_request(endpoint=endpoint)
+
+    def tags_assign(self, request: Dict):
+        endpoint = 'tags/assign'
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def tags_unassign(self, request: Dict):
+        endpoint = 'tags/unassign'
+        return self.post_request(endpoint=endpoint, request=request)
+
+#
+# /groups/ endpoints
+#
+    def groups_search(self, request: Dict):
+        endpoint = 'groups/search'
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def groups_create(self, request: Dict):
+        endpoint = 'groups/create'
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def groups_update(self, group_identifier: str, request: Dict):
+        endpoint = 'groups/{}/update'.format(group_identifier)
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def groups_delete(self, group_identifier: str):
+        endpoint = 'groups/{}/delete'.format(group_identifier)
+        return self.post_request(endpoint=endpoint)
+
+    def groups_import(self, request: Dict):
+        endpoint = 'groups/import'
+        return self.post_request(endpoint=endpoint, request=request)
+
+#
+# /metadata/ endpoints
+#
+    def metadata_search(self, request: Dict):
+        endpoint = 'metadata/search'
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def metadata_liveboard_sql(self, liveboard_identifier: str, visualization_identifiers: Optional[List[str]] = None):
+        endpoint = 'metadata/liveboard/sql'
+        request = {
+            'metadata_identifier': liveboard_identifier
+        }
+        if visualization_identifiers is not None:
+            request['visualization_identifiers'] = visualization_identifiers
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def metadata_answer_sql(self, answer_identifier: str):
+        endpoint = 'metadata/answer/sql'
+        request = {
+            'metadata_identifier': answer_identifier
+        }
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def metadata_tml_import(self, metadata_tmls: List[str], import_policy: str = 'PARTIAL', create_new: bool = False):
+        endpoint = 'metadata/tml/import'
+        request = {
+            'metadata_tmls': metadata_tmls,
+            'import_policy': import_policy,
+            'create_new': create_new
+        }
+        return self.post_request(endpoint=endpoint, request=request)
+
+    # Out of convenience, providing a simple List[str] input for getting these by GUID. metadata_request will override
+    # if you need the deeper functionality with names / types
+    def metadata_tml_export(self, metadata_ids: List[str], export_associated: bool = False, export_fqn: bool = False,
+                            metadata_request: Optional[List[Dict]] = None):
+        endpoint = 'metadata/tml/import'
+        request = {
+            'export_associated': export_associated,
+            'export_fqn': export_fqn
+        }
+        if metadata_request is not None:
+            request['metadata'] = metadata_request
+        else:
+            metadata_list = []
+            for i in metadata_ids:
+                metadata_list.append({'identifier': i})
+            request['metadata'] = metadata_list
+        return self.post_request(endpoint=endpoint, request=request)
+
+    # Out of convenience, providing a simple List[str] input for getting these by GUID. metadata_request will override
+    # if you need the deeper functionality with names / types
+    def metadata_delete(self, metadata_ids: List[str], delete_disabled_objects: bool = False,
+                        metadata_request: Optional[List[Dict]] = None):
+        endpoint = 'metadata/delete'
+        request = {
+            'delete_disabled_objects': delete_disabled_objects
+        }
+        if metadata_request is not None:
+            request['metadata'] = metadata_request
+        else:
+            metadata_list = []
+            for i in metadata_ids:
+                metadata_list.append({'identifier': i})
+            request['metadata'] = metadata_list
+        return self.post_request(endpoint=endpoint, request=request)
 
 
 '''
