@@ -226,7 +226,15 @@ class TSRestApiV2:
             return True
 
     def post_request_binary(self, endpoint, request=None):
-        pass
+        url = self.base_url + endpoint
+        if request is not None:
+            response = self.requests_session.post(url=url, json=request,
+                                                  headers={'Accept': 'application/octet-stream'})
+        else:
+            response = self.requests_session.post(url=url, headers={'Accept': 'application/octet-stream'})
+
+        response.raise_for_status()
+        return response.content
 
     #
     # Principles of individual endpoint implementations:
@@ -468,6 +476,84 @@ class TSRestApiV2:
             request['metadata'] = metadata_list
         return self.post_request(endpoint=endpoint, request=request)
 
+#
+# /reports/ endpoints
+#
+
+    def report_liveboard(self, request: Dict):
+        endpoint = 'report/liveboard'
+        return self.post_request_binary(endpoint=endpoint, request=request)
+
+    def report_answer(self, request: Dict):
+        endpoint = 'report/answer'
+        return self.post_request_binary(endpoint=endpoint, request=request)
+
+#
+# /security/ endpoints
+#
+    def security_principals_fetch_permissions(self, request: Dict):
+        endpoint = 'security/principals/fetch-permissions'
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def security_metadata_fetch_permissions(self, request: Dict):
+        endpoint = 'security/metadata/fetch-permissions'
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def security_metadata_assign(self, request: Dict):
+        endpoint = 'security/metadata/assign'
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def security_metadata_share(self, request: Dict):
+        endpoint = 'security/metadata/share'
+        return self.post_request(endpoint=endpoint, request=request)
+
+#
+# /data/
+#
+    def searchdata(self, request: Dict):
+        endpoint = 'searchdata'
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def metadata_liveboard_data(self, request: Dict):
+        endpoint = 'metadata/liveboard/data'
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def metadata_answer_data(self, request: Dict):
+        endpoint = 'metadata/answer/data'
+        return self.post_request(endpoint=endpoint, request=request)
+
+#
+# /logs/ endpoints
+#
+    def logs_fetch(self, log_type: str, start_epoch_time_in_millis: int,
+                   end_epoch_time_in_millis: int):
+        endpoint = 'logs/fetch'
+        request = {
+            'log_type': log_type,
+            'start_epoch_time_in_millis': start_epoch_time_in_millis,
+            'end_epoch_time_in_millis': end_epoch_time_in_millis
+        }
+        return self.post_request(endpoint=endpoint, request=request)
+
+#
+# /connection/ endpoints
+#
+    def connection_search(self, request: Dict):
+        endpoint = 'connection/search'
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def connection_create(self, request: Dict):
+        endpoint = 'connection/create'
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def connection_delete(self, connection_identifier: str):
+        endpoint = 'connection/delete'
+        request = {'connection_identifier': connection_identifier}
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def connection_update(self, request: Dict):
+        endpoint = 'connection/update'
+        return self.post_request(endpoint=endpoint, request=request)
 
 '''
     def metadata_tag(self, tag_name: Optional[str] = None, tag_guid: Optional[str] = None):
