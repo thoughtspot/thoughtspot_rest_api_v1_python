@@ -285,6 +285,52 @@ class TSRestApiV2:
         return self.post_request(endpoint=endpoint, request=request)
 
     #
+    # /system/ endpoints
+    #
+
+    def system(self):
+        endpoint = 'system'
+        return self.get_request(endpoint=endpoint)
+
+    def system_config(self):
+        endpoint = 'system/config'
+        return self.get_request(endpoint=endpoint)
+
+    def system_config_overrides(self):
+        endpoint = 'system/config-overrides'
+        return self.get_request(endpoint=endpoint)
+
+    def system_config_update(self, configuration: Dict):
+        endpoint = 'system/config-update'
+        request = {
+            'configuration': configuration
+        }
+        return self.post_request(endpoint=endpoint, request=request)
+
+    #
+    # /orgs/ endpoints
+    #
+    def orgs_search(self, request: Dict):
+        endpoint = 'orgs/search'
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def orgs_create(self, name: str, description: Optional[str] = None):
+        endpoint = 'orgs/create'
+        request = {
+            'name': name
+        }
+        if description is not None:
+            request['description'] = description
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def orgs_update(self, org_identifier: str, request: Dict):
+        endpoint = 'orgs/{}/update'.format(org_identifier)
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def orgs_delete(self, org_identifier: str):
+        endpoint = 'orgs/{}/update'.format(org_identifier)
+        return self.post_request(endpoint=endpoint)
+    #
     #
     # /metadata/ endpoints
     #
