@@ -205,55 +205,6 @@ class TSRestApiV1:
         return True
 
     #
-    # V2 Session management
-    #
-
-    def session_login_v2(self,  username: Optional[str] = None, password: Optional[str] = None,
-                         token: Optional[str] = None) -> bool:
-        endpoint = 'session/login'
-
-        url = self.v2_base_url + endpoint
-
-        if token is not None:
-            response = self.requests_session.post(url=url, headers={"Authorization": "Bearer {}".format(token)})
-        elif username is not None and password is not None:
-            json_post_data = {'userName': username, 'password': password, 'rememberMe': 'true'}
-            response = self.requests_session.post(url=url, json=json_post_data)
-        else:
-            raise Exception("If using username/password, must include both")
-
-        # HTTP 204 - success, no content
-        response.raise_for_status()
-        return True
-
-    # This is only the V2 API bearer token, not the Trusted Authentication token from V1
-    def get_token_v2(self,  username: Optional[str] = None, password: Optional[str] = None,
-                     secret_key: Optional[str] = None, token_expiry_duration: int = 300,
-                     access_level: str = "FULL", ts_object_id: Optional[str] = None) -> Dict:
-        endpoint = 'session/gettoken'
-
-        url = self.v2_base_url + endpoint
-
-        json_post_data = {'accessLevel': access_level,
-                          'tokenExpiryDuration': token_expiry_duration}
-
-        if secret_key is not None:
-            json_post_data['secretKey'] = secret_key
-        elif username is not None and password is not None:
-            json_post_data['userName'] = username
-            json_post_data['password'] = password
-        else:
-            raise Exception("If using username/password, must include both")
-
-        if ts_object_id is not None:
-            json_post_data['tsObjectId'] = ts_object_id
-
-        response = self.requests_session.post(url=url, json=json_post_data, headers={'Accept-Language': 'en_US'})
-
-        response.raise_for_status()
-        return response.json()
-
-    #
     # Root level API methods found below, divided into logical separations
     #
 
