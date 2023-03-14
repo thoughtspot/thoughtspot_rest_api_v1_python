@@ -106,7 +106,8 @@ The ThoughtSpot API has internal namings for many features, which require lookin
 - `MetadataSubtypes`: The available options for the 'subtype' argument used for certain metadata calls
 
 ## Logging into REST API V2
-You create a TSRestApiV2 object with the `server_url` argument, then use the `session_login()` method with username and password to log in. After login succeeds, the TSRestApiV2 object has an open requests.Session object which maintains the necessary cookies to use the REST API continuously, which is used by any methods on the TSRestApiV2 object. Additionally, the `session_login()` method returns the requests.Session object so you can issue any V2 REST API commands directly using requests, for those that have not been implemented 
+REST API V2 allows for Bearer Token authentication, which is the preferred method rather than session cookie sign-in. You create a TSRestApiV2 object with the `server_url` argument.
+Next request a Full Access token using `auth_token_full()`. Get the `token` value from the response, then set the `bearer_token` property of the TSRestApiV2 object with the token. The object will keep the bearer token and use it in the headers of any subsequent call.
 
 
     username = os.getenv('username')  # or type in yourself
@@ -115,10 +116,21 @@ You create a TSRestApiV2 object with the `server_url` argument, then use the `se
 
     ts: TSRestApiV2 = TSRestApiV2(server_url=server)
     try:
-        v2_session = ts.session_login(username=username, password=password)
+        auth_token_response = ts.auth_token_full(username=username, password=password, validity_time_in_sec=3000)
     except requests.exceptions.HTTPError as e:
         print(e)
         print(e.response.content)
+    ts.bearer_token = auth_token_response['token']
+
+### V2 Methods
+REST API V2 exclusively uses JSON for the request format. Because Python Dicts map nearly directly to JSON, many of the methods for endpoints simply have a 'request=' argument, with the expectation that you form the request per the Documentation / Playground however you see fit:
+    
+    search_request = {'org_identifiers': ['My Org']}
+    users_response = ts.users_search(request=search_request)
+
+Other methods, where the potential request arguments are very small / simple, do have the full set of arguments represented in the Python method:
+    
+    users_reset_password(user_identifier='bill.guy@company.com', new_password='agreatnewpassword')
 
 ## TML operations
 One primary use case of the REST APIs is to import and export ThoughtSpot Modeling Language (TML) files.
