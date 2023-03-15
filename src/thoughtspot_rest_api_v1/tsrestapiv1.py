@@ -1320,12 +1320,35 @@ class TSRestApiV1:
         response.raise_for_status()
         return response.json()
 
-    def session_orgs(self, batchsize: int = -1, offset: int = -1) -> Dict:
+    def session_orgs_get(self, batchsize: int = -1, offset: int = -1) -> Dict:
         endpoint = 'session/orgs'
 
         url_params = {
             'batchsize': batchsize,
             'offset': offset
+        }
+
+        url = self.base_url + endpoint
+        response = self.requests_session.get(url=url, params=url_params)
+        response.raise_for_status()
+        return response.json()
+
+    def session_orgs_put(self, org_id: int):
+        endpoint = 'session/orgs'
+
+        post_data = {
+            'orgid': org_id
+        }
+
+        url = self.base_url + endpoint
+        response = self.requests_session.put(url=url, data=post_data)
+        response.raise_for_status()
+
+    def session_orgs_users(self, user_guid: str, org_scope: str = 'ALL'):
+        endpoint = 'session/orgs/users/{}'.format(user_guid)
+
+        url_params = {
+            'orgScope': org_scope
         }
 
         url = self.base_url + endpoint
