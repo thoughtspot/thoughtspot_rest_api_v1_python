@@ -1,8 +1,8 @@
-*A simple Python implementation of ThoughtSpot's V1 REST API.*
+*A simple Python implementation of ThoughtSpot's REST APIs (both V1 and V2).*
 
 NOTE: *The 1.2.0 release renamed a few methods to remove a double-underscore (those that ended in "__post" or "__get" now are "_post()" or "_get()" etc. . If you encounter errors, please update your code by removing the extra underscore* 
 
-`thoughtspot_rest_api_v1` implements the ThoughtSpot V1 REST API as directly as possible. Each API endpoint is represented by a single method within the `TSRestApiV1` class. Method and argument names closely match to the documented API endpoints, with a few minor changes are taken to make certain parameters more obvious for an end user. 
+`thoughtspot_rest_api_v1` implements the ThoughtSpot V1 REST API as directly as possible. Each API endpoint is represented by a single method within the `TSRestApiV1` or `TSRestApiV2` class. Method and argument names closely match to the documented API endpoints, with a few minor changes are taken to make certain parameters more obvious for an end user. 
 
 `->` [Learning from the Source Code][jump-learning] </br>
 `->` [Getting Started][jump-getting-started] </br>
@@ -24,7 +24,7 @@ The library is designed to work with the latest version of ThoughtSpot Cloud. It
 
 ## Getting Started
 
-To install ThoughtSpot Rest API V1, simply run this simple command in your terminal of choice:
+To install thoughtspot_rest_api_v1, simply run this simple command in your terminal of choice:
 
 ```
 $ python3 -m pip install thoughtspot_rest_api_v1
@@ -109,6 +109,8 @@ The ThoughtSpot API has internal namings for many features, which require lookin
 REST API V2 allows for Bearer Token authentication, which is the preferred method rather than session cookie sign-in. You create a TSRestApiV2 object with the `server_url` argument.
 Next request a Full Access token using `auth_token_full()`. Get the `token` value from the response, then set the `bearer_token` property of the TSRestApiV2 object with the token. The object will keep the bearer token and use it in the headers of any subsequent call.
 
+    
+    from thoughtspot_rest_api_v1 import *
 
     username = os.getenv('username')  # or type in yourself
     password = os.getenv('password')  # or type in yourself
