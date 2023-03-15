@@ -183,9 +183,9 @@ class TSRestApiV1:
     # Session management calls
     # - up here vs. in the SESSION section below (because these two are required)
     #
-    def session_login(self, username: str, password: str) -> bool:
+    def session_login(self, username: str, password: str, remember_me: bool = True) -> bool:
         endpoint = 'session/login'
-        post_data = {'username': username, 'password': password, 'rememberme': 'true'}
+        post_data = {'username': username, 'password': password, 'rememberme': str(remember_me).lower()}
 
         url = self.base_url + endpoint
         response = self.requests_session.post(url=url, data=post_data)
@@ -1313,6 +1313,25 @@ class TSRestApiV1:
         response.raise_for_status()
         return True
 
+    def session_info(self) -> Dict:
+        endpoint = 'session/info'
+        url = self.base_url + endpoint
+        response = self.requests_session.get(url=url)
+        response.raise_for_status()
+        return response.json()
+
+    def session_orgs(self, batchsize: int = -1, offset: int = -1) -> Dict:
+        endpoint = 'session/orgs'
+
+        url_params = {
+            'batchsize': batchsize,
+            'offset': offset
+        }
+
+        url = self.base_url + endpoint
+        response = self.requests_session.get(url=url, params=url_params)
+        response.raise_for_status()
+        return response.json()
     # NOTE:
     #
     #   The below shows an implementation of session/auth/token but it should only be
@@ -1320,7 +1339,8 @@ class TSRestApiV1:
     #   in memory
     #
     def session_auth_token(self, secret_key: str, username: str, access_level: str = 'FULL',
-                           object_guid: Optional[str] = None):
+                           object_guid: Optional[str] = None, org_id: Optional[int] = None,
+                           groups: Optional[List[str]] = None, auto_create_user: Optional[bool] = None):
         endpoint = 'session/auth/token'
 
         post_params = {
@@ -1331,6 +1351,15 @@ class TSRestApiV1:
         }
         if object_guid is not None:
             post_params['id'] = object_guid
+
+        if org_id is not None:
+            post_params['orgid'] = org_id
+
+        if auto_create_user is not None:
+            post_params['autocreate'] = str(auto_create_user).lower()
+
+        if groups is not None:
+            post_params['groups'] = json.dumps(groups)
 
         url = self.base_url + endpoint
 
