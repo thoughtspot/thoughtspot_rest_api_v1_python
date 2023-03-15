@@ -1,8 +1,8 @@
 import os
 import requests.exceptions
 
-# from thoughtspot_rest_api_v1 import *
-from src.thoughtspot_rest_api_v1 import *
+from thoughtspot_rest_api_v1 import *
+
 
 # Details about objects within ThoughtSpot all are accessed through 'metadata/' endpoints, which can be used
 # for almost every object type
