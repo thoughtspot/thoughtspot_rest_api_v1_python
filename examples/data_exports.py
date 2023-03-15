@@ -42,30 +42,3 @@ for viz_data in viz_data_response:
 ds_guid = '{dsGuid}'  # typically a Worksheet, but could be Table or View
 tml_search_string = '[Product Name] [Sales] by [Region]'
 search_data_response = ts.searchdata(query_string=tml_search_string, data_source_guid=ds_guid)
-
-
-# V2 /data/ endpoints
-# V2 allows you to retrieve JSON results from a Saved Answer
-# As well as pull back the SQL query used by an Answer or the Vizes on a Liveboard
-
-ts2: TSRestApiV2 = TSRestApiV2(server_url=server)
-try:
-    ts2.session_login(username=username, password=password)
-except requests.exceptions.HTTPError as e:
-    print(e)
-    print(e.response.content)
-
-answer_guid = '{answerGuid}'
-answer_data_response = ts2.data_answer_data(guid=answer_guid)
-
-answer_sql = ts2.data_answer_query_sql(guid=answer_guid)
-
-all_lb_sql = ts2.data_liveboard_query_sql(guid=lb_guid)
-
-viz_sql = ts2.data_liveboard_query_sql(guid=lb_guid, viz_ids=[viz_on_lb_guid])
-
-for lb_sql in all_lb_sql:
-    print(json.dumps(lb_sql, indent=2))
-
-# You can also get data results in CSV and XSLX format using the V2 REST API when the viz is in a table format using
-# the /report/ endpoints. See liveboard_pdf_export.pdf for those examples (as the same endpoints export PDF and PNG)
