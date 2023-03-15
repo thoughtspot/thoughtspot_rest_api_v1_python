@@ -1355,6 +1355,7 @@ class TSRestApiV1:
         response = self.requests_session.get(url=url, params=url_params)
         response.raise_for_status()
         return response.json()
+
     # NOTE:
     #
     #   The below shows an implementation of session/auth/token but it should only be
