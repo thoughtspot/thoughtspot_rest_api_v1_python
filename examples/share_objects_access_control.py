@@ -45,18 +45,3 @@ ts.security_metadata_permissions_by_id(object_type=TSTypes.LIVEBOARD, object_gui
 ts.security_effectivepermissionbulk(ids_by_type={MetadataTypes.LIVEBOARD: ['{lbGuid1}'],
                                                  MetadataTypes.ANSWER: ['{aGuid1}']}
                                     )
-
-#
-# REST API V2 simplifies down to a request from the principle (user or group) perspective or
-# from the object perspective
-#
-ts2 = TSRestApiV2(server_url='https://a.thoughtspot.cloud')
-try:
-    ts2.session_login(username=username, password=password)
-except requests.exceptions.HTTPError as e:
-    print(e)
-    print(e.response.content)
-
-principal_perms = ts2.security_permission_principal(username_or_group_name='auser@domain.com')  # alternatively username_or_group_guid=
-
-object_perms = ts2.security_permission_tsobject(guid=lb_guid, object_type=TSTypesV2.LIVEBOARD, include_dependents=False)
