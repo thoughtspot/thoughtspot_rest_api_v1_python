@@ -16,27 +16,11 @@ password = os.getenv('password')  # or type in yourself
 server = os.getenv('server')        # or type in yourself
 
 #
-# REST API V2 features a transfer without knowing the object owner
+# REST API V2 features a transfer without knowing the object owner. See example script in 'examples_v2' folder
 #
-ts: TSRestApiV2 = TSRestApiV2(server_url=server)
-try:
-    ts.session_login(username=username, password=password)
-except requests.exceptions.HTTPError as e:
-    print(e)
-    print(e.response.content)
-
-# Determine the set of GUIDs however you like
-guids_to_transfer = ['{guid_1}', '{guid_2}']
-# admin/assignauthor
-ts.admin_assignauthor(guids=guids_to_transfer, to_username=transfer_to_username)
-
-# admin/changeauthor still exists to do the equivalent of user/transfer/ownership in V1
-
-exit()
 #
 # REST API V1 version, if V2 API is not available
 # Requires knowing who owns the objects are owned by to transfer them, so has a process for looking up owner of GUIDs
-# None of that is necessary in V2, as you can see from the brevity of the code above vs. below
 #
 
 ts: TSRestApiV1 = TSRestApiV1(server_url=server)

@@ -1,6 +1,6 @@
 import os
 import requests.exceptions
-from src.thoughtspot_rest_api_v1 import *
+from thoughtspot_rest_api_v1 import *
 
 #
 # This script is an example of a workflow useful in a Git-based SDLC process
