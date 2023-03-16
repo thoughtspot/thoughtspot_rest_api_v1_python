@@ -2,7 +2,7 @@
 
 NOTE: *The 1.2.0 release renamed a few methods to remove a double-underscore (those that ended in "__post" or "__get" now are "_post()" or "_get()" etc. . If you encounter errors, please update your code by removing the extra underscore* 
 
-`thoughtspot_rest_api_v1` implements the ThoughtSpot V1 REST API as directly as possible. Each API endpoint is represented by a single method within the `TSRestApiV1` or `TSRestApiV2` class. Method and argument names closely match to the documented API endpoints, with a few minor changes are taken to make certain parameters more obvious for an end user. 
+`thoughtspot_rest_api_v1` library implements the ThoughtSpot public REST APIs as directly as possible. Each API endpoint is represented by a single method within the `TSRestApiV1` or `TSRestApiV2` class. Method and argument names closely match to the documented API endpoints, with a few minor changes are taken to make certain parameters more obvious for an end user, or to align with Pythonic conventions ('id' parameters in the API itself are written as 'guid' or '{object-name}_id' for example)
 
 `->` [Learning from the Source Code][jump-learning] </br>
 `->` [Getting Started][jump-getting-started] </br>
@@ -133,6 +133,9 @@ REST API V2 exclusively uses JSON for the request format. Because Python Dicts m
 Other methods, where the potential request arguments are very small / simple, do have the full set of arguments represented in the Python method:
     
     users_reset_password(user_identifier='bill.guy@company.com', new_password='agreatnewpassword')
+
+### V2 Examples
+The /examples_v2/ directory of this repository contains examples of using the V2 API, often as a parallel to a script with the same name in the V1 /examples/ directory.
 
 ## TML operations
 One primary use case of the REST APIs is to import and export ThoughtSpot Modeling Language (TML) files.
