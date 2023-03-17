@@ -134,6 +134,25 @@ Other methods, where the potential request arguments are very small / simple, do
     
     users_reset_password(user_identifier='bill.guy@company.com', new_password='agreatnewpassword')
 
+### Implementing new V2 methods
+The TSRestApiV2 class includes three 'base' methods, one for each HTTP request verb one might make to the V2.0 REST API:
+
+    TSRestApiV2.get_request(endpoint)
+    TSRestApiV2.post_request(endpoint, request=None)
+    TSRestApiV2.post_request_binary(endpoint, request=None)  # for binary responses
+
+The `endpoint` argument only takes the unique part of the endpoint, like `users/create`, not the entire URL. 
+
+All of the methods for particular endpoints call these base methods like:
+
+    def users_update(self, user_identifier: str, request: Dict):
+        endpoint = 'users/{}/update'.format(user_identifier)
+        return self.post_request(endpoint=endpoint, request=request)
+
+If a method is not implemented in the library (a new version has rolled out before a maintainer has added the new endpoint to the library), you can simply implement it "externally" using these 'base methods'.
+
+You can also reference the `TSRestApiV2.requests_session` object directly if you want to issue something directly using the Python `requests` library.
+
 ### V2 Examples
 The /examples_v2/ directory of this repository contains examples of using the V2 API, often as a parallel to a script with the same name in the V1 /examples/ directory.
 
