@@ -445,7 +445,7 @@ class TSRestApiV2:
     # if you need the deeper functionality with names / types
     def metadata_tml_export(self, metadata_ids: List[str], export_associated: bool = False, export_fqn: bool = False,
                             metadata_request: Optional[List[Dict]] = None):
-        endpoint = 'metadata/tml/import'
+        endpoint = 'metadata/tml/export'
         request = {
             'export_associated': export_associated,
             'export_fqn': export_fqn
