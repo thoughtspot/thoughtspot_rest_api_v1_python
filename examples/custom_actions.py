@@ -71,10 +71,12 @@ viz_guids_to_add_to_action =[]
 for v in lb_tml_obj['liveboard']['visualizations']:
     viz_guid = v['viz_guid']
     print(viz_guid)
-    chart_type = v['answer']['chart']['type']
-    print(chart_type)
-    if chart_type not in ['KPI']:
-        viz_guids_to_add_to_action.append(viz_guid)
+    # Not every viz has 'answer' key, could be 'note_tile' now
+    if 'answer' in v:
+        chart_type = v['answer']['chart']['type']
+        print(chart_type)
+        if chart_type not in ['KPI']:
+            viz_guids_to_add_to_action.append(viz_guid)
 
 print("Viz GUIDs to add to action: ")
 print(viz_guids_to_add_to_action)
