@@ -1853,12 +1853,16 @@ class TSRestApiV1:
         response.raise_for_status()
         return response.json()
 
-    def connection_fetch_live_columns(self, connection_guid, config_json_string, database_name: str,
+    def connection_fetch_live_columns(self, connection_guid, database_name: str,
                                       schema_name: str, table_name: str,
-                                      authentication_type='SERVICE_ACCOUNT'):
+                                      authentication_type='SERVICE_ACCOUNT', config_json_string: Optional[Dict] = None,
+                                      use_internal_endpoint=False):
         endpoint = 'connection/fetchLiveColumns'
 
-        url = self.non_public_base_url + endpoint
+        if use_internal_endpoint is True:
+            url = self.non_public_base_url + endpoint
+        else:
+            url = self.base_url + endpoint
         tables = [{"databaseName": database_name,
                   "schemaName": schema_name,
                   "tableName": table_name
@@ -1875,10 +1879,11 @@ class TSRestApiV1:
         # '''
         #
         post_data = {'connection_id': connection_guid,
-                     'config': config_json_string,
                      'tables': json.dumps(tables),
                      'authentication_type': authentication_type
                      }
+        if config_json_string is not None:
+            post_data['config'] = config_json_string
 
         response = self.requests_session.post(url=url, data=post_data)
         response.raise_for_status()
