@@ -1388,6 +1388,7 @@ class TSRestApiV1:
         url = self.base_url + endpoint
 
         response = self.requests_session.post(url=url, data=post_params, headers={"Accept": "text/plain"})
+        response.raise_for_status()
         return response
 
     # session/login/token is typically only used within the browser and handled by the Visual Embed SDK,
@@ -1405,6 +1406,7 @@ class TSRestApiV1:
         url = self.base_url + endpoint
 
         response = self.requests_session.post(url=url, data=post_params)
+        response.raise_for_status()
         return response
     #
     # USER Methods
