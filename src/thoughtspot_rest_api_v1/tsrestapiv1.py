@@ -1857,7 +1857,7 @@ class TSRestApiV1:
 
     def connection_fetch_live_columns(self, connection_guid, database_name: str,
                                       schema_name: str, table_name: str,
-                                      authentication_type='SERVICE_ACCOUNT', config_json_string: Optional[Dict] = None,
+                                      authentication_type='SERVICE_ACCOUNT', config_json_string: Optional[str] = None,
                                       use_internal_endpoint=False):
         endpoint = 'connection/fetchLiveColumns'
 
