@@ -1863,6 +1863,8 @@ class TSRestApiV1:
 
         if use_internal_endpoint is True:
             url = self.non_public_base_url + endpoint
+            if config_json_string is None:
+                raise Exception('The config_json_string (a JSON object converted to string using json.dumps() ) is required')
         else:
             url = self.base_url + endpoint
         tables = [{"databaseName": database_name,
