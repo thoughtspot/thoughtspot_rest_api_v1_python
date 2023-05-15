@@ -1830,10 +1830,18 @@ class TSRestApiV1:
         response.raise_for_status()
         return response.json()
 
-    def connection_fetch_connection(self, connection_guid, config_json_string, include_columns=False, authentication_type='SERVICE_ACCOUNT'):
+    def connection_fetch_connection(self, connection_guid: str, include_columns=False,
+                                    authentication_type='SERVICE_ACCOUNT', config_json_string: Optional[str] = None,
+                                    use_internal_endpoint=False):
         endpoint = 'connection/fetchConnection'
 
-        url = self.non_public_base_url + endpoint
+        if use_internal_endpoint is True:
+            url = self.non_public_base_url + endpoint
+            if config_json_string is None:
+                raise Exception('The config_json_string (a JSON object converted to string using json.dumps() ) is required')
+        else:
+            url = self.base_url + endpoint
+
         # Example of a config_json, which may vary per connection
         #
         # config_json_string_example = '''
@@ -1846,10 +1854,12 @@ class TSRestApiV1:
         # '''
         #
         post_data = {'id': connection_guid,
-                     'config': config_json_string,
                      'includeColumns': str(include_columns).lower(),
                      'authentication_type': authentication_type
                      }
+
+        if config_json_string is not None:
+            post_data['config'] = config_json_string
 
         response = self.requests_session.post(url=url, data=post_data)
         response.raise_for_status()
