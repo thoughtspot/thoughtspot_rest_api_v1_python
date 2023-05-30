@@ -246,6 +246,13 @@ class TSRestApiV2:
     #
 
     #
+    # /auth/ endpoints not involved with signin /tokens
+    #
+    def auth_session_user(self):
+        endpoint = 'auth/session/user'
+        return self.get_request(endpoint=endpoint)
+
+    #
     # /users/ endpoints
     #
     def users_search(self, request: Dict):
@@ -338,11 +345,6 @@ class TSRestApiV2:
     def orgs_delete(self, org_identifier: str):
         endpoint = 'orgs/{}/delete'.format(org_identifier)
         return self.post_request(endpoint=endpoint)
-    #
-    #
-    # /metadata/ endpoints
-    #
-    #
 
     #
     # /metadata/tag endpoints
@@ -536,6 +538,55 @@ class TSRestApiV2:
         return self.post_request(endpoint=endpoint, request=request)
 
 #
+# Version Control /vcs/ endpoints
+#
+    def vcs_git_config_search(self, request: Dict):
+        endpoint = 'vcs/git/config/search'
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def vcs_git_commits_search(self, request: Dict):
+        endpoint = 'vcs/git/commits/search'
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def vcs_git_config_create(self, request: Dict):
+        endpoint = 'vcs/git/config/create'
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def vcs_git_config_update(self, request: Dict):
+        endpoint = 'vcs/git/config/update'
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def vcs_git_config_delete(self, request: Dict):
+        endpoint = 'vcs/git/config/delete'
+        return self.post_request(endpoint=endpoint, request=request)
+
+    # Possibly will change?
+    def vcs_git_branches_pull(self, branch_name: str):
+        endpoint = 'vcs/git/branches/{}/pull'.format(branch_name)
+        request = {'branch_name': branch_name}
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def vcs_git_branches_commit(self, request: Dict):
+        endpoint = 'vcs/git/branches/commit'
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def vcs_git_commits_revert(self, commit_id: str, request: Dict):
+        endpoint = 'vcs/git/commits/{}/revert'.format(commit_id)
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def vcs_git_branches_validate(self, source_branch_name: str, target_branch_name: str):
+        endpoint = 'vcs/git/branches/validate'
+        request = {
+            'source_branch_name': source_branch_name,
+            'target_branch_name': target_branch_name
+        }
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def vcs_git_commits_deploy(self, request: Dict):
+        endpoint = 'vcs/git/commits/deploy'
+        return self.post_request(endpoint=endpoint, request=request)
+
+#
 # /connection/ endpoints
 #
     def connection_search(self, request: Dict):
@@ -553,4 +604,44 @@ class TSRestApiV2:
 
     def connection_update(self, request: Dict):
         endpoint = 'connection/update'
+        return self.post_request(endpoint=endpoint, request=request)
+
+#
+# /roles/ endpoints
+#
+    def roles_search(self, request: Dict):
+        endpoint = 'roles/search'
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def roles_create(self, request: Dict):
+        endpoint = 'roles/create'
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def roles_update(self, role_identifier: str, request: Dict):
+        endpoint = 'roles/{}/update'.format(role_identifier)
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def roles_delete(self, role_identifier: str):
+        endpoint = 'roles/{}/delete'.format(role_identifier)
+        request = { 'role_identifier': role_identifier}
+        return self.post_request(endpoint=endpoint, request=request)
+
+#
+# /schedules/ endpoints
+#
+    def schedules_search(self, request: Dict):
+        endpoint = 'schedules/search'
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def schedules_create(self, request: Dict):
+        endpoint = 'schedules'
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def schedules_update(self, schedule_identifier: str, request: Dict):
+        endpoint = 'schedules/{}/update'.format(schedule_identifier)
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def schedules_delete(self, schedule_identifier: str):
+        endpoint = 'schedules/{}/delete'.format(schedule_identifier)
+        request = { 'schedule_identifier': schedule_identifier}
         return self.post_request(endpoint=endpoint, request=request)
