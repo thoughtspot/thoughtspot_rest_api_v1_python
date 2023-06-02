@@ -103,10 +103,17 @@ for v in vizes:
 
 # Update the actionAssociationMap to set all the identified viz IDs to be on the context menu
 for guid in internal_viz_guids_to_add_to_action:
-    action_info['actionAssociationMap']['VISUALIZATION'][guid] = {
-        "context": "CONTEXT_MENU",
-        "enabled": "true"
-    }
+    if 'VISUALIZATION' in action_info['actionAssociationMap']:
+        action_info['actionAssociationMap']['VISUALIZATION'][guid] = {
+            "context": "CONTEXT_MENU",
+            "enabled": "true"
+        }
+    else:
+        action_info['actionAssociationMap'] = {'VISUALIZATION' : { guid : {
+            "context": "CONTEXT_MENU",
+            "enabled": "true"
+        }}}
+
 
 # Update the action associations using /admin/embed/actions/{}/associations
 resp = ts.admin_embed_action_associations_post(action_guid=action_guid, action_association=action_info)
