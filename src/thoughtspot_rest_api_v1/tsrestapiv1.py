@@ -1405,7 +1405,7 @@ class TSRestApiV1:
 
         url = self.base_url + endpoint
 
-        response = self.requests_session.post(url=url, data=post_params)
+        response = self.requests_session.post(url=url, data=post_params, headers={'Accept': 'text/plain'})
         response.raise_for_status()
         return response
     #
