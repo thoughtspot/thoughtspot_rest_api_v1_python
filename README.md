@@ -408,8 +408,6 @@ The Data APIs return back the data from a saved object or an arbitrary TML searc
 ## Additional libraries
 `thoughtspot_tml` is a library for processing the ThoughtSpot Modeling Language (TML) files. You can use `thoughtspot_tml` to manipulate TML files from disk or exported via the REST API.
 
-`ts_rest_api_and_tml_tools` is a convenience library that imports both `thoughtspot_rest_api_v1` and `thoughtspot_tml` and wraps them in more convenient and obvious packaging. It also contains many example scripts to do common workflows. In particular, there are many examples of SDLC use cases that involve REST API commands and TML manipulation.
-
 `cs_tools` is a package of command-line tools built by the ThoughtSpot Professional Services team, aimed at ThoughtSpot administrators. 
 
 
