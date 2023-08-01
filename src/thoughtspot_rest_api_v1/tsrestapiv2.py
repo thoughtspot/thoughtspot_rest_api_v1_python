@@ -527,14 +527,16 @@ class TSRestApiV2:
 #
 # /logs/ endpoints
 #
-    def logs_fetch(self, log_type: str, start_epoch_time_in_millis: int,
-                   end_epoch_time_in_millis: int):
+    def logs_fetch(self, log_type: str = 'SECURITY_AUDIT', start_epoch_time_in_millis: Optional[int] = None,
+                   end_epoch_time_in_millis: Optional[int] = None):
         endpoint = 'logs/fetch'
         request = {
-            'log_type': log_type,
-            'start_epoch_time_in_millis': start_epoch_time_in_millis,
-            'end_epoch_time_in_millis': end_epoch_time_in_millis
+            'log_type': log_type
         }
+        if start_epoch_time_in_millis is not None:
+            request['start_epoch_time_in_millis'] = start_epoch_time_in_millis
+        if end_epoch_time_in_millis is not None:
+            request['end_epoch_time_in_millis'] =  end_epoch_time_in_millis
         return self.post_request(endpoint=endpoint, request=request)
 
 #
