@@ -56,7 +56,7 @@ action_guids = []
 
 # To associate all Vizes on a Liveboard, use either /metadata/listvizheaders or /metadata/tml/export
 lb_guid = 'c7366d05-dc19-4aae-8f72-e8acf1d641e1'
-viz_headers = ts.metadata_listvizheaders(guid=lb_guid)
+# viz_headers = ts.metadata_listvizheaders(guid=lb_guid)
 
 # TML can be parsed to give you info like chart.type, to skip KPI charts or otherwise with assignment
 # Or to find any formulas defined at the viz level, which might also be reason to skip
