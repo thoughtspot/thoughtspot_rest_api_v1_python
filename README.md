@@ -1,8 +1,12 @@
-*A simple Python implementation of ThoughtSpot's REST APIs (both V1 and V2).*
+*A simple and pythonic Python implementation of ThoughtSpot's REST APIs (both V1 and V2).*
 
-NOTE: *The 1.2.0 release renamed a few methods to remove a double-underscore (those that ended in "__post" or "__get" now are "_post()" or "_get()" etc. . If you encounter errors, please update your code by removing the extra underscore* 
+`thoughtspot_rest_api_v1` library implements the ThoughtSpot public REST APIs as directly as possible. It is not a "full SDK" with representation of each request and response type, but rather uses Python's Lists and Dicts for input and output.
 
-`thoughtspot_rest_api_v1` library implements the ThoughtSpot public REST APIs as directly as possible. Each API endpoint is represented by a single method within the `TSRestApiV1` or `TSRestApiV2` class. Method and argument names closely match to the documented API endpoints, with a few minor changes are taken to make certain parameters more obvious for an end user, or to align with Pythonic conventions ('id' parameters in the API itself are written as 'guid' or '{object-name}_id' for example)
+Each API endpoint is represented by a single method within the `TSRestApiV1` or `TSRestApiV2` class.
+
+Method and argument names closely match to the documented API endpoints, with a few minor changes are taken to make certain parameters more obvious for an end user, or to align with Pythonic conventions ('id' parameters in the API itself are written as 'guid' or '{object-name}_id' for example)
+
+`TSRestApiV2` is implemented with an open `request` parameter for most endpoints, allowing you to construct any variation of a request based on what you build in the V2 REST API playground (a few simple endpoints have all their parameters implemented in the Python method).
 
 `->` [Learning from the Source Code][jump-learning] </br>
 `->` [Getting Started][jump-getting-started] </br>
