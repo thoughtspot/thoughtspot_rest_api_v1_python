@@ -11,9 +11,10 @@
 #   We have chosen to make it as simple to understand as possible. There are comments
 #   and notes written throughout to help the reader understand more.
 #
+import json
 from collections import OrderedDict
 from typing import Optional, Dict, List, Union
-import json
+from copy import copy
 
 import requests
 
@@ -1285,6 +1286,18 @@ class TSRestApiV1:
     #
     # SESSION Methods
     #
+
+    def session_isactive(self):
+        """
+        Check if the login session is active
+        Returns:
+            bool: True/False
+        """
+        url = f"{self.non_public_base_url}session/isactive"
+        headers = copy(self.requests_session.headers)
+        headers.update({"Accept": "*/*"})
+        response = self.requests_session.get(url, headers=headers)
+        return response.ok
 
     # Home Pinboard Methods
     def session_homepinboard_post(self, pinboard_guid: str, user_guid: str):
