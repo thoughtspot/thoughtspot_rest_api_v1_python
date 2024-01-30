@@ -111,7 +111,8 @@ class TSRestApiV2:
     def auth_token_full(self, username: str, password: Optional[str] = None, org_id: Optional[int] = None,
                         secret_key: Optional[str] = None, validity_time_in_sec: int = 300,
                         auto_create: bool = False, display_name: Optional[str] = None,
-                        email: Optional[str] = None, group_identifiers: Optional[List[str]] = None) -> Dict:
+                        email: Optional[str] = None, group_identifiers: Optional[List[str]] = None,
+                        jwt_user_options: Optional[Dict] = None) -> Dict:
         endpoint = 'auth/token/full'
 
         url = self.base_url + endpoint
@@ -142,6 +143,9 @@ class TSRestApiV2:
                     json_post_data['group_identifiers'] = group_identifiers
             else:
                 raise Exception("If using auto_create=True, must include display_name and email")
+
+        if jwt_user_options is not None:
+            json_post_data['jwt_user_options'] = jwt_user_options
 
         response = self.requests_session.post(url=url, json=json_post_data)
 
