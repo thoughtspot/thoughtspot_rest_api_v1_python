@@ -108,11 +108,13 @@ class TSRestApiV2:
 
     # V2 API Bearer token can be used with V1 /session/login/token for Trusted Auth flow
     # or used with each API call (no session object) or used with V2 /auth/session/login to create session
+    # additional_request_parameters allows setting new arbitrary keys and data structures to
+    # be appended along with the existing defined method arguments
     def auth_token_full(self, username: str, password: Optional[str] = None, org_id: Optional[int] = None,
                         secret_key: Optional[str] = None, validity_time_in_sec: int = 300,
                         auto_create: bool = False, display_name: Optional[str] = None,
                         email: Optional[str] = None, group_identifiers: Optional[List[str]] = None,
-                        jwt_user_options: Optional[Dict] = None) -> Dict:
+                        additional_request_parameters: Optional[Dict] = None) -> Dict:
         endpoint = 'auth/token/full'
 
         url = self.base_url + endpoint
@@ -144,8 +146,9 @@ class TSRestApiV2:
             else:
                 raise Exception("If using auto_create=True, must include display_name and email")
 
-        if jwt_user_options is not None:
-            json_post_data['jwt_user_options'] = jwt_user_options
+        if additional_request_parameters is not None:
+            for param in additional_request_parameters:
+                json_post_data[param] = additional_request_parameters[param]
 
         response = self.requests_session.post(url=url, json=json_post_data)
 
