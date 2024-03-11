@@ -632,8 +632,26 @@ class TSRestApiV2:
 
     def roles_delete(self, role_identifier: str):
         endpoint = 'roles/{}/delete'.format(role_identifier)
-        request = { 'role_identifier': role_identifier}
+        return self.post_request(endpoint=endpoint)
+
+#
+# /customization/custom-action/ endpoints
+#
+    def customization_custom_actions_search(self, request: Dict):
+        endpoint = 'customization/custom-actions/search'
         return self.post_request(endpoint=endpoint, request=request)
+
+    def customization_custom_actions_create(self, request: Dict):
+        endpoint = 'customization/custom-actions/create'
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def customization_custom_actions_update(self, role_identifier: str, request: Dict):
+        endpoint = 'customization/custom-actions/{}/update'.format(role_identifier)
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def customization_custom_actions_delete(self, custom_action_identifier: str):
+        endpoint = 'customization/custom-actions/{}/delete'.format(custom_action_identifier)
+        return self.post_request(endpoint=endpoint)
 
 #
 # /schedules/ endpoints
