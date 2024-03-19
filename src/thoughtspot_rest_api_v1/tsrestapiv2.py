@@ -672,3 +672,28 @@ class TSRestApiV2:
         endpoint = 'schedules/{}/delete'.format(schedule_identifier)
         request = { 'schedule_identifier': schedule_identifier}
         return self.post_request(endpoint=endpoint, request=request)
+
+#
+# /dbt/ endpoints
+#
+    def dbt_dbt_connection(self, request: Dict):
+        endpoint = 'dbt/dbt-connection'
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def dbt_generate_tml(self, request: Dict):
+        endpoint = 'dbt/generate-tml'
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def dbt_generate_sync_tml(self, request: Dict):
+        endpoint = 'dbt/generate-sync-tml'
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def dbt_search(self):
+        endpoint = 'dbt/search'
+        return self.post_request(endpoint=endpoint)
+
+    def dbt_dbt_connection_update(self, dbt_connection_identifier: str, request: Dict):
+        endpoint = 'dbt/{}'.format(dbt_connection_identifier)
+        return self.post_request(endpoint=endpoint, request=request)
+
+
