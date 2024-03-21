@@ -453,12 +453,19 @@ class TSRestApiV2:
     # Out of convenience, providing a simple List[str] input for getting these by GUID. metadata_request will override
     # if you need the deeper functionality with names / types
     def metadata_tml_export(self, metadata_ids: List[str], export_associated: bool = False, export_fqn: bool = False,
+                            edoc_format: Optional[str] = None, export_schema_version: Optional[str] = None,
                             metadata_request: Optional[List[Dict]] = None):
         endpoint = 'metadata/tml/export'
+
         request = {
             'export_associated': export_associated,
             'export_fqn': export_fqn
         }
+        # These are left as optionals / defaults because they may have been added after 9.5
+        if edoc_format.upper() == 'YAML':
+            request['edoc_format'] = 'YAML'
+        if export_schema_version is not None:
+            request['export_schema_version'] = export_schema_version
         if metadata_request is not None:
             request['metadata'] = metadata_request
         else:
