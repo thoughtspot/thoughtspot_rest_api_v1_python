@@ -358,8 +358,6 @@ class TSRestApiV2:
     #
     def tags_search(self, tag_identifier: Optional[str] = None, color: Optional[str] = None):
         endpoint = 'tags/search'
-        if tag_identifier is None and color is None:
-            raise Exception("Must provide tag_identifier or color")
         request = {}
         if tag_identifier is not None:
             request['tag_identifier'] = tag_identifier
