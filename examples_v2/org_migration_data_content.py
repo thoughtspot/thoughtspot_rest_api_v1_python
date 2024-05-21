@@ -1,7 +1,7 @@
 import os
 import requests.exceptions
 
-from src.thoughtspot_rest_api_v1 import *
+from thoughtspot_rest_api_v1 import *
 
 #
 # Example order of actions to "move" data and content objects
@@ -126,6 +126,9 @@ def main():
 
     # If Connection Name is different between the two orgs, you'll need to adjust the TML objects
     # use https://github.com/thoughtspot/thoughtspot_tml library for each object access all properties
+
+
+    # Only need to share the Worksheets on the new org with READ privilege, not the Table objects
 
 if __name__ == "__main__":
     main()

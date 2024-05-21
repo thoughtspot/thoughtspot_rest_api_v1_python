@@ -1,7 +1,7 @@
 import os
 import requests.exceptions
 
-from src.thoughtspot_rest_api_v1 import *
+from thoughtspot_rest_api_v1 import *
 
 #
 # Example order of actions to "move" users and groups from primary (org_id=0) to
