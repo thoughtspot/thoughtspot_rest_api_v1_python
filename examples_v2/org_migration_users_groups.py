@@ -115,6 +115,7 @@ def create_groups_on_dest_org(groups_list, users_list: Optional[List] = None, vi
             new_group_req["user_identifiers"] = users_list  # This would put ALL users into these groups - may not want
         new_group_resp = dest_org.groups_create(request=new_group_req)
 
+
 # Actual steps, feel free to comment out however you feel, or implement command-line arguments
 def main():
     # Moving users from a specific group
@@ -132,6 +133,8 @@ def main():
     ]
     create_groups_on_dest_org(new_groups_to_create, users_list=users_in_group)
 
+    # Remove the users from the Primary org once they have been added to the new Org
+    remove_users_from_orig_org(users_in_group)
 
 
 if __name__ == "__main__":
