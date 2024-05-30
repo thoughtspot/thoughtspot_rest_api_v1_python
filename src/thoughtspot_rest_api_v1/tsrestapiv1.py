@@ -1082,10 +1082,7 @@ class TSRestApiV1:
             tml_list = tml
         encoded_tmls = []
 
-        if formattype == 'JSON':
-            for t in tml_list:
-                encoded_tmls.append(json.dumps(t))
-        elif formattype == 'YAML':
+        if formattype == 'JSON' or formattype == 'YAML':
             for t in tml_list:
                 encoded_tmls.append(t)
         # Assume it's just a Python object which will dump to JSON matching the TML format
