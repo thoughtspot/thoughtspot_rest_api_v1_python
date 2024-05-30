@@ -1080,14 +1080,18 @@ class TSRestApiV1:
             tml_list = [tml]
         else:
             tml_list = tml
+        encoded_tmls = []
 
         if formattype == 'JSON':
-            json_encoded_tml = json.dumps(tml_list)
+            for t in tml_list:
+                encoded_tmls.append(json.dumps(t))
         elif formattype == 'YAML':
-            json_encoded_tml = json.dumps(tml_list)
+            for t in tml_list:
+                encoded_tmls.append(t)
         # Assume it's just a Python object which will dump to JSON matching the TML format
         else:
-            json_encoded_tml = json.dumps(tml_list)
+            for t in tml_list:
+                encoded_tmls.append(json.dumps(t))
 
         import_policy = 'ALL_OR_NONE'
 
@@ -1095,7 +1099,7 @@ class TSRestApiV1:
             import_policy = 'VALIDATE_ONLY'
 
         post_data = {
-            'import_objects': json_encoded_tml,
+            'import_objects': str(encoded_tmls),
             'import_policy': import_policy,
             'force_create': str(create_new_on_server).lower()
         }
