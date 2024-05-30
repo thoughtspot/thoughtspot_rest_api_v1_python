@@ -16,6 +16,7 @@ from typing import Optional, Dict, List, Union
 import json
 
 import requests
+from requests_toolbelt.adapters.socket_options import TCPKeepAliveAdapter
 
 
 class MetadataTypes:
@@ -178,6 +179,15 @@ class TSRestApiV1:
 
         # Flag for whether the version implements the export_fqn option of metadata/tml/export
         self.can_export_fqn = True
+
+    # The following two methods allow for modifying the session for long-lived purposes, particularly TML import
+    @staticmethod
+    def get_default_tcp_keep_alive_adaptor() -> TCPKeepAliveAdapter:
+        return TCPKeepAliveAdapter(idle=120, count=20, interval=30)
+
+    def set_tcp_keep_alive_adaptor(self, tcp_keep_alive_adaptor: TCPKeepAliveAdapter):
+        self.requests_session.mount('http://', tcp_keep_alive_adaptor)
+        self.requests_session.mount('https://', tcp_keep_alive_adaptor)
 
     #
     # Session management calls
