@@ -7,7 +7,7 @@ import os
 import requests.exceptions
 import functools
 
-from thoughtspot_rest_api_v1 import *
+from src.thoughtspot_rest_api_v1 import *
 
 
 # Details about objects within ThoughtSpot all are accessed through 'metadata/' endpoints, which can be used
@@ -25,6 +25,9 @@ timeout_in_secs = 300
 session = ts.requests_session
 for method in ('get', 'options', 'head', 'post', 'put', 'patch', 'delete'):
     setattr(session, method, functools.partial(getattr(session, method), timeout=timeout_in_secs))
+
+# Add TCP keepalive
+ts.set_tcp_keep_alive_adaptor(ts.get_default_tcp_keep_alive_adaptor())
 
 # Now any call you make will send the specified timeout along to Requests
 
