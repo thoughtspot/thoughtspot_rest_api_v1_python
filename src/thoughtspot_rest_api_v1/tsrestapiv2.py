@@ -3,7 +3,7 @@ from typing import Optional, Dict, List, Union
 import json
 
 import requests
-
+from requests_toolbelt.adapters.socket_options import TCPKeepAliveAdapter
 
 class ReportTypes:
     PDF = 'PDF'
@@ -56,6 +56,15 @@ class TSRestApiV2:
         # TS documentation shows the /tspublic/v2/ portion but it is always preceded by {server}/callosum/v2/
         self.base_url = '{server}/api/rest/{version}/'.format(server=self.server, version=self.api_version)
         # self.non_public_base_url = '{server}/callosum/v1/'.format(server=self.server)
+
+    # The following two methods allow for modifying the session for long-lived purposes, particularly TML import
+    @staticmethod
+    def get_default_tcp_keep_alive_adaptor() -> TCPKeepAliveAdapter:
+        return TCPKeepAliveAdapter(idle=120, count=20, interval=30)
+
+    def set_tcp_keep_alive_adaptor(self, tcp_keep_alive_adaptor: TCPKeepAliveAdapter):
+        self.requests_session.mount('http://', tcp_keep_alive_adaptor)
+        self.requests_session.mount('https://', tcp_keep_alive_adaptor)
 
     @property
     def bearer_token(self):

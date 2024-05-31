@@ -77,21 +77,67 @@ for group in groups:
 
 # Get all Tables
 search_request = {
-    'metadata': {'type': 'LIVEBOARD'},
+    'metadata': {'type': 'LOGICAL_TABLE'},
     'record_offset': 0,
-    'record_size': 10000  # default is 10
+    'record_size': 100000  # default is 10
 }
 tables = ts.metadata_search(request=search_request)
 
 print(tables)
 
-# Tables created by a user
+# Liveboards created by a user
 search_request = {
     'metadata': {'type': 'LIVEBOARD'},
     'created_by_user_identifiers': ['bryant.howell'],
     'record_offset': 0,
-    'record_size': 10000  # default is 10
+    'record_size': 100000  # default is 10
+}
+lbs = ts.metadata_search(request=search_request)
+print(lbs)
+# You can use this pattern for all the various metadata object requests
+
+# List objects that are shared to a certain group or user (must look at 'MODIFY' and 'READ_ONLY' separately
+# Alternatively, use security_metadata_fetch_permissions() (see `share_objects_access_control.py` for example)
+search_request = {
+    'metadata': {'type': 'LIVEBOARD'},
+    "permissions": [
+        {
+            "principal": {
+                "identifier": "Developers",
+                "type": "USER_GROUP"
+            },
+            "share_mode": "MODIFY"
+        },
+        {
+            "principal": {
+                "identifier": "Developers",
+                "type": "USER_GROUP"
+            },
+            "share_mode": "READ_ONLY"
+        }
+    ],
+    'record_offset': 0,
+    'record_size': 100000  # default is 10
+}
+lbs = ts.metadata_search(request=search_request)
+print(lbs)
+
+
+
+# Dependencies
+# Get all dependencies of a Table
+search_request = {
+    'metadata': {'type': 'LOGICAL_TABLE'},
+    "include_dependent_objects" : True,
+    'record_offset': 0,
+    'record_size': 100000  # default is 10
 }
 tables = ts.metadata_search(request=search_request)
+for t in tables:
+    guid = t['metadata_id']
+    print(guid)
+    dep_objs = t['dependent_objects'][guid]
+    # The dependent_objects response is split into the V1 object_types:
+    # LOGICAL_TABLE, QUESTION_ANSWER_BOOK (Answer), PINBOARD_ANSWER_BOOK (Liveboard)
+
 print(tables)
-# You can use this pattern for all the various metadata object requests

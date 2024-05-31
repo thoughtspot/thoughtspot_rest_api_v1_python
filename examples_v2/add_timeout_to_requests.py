@@ -26,6 +26,9 @@ session = ts.requests_session
 for method in ('get', 'options', 'head', 'post', 'put', 'patch', 'delete'):
     setattr(session, method, functools.partial(getattr(session, method), timeout=timeout_in_secs))
 
+# Add TCP keepalive
+ts.set_tcp_keep_alive_adaptor(ts.get_default_tcp_keep_alive_adaptor())
+
 # Now any call you make will send the specified timeout along to Requests
 
 #  ts.session_login() ... etc
