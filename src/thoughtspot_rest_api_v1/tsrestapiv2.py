@@ -82,7 +82,8 @@ class TSRestApiV2:
     #
     def auth_session_login(self,  username: Optional[str] = None, password: Optional[str] = None,
                            remember_me: bool = True,
-                           bearer_token: Optional[str] = None) -> requests.Session:
+                           bearer_token: Optional[str] = None,
+                           org_identifier: Optional[int] = None) -> requests.Session:
         endpoint = 'auth/session/login'
 
         url = self.base_url + endpoint
@@ -97,6 +98,8 @@ class TSRestApiV2:
                 'password': password,
                 'remember_me': str(remember_me).lower()
             }
+            if org_identifier is not None:
+                json_post_data["org_identifier"] = org_identifier
             response = self.requests_session.post(url=url, json=json_post_data)
         else:
             raise Exception("If using username/password, must include both")
@@ -367,8 +370,6 @@ class TSRestApiV2:
     #
     def tags_search(self, tag_identifier: Optional[str] = None, color: Optional[str] = None):
         endpoint = 'tags/search'
-        if tag_identifier is None and color is None:
-            raise Exception("Must provide tag_identifier or color")
         request = {}
         if tag_identifier is not None:
             request['tag_identifier'] = tag_identifier
@@ -471,8 +472,9 @@ class TSRestApiV2:
             'export_fqn': export_fqn
         }
         # These are left as optionals / defaults because they may have been added after 9.5
-        if edoc_format.upper() == 'YAML':
-            request['edoc_format'] = 'YAML'
+        if edoc_format is not None:
+            if edoc_format.upper() == 'YAML':
+                request['edoc_format'] = 'YAML'
         if export_schema_version is not None:
             request['export_schema_version'] = export_schema_version
         if metadata_request is not None:
