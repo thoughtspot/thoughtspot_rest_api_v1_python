@@ -472,8 +472,9 @@ class TSRestApiV2:
             'export_fqn': export_fqn
         }
         # These are left as optionals / defaults because they may have been added after 9.5
-        if edoc_format.upper() == 'YAML':
-            request['edoc_format'] = 'YAML'
+        if edoc_format is not None:
+            if edoc_format.upper() == 'YAML':
+                request['edoc_format'] = 'YAML'
         if export_schema_version is not None:
             request['export_schema_version'] = export_schema_version
         if metadata_request is not None:
