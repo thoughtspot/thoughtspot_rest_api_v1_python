@@ -82,7 +82,8 @@ class TSRestApiV2:
     #
     def auth_session_login(self,  username: Optional[str] = None, password: Optional[str] = None,
                            remember_me: bool = True,
-                           bearer_token: Optional[str] = None) -> requests.Session:
+                           bearer_token: Optional[str] = None,
+                           org_identifier: Optional[int] = None) -> requests.Session:
         endpoint = 'auth/session/login'
 
         url = self.base_url + endpoint
@@ -97,6 +98,8 @@ class TSRestApiV2:
                 'password': password,
                 'remember_me': str(remember_me).lower()
             }
+            if org_identifier is not None:
+                json_post_data["org_identifier"] = org_identifier
             response = self.requests_session.post(url=url, json=json_post_data)
         else:
             raise Exception("If using username/password, must include both")
