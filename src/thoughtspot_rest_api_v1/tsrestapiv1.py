@@ -1073,6 +1073,8 @@ class TSRestApiV1:
         return response_str, name_guid_map
 
     # TML import is distinguished by having an {'Accept': 'text/plain'} header on the POST
+    # 'JSON' default actually takes a Python object representing JSON output
+    # Use 'YAML' or 'JSON_STR' as formattype if you have already stringified the input (read from disk etc.)
     def metadata_tml_import(
         self,
         tml: Union[Dict, List[Dict]],
@@ -1090,14 +1092,20 @@ class TSRestApiV1:
             tml_list = [tml]
         else:
             tml_list = tml
+        encoded_tmls = []
 
+        # Assume JSON is Python object
         if formattype == 'JSON':
-            json_encoded_tml = json.dumps(tml_list)
-        elif formattype == 'YAML':
-            json_encoded_tml = json.dumps(tml_list)
+            for t in tml_list:
+                encoded_tmls.append(json.dumps(t))
+        # YAML or JSON_STR are already string when sent in
+        elif formattype in ['YAML', 'JSON_STR']:
+            for t in tml_list:
+                encoded_tmls.append(t)
         # Assume it's just a Python object which will dump to JSON matching the TML format
         else:
-            json_encoded_tml = json.dumps(tml_list)
+            for t in tml_list:
+                encoded_tmls.append(json.dumps(t))
 
         import_policy = 'ALL_OR_NONE'
 
@@ -1105,7 +1113,7 @@ class TSRestApiV1:
             import_policy = 'VALIDATE_ONLY'
 
         post_data = {
-            'import_objects': json_encoded_tml,
+            'import_objects': str(encoded_tmls),
             'import_policy': import_policy,
             'force_create': str(create_new_on_server).lower()
         }
