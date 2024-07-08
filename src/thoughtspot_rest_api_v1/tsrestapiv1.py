@@ -1443,7 +1443,8 @@ class TSRestApiV1:
         response.raise_for_status()
         return response.json()
 
-    def user_post(self, username: str, password: str, display_name: str, properties: Optional[Dict] = None,
+    def user_post(self, username: str, password: str, display_name: str, email: Optional[str] = None,
+                  properties: Optional[Dict] = None,
                   groups: Optional[List[str]] = None, user_type: str = 'LOCAL_USER',
                   tenant_id: Optional[str] = None, visibility: str = 'DEFAULT'):
         endpoint = 'user'
@@ -1456,7 +1457,11 @@ class TSRestApiV1:
             'visibility': visibility
         }
         if properties is not None:
-            post_data['properties'] = properties
+            if email is not None:
+                properties['mail'] = email
+            post_data['properties'] = json.dumps(properties)
+        else:
+            post_data['properties'] = json.dumps({'mail': email})
         if groups is not None:
             post_data['groups'] = json.dumps(groups)
         if tenant_id is not None:
