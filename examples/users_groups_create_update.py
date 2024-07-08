@@ -43,9 +43,9 @@ def create_user(rest_api_obj: TSRestApiV1, username, display_name, email, groups
     user_password = ''.join(random.choice(letters) for i in range(20))
 
     new_user_guid = rest_api_obj.user_post(username=username, password=user_password, display_name=display_name,
-                                           properties=None, groups=groups_guid)
-    if email is not None:
-        rest_api_obj.user_email(user_guid=new_user_guid, user_email=email)
+                                           properties={"mail" : email}, groups=groups_guid)
+    # if email is not None:
+    #    rest_api_obj.user_email(user_guid=new_user_guid, user_email=email)
 
     return new_user_guid
 
@@ -86,5 +86,5 @@ for group in groups_to_create:
                                    visibility=GroupVisibility.NON_SHARABLE)
     group_guid_list.append(new_group_guid)
 
-create_user(rest_api_obj=ts, username='test_user_1', display_name='Test User 1', email=None,
+create_user(rest_api_obj=ts, username='test_user_1', display_name='Test User 1', email='testuser1@domain.com',
             groups_guid=group_guid_list)
