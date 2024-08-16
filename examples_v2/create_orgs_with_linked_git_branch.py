@@ -2,7 +2,7 @@ import os
 import requests.exceptions
 import json
 
-from src.thoughtspot_rest_api_v1 import *
+from thoughtspot_rest_api_v1 import *
 
 #
 # Example order of actions to "move" data and content objects
