@@ -77,8 +77,11 @@ for org_name in org_names_to_deploy_to:
         # which is the same between V1 and V2 of this API
         create_req = {
             "name": "My Connection",
-            "data_warehouse_type": "Snowflake",
-            "configuration": connection_config_per_org[org_name],
+            "data_warehouse_type": "SNOWFLAKE",
+            "data_warehouse_config": {
+                "configuration": connection_config_per_org[org_name],
+                "externalDatabases": []
+            },
             "validate": False  # Must set to FALSE to create without adding tables initially
         }
         conn_create_resp = ts.connection_create(request=create_req)
