@@ -2,7 +2,7 @@ import os
 import requests.exceptions
 import json
 
-from thoughtspot_rest_api_v1 import *
+from src.thoughtspot_rest_api_v1 import *
 
 #
 # Example order of actions to "move" data and content objects
@@ -73,4 +73,15 @@ for org_name in names_org_id:
       "configuration_branch_name": config_branch_name
     }
     config_resp = ts.vcs_git_config_create(request=config_req)
+    print("Config response: ")
     print(json.dumps(config_resp, indent=2))
+
+    # Initialize the mapping and commit files, which will be stored to the configuration branch
+    commit_req = {
+        "branch_name": org_name,
+        "deploy_type": "FULL",
+        "deploy_policy": "ALL_OR_NONE"
+    }
+    commit_resp = ts.vcs_git_commits_deploy(request=commit_req)
+    print("Commit response: ")
+    print(json.dumps(commit_resp, indent=2))
