@@ -5,9 +5,7 @@ import json
 from thoughtspot_rest_api_v1 import *
 
 #
-# Example order of actions to "move" data and content objects
-# from primary org to a destination org
-# Then share to groups on the destination org (see org_migration_users_groups.py for user/group migration)
+# Example of creating the setups of Orgs linked to Git branches in GitHub for dev->test->pre_prod->prod_per_customer
 #
 
 username = os.getenv('username')  # or type in yourself

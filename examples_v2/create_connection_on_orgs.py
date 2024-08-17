@@ -5,9 +5,10 @@ import json
 from thoughtspot_rest_api_v1 import *
 
 #
-# Example order of actions to "move" data and content objects
-# from primary org to a destination org
-# Then share to groups on the destination org (see org_migration_users_groups.py for user/group migration)
+# Example of creating a Connection on each Org in the dev->test->pre_prod->prod_per_customer deployment model
+# Where each Connection has the same name, but can have different configurations
+# Allowing the Git deployment APIs to easily automatically do  any mapping/swapping of identifiers for tables
+# from the dev environment to another.
 #
 
 username = os.getenv('username')  # or type in yourself
