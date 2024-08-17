@@ -83,3 +83,13 @@ for org_name in names_org_id:
     commit_resp = ts.vcs_git_commits_deploy(request=commit_req)
     print("Commit response: ")
     print(json.dumps(commit_resp, indent=2))
+
+    # Once you've initialized the mapping file, go to your Config Branch in GitHub
+    # You will see two directories, one that ends in `.mapping`
+    # Inside this directory, will be an org-{org_id}.json file
+    # Per https://developers.thoughtspot.com/docs/guid-mapping#_using_mapping_for_table_tml_properties
+    # You can manually edit the file and add entries
+    # to swap out the db:, schema: and even db_table: properties
+    # When you actually deploy any objects using the /vcs/git/commits/deploy endpoint,
+    # these mappings will be in use, and ThoughtSpot will update the .mapping file with mappings of deployed objects
+    # See git_deploy_commits_to_prod_single_tenants.py for script using the vcs_git_commits_deploy() method

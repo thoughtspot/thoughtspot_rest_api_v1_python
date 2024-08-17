@@ -2,7 +2,7 @@ import os
 import requests.exceptions
 import json
 
-from thoughtspot_rest_api_v1 import *
+from src.thoughtspot_rest_api_v1 import *
 
 #
 # Example of deploying from a pre_prod or release branch out to individual customer "prod Orgs"
@@ -61,6 +61,6 @@ for org_name in org_names_to_deploy_to:
           "deploy_type": "DELTA",  # Switch to FULL if you know that works best for you
           "deploy_policy": "PARTIAL"   # ALL_OR_NONE or VALIDATE are other options, depending on your needs
         }
-        deploy_resp = ts.connection_create(request=deploy_req)
+        deploy_resp = ts.vcs_git_commits_deploy(request=deploy_req)
         print("Deployed to: " + org_name)
         print(json.dumps(deploy_resp, indent=2))
