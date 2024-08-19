@@ -15,6 +15,8 @@ username = os.getenv('username')  # or type in yourself
 password = os.getenv('password')  # or type in yourself
 server = os.getenv('server')        # or type in yourself
 
+# First org name in the list must be the "dev" org
+# so that the .mapping file JSON can be generated automatically for each connection created after
 org_names_to_deploy_to = [
     "dev",
     "test",
@@ -22,6 +24,9 @@ org_names_to_deploy_to = [
     "cust_a",
     "cust_b"
 ]
+
+# Alternatively, provide the GUID of the connection on dev org (if already created before this script)
+dev_org_connection_guid = None
 
 connection_config_per_org = {
     "dev": {
@@ -77,8 +82,8 @@ for org_name in org_names_to_deploy_to:
         # See https://developers.thoughtspot.com/docs/connections-api for configuration portion of JSON,
         # which is the same between V1 and V2 of this API
         create_req = {
-            "name": "My Connection",
-            "data_warehouse_type": "SNOWFLAKE",
+            "name": "My Connection",  # Make variable if you need to, but must add JSON output to .mapping file
+            "data_warehouse_type": "SNOWFLAKE",  # change for data warehouse type
             "data_warehouse_config": {
                 "configuration": connection_config_per_org[org_name],
                 "externalDatabases": []
@@ -88,3 +93,16 @@ for org_name in org_names_to_deploy_to:
         conn_create_resp = ts.connection_create(request=create_req)
         print("Created Connection: ")
         print(json.dumps(conn_create_resp, indent=2))
+
+        # Grab the first connection GUID to use as originalGuid in all subsequent
+        if dev_org_connection_guid is None:
+            dev_org_connection_guid = conn_create_resp["id"]
+        else:
+            print("-------")
+            print("org-{}.mapping - JSON entry for connection in .mapping file:".format(org_id))
+            connection_map_entry = {"originalGuid": dev_org_connection_guid,
+                                    "mappedGuid": conn_create_resp["id"],
+                                    "counter": 0,
+                                    "additionalMapping": {}}
+            print(json.dumps(conn_create_resp, indent=2))
+            print("-------")
