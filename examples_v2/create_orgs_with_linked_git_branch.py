@@ -2,7 +2,7 @@ import os
 import requests.exceptions
 import json
 
-from thoughtspot_rest_api_v1 import *
+from src.thoughtspot_rest_api_v1 import *
 
 #
 # Example of creating the setups of Orgs linked to Git branches in GitHub for dev->test->pre_prod->prod_per_customer
@@ -30,15 +30,30 @@ except requests.exceptions.HTTPError as e:
     print(e.response.content)
     exit()
 
-names_org_id = {}
 
-# Create the orgs
-for name in org_names_to_create:
-    resp = org0.orgs_create(name=name)
-    names_org_id[name] = resp['id']
+def create_orgs(org_names):
+    # Create the orgs
+    orgs_name_id_map = {}
+    for name in org_names_to_create:
+        resp = org0.orgs_create(name=name)
+        orgs_name_id_map[name] = resp['id']
 
-print("Created the following orgs: ")
-print(json.dumps(names_org_id, indent=2))
+    print("Created the following orgs: ")
+    print(json.dumps(orgs_name_id_map, indent=2))
+    return orgs_name_id_map
+
+
+def get_orgs_names_ids_map():
+    resp = org0.orgs_search(request={"visibility": "SHOW", "status": "ACTIVE"})
+    orgs_name_id_map = {}
+    for i in resp:
+        orgs_name_id_map[i["name"]] = i["id"]
+    return orgs_name_id_map
+
+
+# If the orgs already exist, comment this out and get a { org_name : org_id } map from /orgs/search endpoint with below
+names_org_id = create_orgs(org_names_to_create)
+# names_org_id = get_orgs_names_ids_map()
 
 # Config the Orgs with their Git branch
 gh_repo_url = "https://github.com/yourCompany/repoName"
