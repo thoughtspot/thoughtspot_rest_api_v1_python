@@ -2,7 +2,7 @@ import os
 import requests.exceptions
 import json
 
-from src.thoughtspot_rest_api_v1 import *
+from thoughtspot_rest_api_v1 import *
 
 #
 # Example of creating the setups of Orgs linked to Git branches in GitHub for dev->test->pre_prod->prod_per_customer
@@ -86,6 +86,12 @@ for org_name in names_org_id:
       "commit_branch_name": org_name,
       "configuration_branch_name": config_branch_name
     }
+
+    # If you need to clear a previous config, delete with:
+    # delete_config_resp = ts.vcs_git_config_create(request={})
+    # print("Delete Config response: ")
+    # print(json.dumps(delete_config_resp, indent=2))
+
     config_resp = ts.vcs_git_config_create(request=config_req)
     print("Config response: ")
     print(json.dumps(config_resp, indent=2))
