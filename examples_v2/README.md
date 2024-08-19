@@ -2,7 +2,7 @@
 
 # Orgs and SDLC
 
-## create_orgs_with_linked_git_branch.py*
+## create_orgs_with_linked_git_branch.py
 Create dev-test-prod Orgs with matching Git branches for basic SDLC setup in ThoughtSpot
 
 ## create_connection_on_orgs.py
