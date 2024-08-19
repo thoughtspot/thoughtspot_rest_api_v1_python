@@ -47,7 +47,8 @@ def get_orgs_names_ids_map():
     resp = org0.orgs_search(request={"visibility": "SHOW", "status": "ACTIVE"})
     orgs_name_id_map = {}
     for i in resp:
-        orgs_name_id_map[i["name"]] = i["id"]
+        if i["name"] in org_names_to_create:
+            orgs_name_id_map[i["name"]] = i["id"]
     return orgs_name_id_map
 
 
