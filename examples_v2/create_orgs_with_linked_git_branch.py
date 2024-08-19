@@ -95,7 +95,7 @@ for org_name in names_org_id:
 
         print("Trying to configure with:")
         print(json.dumps(config_req, indent=2))
-        config_resp = ts.vcs_git_config_config(request=config_req)
+        config_resp = ts.vcs_git_config_create(request=config_req)
         print("Config response: ")
         print(json.dumps(config_resp, indent=2))
 
