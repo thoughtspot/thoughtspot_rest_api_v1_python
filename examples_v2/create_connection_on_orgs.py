@@ -99,7 +99,7 @@ for org_name in org_names_to_deploy_to:
             dev_org_connection_guid = conn_create_resp["id"]
         else:
             print("-------")
-            print("org-{}.mapping - JSON entry for connection in .mapping file:".format(org_id))
+            print("org-{}.json - JSON entry for connection .mapping directory:".format(org_id))
             connection_map_entry = {"originalGuid": dev_org_connection_guid,
                                     "mappedGuid": conn_create_resp["id"],
                                     "counter": 0,
