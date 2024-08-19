@@ -87,24 +87,32 @@ for org_name in names_org_id:
       "configuration_branch_name": config_branch_name
     }
 
-    # If you need to clear a previous config, delete with:
-    # delete_config_resp = ts.vcs_git_config_create(request={})
-    # print("Delete Config response: ")
-    # print(json.dumps(delete_config_resp, indent=2))
+    try:
+        # If you need to clear a previous config, delete with:
+        # delete_config_resp = ts.vcs_git_config_create(request={})
+        # print("Delete Config response: ")
+        # print(json.dumps(delete_config_resp, indent=2))
 
-    config_resp = ts.vcs_git_config_create(request=config_req)
-    print("Config response: ")
-    print(json.dumps(config_resp, indent=2))
+        print("Trying to configure with:")
+        print(json.dumps(config_req, indent=2))
+        config_resp = ts.vcs_git_config_config(request=config_req)
+        print("Config response: ")
+        print(json.dumps(config_resp, indent=2))
 
-    # Initialize the mapping and commit files, which will be stored to the configuration branch
-    commit_req = {
-        "branch_name": org_name,
-        "deploy_type": "FULL",
-        "deploy_policy": "ALL_OR_NONE"
-    }
-    commit_resp = ts.vcs_git_commits_deploy(request=commit_req)
-    print("Commit response: ")
-    print(json.dumps(commit_resp, indent=2))
+        # Initialize the mapping and commit files, which will be stored to the configuration branch
+        commit_req = {
+            "branch_name": org_name,
+            "deploy_type": "FULL",
+            "deploy_policy": "ALL_OR_NONE"
+        }
+        commit_resp = ts.vcs_git_commits_deploy(request=commit_req)
+        print("Commit response: ")
+        print(json.dumps(commit_resp, indent=2))
+
+    except requests.exceptions.HTTPError as e:
+        print(e)
+        print(e.response.content)
+        exit()
 
     # Once you've initialized the mapping file, go to your Config Branch in GitHub
     # You will see two directories, one that ends in `.mapping`
