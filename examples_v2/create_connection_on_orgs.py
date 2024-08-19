@@ -100,9 +100,9 @@ for org_name in org_names_to_deploy_to:
         else:
             print("-------")
             print("org-{}.json - JSON entry for connection .mapping directory:".format(org_id))
-            connection_map_entry = {"originalGuid": dev_org_connection_guid,
+            connection_map_entry = [{"originalGuid": dev_org_connection_guid,
                                     "mappedGuid": conn_create_resp["id"],
-                                    "counter": 0,
-                                    "additionalMapping": {}}
+                                     "counter": 0,
+                                     "additionalMapping": {}}]
             print(json.dumps(conn_create_resp, indent=2))
             print("-------")
