@@ -630,7 +630,8 @@ class TSRestApiV1:
         url = self.base_url + endpoint
         response = self.requests_session.post(url=url, params=url_params)
         response.raise_for_status()
-        return response.json()
+        # Return is a 204 with no response body
+        return True
 
     def group_users_delete(self, group_guid: str, user_guids: List[str]):
         endpoint = 'group/{}/users'.format(group_guid)
