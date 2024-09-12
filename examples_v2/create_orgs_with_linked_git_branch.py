@@ -123,3 +123,11 @@ for org_name in names_org_id:
     # When you actually deploy any objects using the /vcs/git/commits/deploy endpoint,
     # these mappings will be in use, and ThoughtSpot will update the .mapping file with mappings of deployed objects
     # See git_deploy_commits_to_prod_single_tenants.py for script using the vcs_git_commits_deploy() method
+
+    #
+    # Create Groups and other Org objects
+    # You may do other initialization steps such as creating matching Groups and Tags
+    # See `org_migration_user_groups.py` for examples of these APIs and how to
+    # replicate them from one Org to another (alternatively just define your pattern
+    # in code to deploy out to each Org)
+    #

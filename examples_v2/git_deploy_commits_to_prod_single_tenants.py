@@ -2,7 +2,7 @@ import os
 import requests.exceptions
 import json
 
-from src.thoughtspot_rest_api_v1 import *
+from thoughtspot_rest_api_v1 import *
 
 #
 # Example of deploying from a pre_prod or release branch out to individual customer "prod Orgs"
@@ -64,3 +64,9 @@ for org_name in org_names_to_deploy_to:
         deploy_resp = ts.vcs_git_commits_deploy(request=deploy_req)
         print("Deployed to: " + org_name)
         print(json.dumps(deploy_resp, indent=2))
+
+        #
+        # When content is deployed to an Org for the first time, you must share the content to
+        # give access to customers. See `share_objects_access_control.py example
+        # You may also want to Tag content. See `tag_objects.py` for example
+        #
