@@ -460,6 +460,21 @@ class TSRestApiV2:
         }
         return self.post_request(endpoint=endpoint, request=request)
 
+    def metadata_tml_async_import(self, metadata_tmls: List[str], import_policy: str = 'PARTIAL',
+                                  create_new: bool = False, all_orgs_context: bool = False,
+                                  skip_cdw_validation_for_tables: bool = False):
+        endpoint = 'metadata/tml/async/import'
+        request = {
+            'metadata_tmls': metadata_tmls,
+            'import_policy': import_policy,
+            'create_new': create_new
+        }
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def metadata_tml_async_status(self, request: Dict):
+        endpoint = 'metadata/tml/async/status'
+        return self.post_request(endpoint=endpoint, request=request)
+
     # Out of convenience, providing a simple List[str] input for getting these by GUID. metadata_request will override
     # if you need the deeper functionality with names / types
     def metadata_tml_export(self, metadata_ids: List[str], export_associated: bool = False, export_fqn: bool = False,
@@ -484,6 +499,10 @@ class TSRestApiV2:
             for i in metadata_ids:
                 metadata_list.append({'identifier': i})
             request['metadata'] = metadata_list
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def metadata_tml_export_batch(self, request: Dict):
+        endpoint = 'metadata/tml/export/batch'
         return self.post_request(endpoint=endpoint, request=request)
 
     # Out of convenience, providing a simple List[str] input for getting these by GUID. metadata_request will override
