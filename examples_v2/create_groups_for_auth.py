@@ -2,7 +2,8 @@ import os
 import requests.exceptions
 import json
 
-from thoughtspot_rest_api_v1 import *
+from examples.share_objects_access_control import read_only_guids
+from src.thoughtspot_rest_api_v1 import *
 
 #
 # Script showing creating Groups on the fly for auth purposes and assigning
@@ -24,6 +25,7 @@ ts1: TSRestApiV1 = TSRestApiV1(server_url=server)
 try:
     auth_token_response = ts.auth_token_full(username=username, password=password, validity_time_in_sec=3000)
     ts.bearer_token = auth_token_response['token']
+    ts1.bearer_token = auth_token_response['token']
 except requests.exceptions.HTTPError as e:
     print(e)
     print(e.response.content)
@@ -168,7 +170,16 @@ if len(tables_resp) == 1:
 
         col_ids_to_share.append(col_id)
 
-
+# Add sharing permissions
+read_only_guids = [new_group_guid]
+perms = ts1.create_share_permissions(read_only_users_or_groups_guids=read_only_guids)
+                                    # edit_access_users_or_groups_guids=edit_guids)
+try:
+    ts1.security_share(shared_object_type=TSTypes.COLUMN, shared_object_guids=col_ids_to_share, permissions=perms)
+except requests.exceptions.HTTPError as e:
+    print(e)
+    print(e.response.content)
+    exit()
 
 # Finally - you can assign the new Group to a user either via Update User
 # or the Full Access Token request using the JIT provisioning feature
