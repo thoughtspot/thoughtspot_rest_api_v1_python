@@ -180,6 +180,10 @@ class TSRestApiV1:
         # Flag for whether the version implements the export_fqn option of metadata/tml/export
         self.can_export_fqn = True
 
+        # Can be set after initial request
+        # V1 API can use bearer auth in headers just like V2.0
+        self.__bearer_token = None
+
     # The following two methods allow for modifying the session for long-lived purposes, particularly TML import
     @staticmethod
     def get_default_tcp_keep_alive_adaptor() -> TCPKeepAliveAdapter:
@@ -213,6 +217,16 @@ class TSRestApiV1:
         # HTTP 204 - success, no content
         response.raise_for_status()
         return True
+
+    @property
+    def bearer_token(self):
+        return self.__bearer_token
+
+    @bearer_token.setter
+    def bearer_token(self, bearer_token):
+        self.__bearer_token = bearer_token
+        self.api_headers['Authorization'] = 'Bearer {}'.format(bearer_token)
+        self.requests_session.headers.update(self.api_headers)
 
     #
     # Root level API methods found below, divided into logical separations
