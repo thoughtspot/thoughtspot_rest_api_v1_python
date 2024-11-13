@@ -368,29 +368,35 @@ class TSRestApiV2:
     #
     # /metadata/tag endpoints
     #
-    def tags_search(self, tag_identifier: Optional[str] = None, color: Optional[str] = None):
+    def tags_search(self, tag_identifier: Optional[str] = None, name_pattern: Optional[str] = None,
+                    color: Optional[str] = None):
         endpoint = 'tags/search'
         request = {}
         if tag_identifier is not None:
             request['tag_identifier'] = tag_identifier
         if color is not None:
             request['color'] = color
+        if name_pattern is not None:
+            request['name_pattern'] = name_pattern
+
         return self.post_request(endpoint=endpoint, request=request)
 
-    def tags_create(self, name: str, color: str):
+    def tags_create(self, name: str, color: Optional[str] = None):
         endpoint = 'tags/create'
         request = {
-            'name': name,
-            'color': color
+            'name': name
         }
+        if color is not None:
+            request['color'] = color
         return self.post_request(endpoint=endpoint, request=request)
 
-    def tags_update(self, tag_identifier: str, name: str, color: str):
+    def tags_update(self, tag_identifier: str, name: str, color: Optional[str] = None):
         endpoint = 'tags/{}/update'.format(tag_identifier)
         request = {
-            'name': name,
-            'color': color
+            'name': name
         }
+        if color is not None:
+            request['color'] = color
         return self.post_request(endpoint=endpoint, request=request)
 
     def tags_delete(self, tag_identifier: str):
@@ -733,4 +739,44 @@ class TSRestApiV2:
         endpoint = 'dbt/{}'.format(dbt_connection_identifier)
         return self.post_request(endpoint=endpoint, request=request)
 
+#
+# /ai/ endpoints
+#
+
+    def ai_conversation_create(self, metadata_identifier: str,
+                               tokens: Optional[List[str]] = None):
+        endpoint = 'ai/conversation/create'
+
+        request = {
+            "metadata_identifier": metadata_identifier
+        }
+
+        if tokens is not None:
+            tokens_string = ""
+            for token in tokens:
+                tokens_string += "[{}],".format(token.lower())
+            tokens_string = tokens_string[0:-1]
+            request["tokens"] = tokens_string
+
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def ai_conversation_converse(self, conversation_identifier: str, metadata_identifier: str, message: str):
+        endpoint = 'ai/conversation/{}/converse'.format(conversation_identifier)
+
+        request = {
+            "metadata_identifier": metadata_identifier,
+            "message": message
+        }
+
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def ai_answer_create(self, metadata_identifier: str, query: str):
+        endpoint = 'ai/answer/create'
+
+        request = {
+            "metadata_identifier": metadata_identifier,
+            "query": query
+        }
+
+        return self.post_request(endpoint=endpoint, request=request)
 
