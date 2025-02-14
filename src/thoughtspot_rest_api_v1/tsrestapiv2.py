@@ -3,6 +3,7 @@ from typing import Optional, Dict, List, Union
 import json
 
 import requests
+from charset_normalizer.utils import identify_sig_or_bom
 from requests_toolbelt.adapters.socket_options import TCPKeepAliveAdapter
 
 class ReportTypes:
@@ -457,24 +458,56 @@ class TSRestApiV2:
         }
         return self.post_request(endpoint=endpoint, request=request)
 
-    def metadata_tml_import(self, metadata_tmls: List[str], import_policy: str = 'PARTIAL', create_new: bool = False):
+    def metadata_tml_import(self,
+                            metadata_tmls: List[str],
+                            import_policy: str = 'PARTIAL',
+                            create_new: bool = False,
+                            all_orgs_context: Optional[bool] = None,
+                            skip_cdw_validation_for_tables: Optional[bool] = None,
+                            skip_diff_check: Optional[bool] = None,
+                            enable_large_metadata_validation: Optional[bool] = None
+                            ):
         endpoint = 'metadata/tml/import'
         request = {
             'metadata_tmls': metadata_tmls,
             'import_policy': import_policy,
             'create_new': create_new
         }
+        if all_orgs_context is not None:
+            request['all_orgs_context'] = all_orgs_context
+        if skip_cdw_validation_for_tables is not None:
+            request['cdw_validation_for_tables'] = skip_cdw_validation_for_tables
+        if skip_diff_check is not None:
+            request['skip_diff_check'] = skip_diff_check
+        if enable_large_metadata_validation is not None:
+            request['enable_large_metadata_validation'] = enable_large_metadata_validation
+
+
         return self.post_request(endpoint=endpoint, request=request)
 
-    def metadata_tml_async_import(self, metadata_tmls: List[str], import_policy: str = 'PARTIAL',
-                                  create_new: bool = False, all_orgs_context: bool = False,
-                                  skip_cdw_validation_for_tables: bool = False):
+    def metadata_tml_async_import(self, metadata_tmls: List[str],
+                                  import_policy: str = 'PARTIAL',
+                                  create_new: bool = False,
+                                  all_orgs_context: Optional[bool] = None,
+                                  skip_cdw_validation_for_tables: Optional[bool] = None,
+                                  skip_diff_check: Optional[bool] = None,
+                                  enable_large_metadata_validation: Optional[bool] = None
+                                  ):
         endpoint = 'metadata/tml/async/import'
         request = {
             'metadata_tmls': metadata_tmls,
             'import_policy': import_policy,
             'create_new': create_new
         }
+        if all_orgs_context is not None:
+            request['all_orgs_context'] = all_orgs_context
+        if skip_cdw_validation_for_tables is not None:
+            request['cdw_validation_for_tables'] = skip_cdw_validation_for_tables
+        if skip_diff_check is not None:
+            request['skip_diff_check'] = skip_diff_check
+        if enable_large_metadata_validation is not None:
+            request['enable_large_metadata_validation'] = enable_large_metadata_validation
+
         return self.post_request(endpoint=endpoint, request=request)
 
     def metadata_tml_async_status(self, request: Dict):
@@ -546,6 +579,38 @@ class TSRestApiV2:
                 metadata_list.append({'identifier': i})
             request['metadata'] = metadata_list
         return self.post_request(endpoint=endpoint, request=request)
+
+    def metadata_copyobject(self, identifier: str, object_type: Optional[str] = None,
+                            title: Optional[str] = None, description: Optional[str] = None):
+        endpoint = 'metadata/copyobject'
+        request = {
+            identifier : identifier
+        }
+        if object_type is not None:
+            request['type'] = object_type
+        if title is not None:
+            request['title'] = title
+        if description is not None:
+            request['description'] = description
+
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def metadata_worksheets_convert(self, worksheet_ids: Optional[List[str]] = None,
+                                    exclude_worksheet_ids: Optional[List[str]] = None,
+                                    convert_all: bool = False,
+                                    apply_changes: bool = False):
+        endpoint = 'metadata/worksheets/convert'
+        request = {
+            'convert_all': convert_all,
+            'apply_changes': apply_changes
+        }
+        if worksheet_ids is not None:
+            request['worksheet_ids'] = worksheet_ids
+        if exclude_worksheet_ids is not None:
+            request['exclude_worksheet_ids'] = exclude_worksheet_ids
+
+        return self.post_request(endpoint=endpoint, request=request)
+
 
 #
 # /reports/ endpoints
