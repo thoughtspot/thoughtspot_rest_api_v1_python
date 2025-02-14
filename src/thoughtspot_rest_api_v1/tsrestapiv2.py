@@ -483,9 +483,19 @@ class TSRestApiV2:
 
     # Out of convenience, providing a simple List[str] input for getting these by GUID. metadata_request will override
     # if you need the deeper functionality with names / types
-    def metadata_tml_export(self, metadata_ids: List[str], export_associated: bool = False, export_fqn: bool = False,
-                            edoc_format: Optional[str] = None, export_schema_version: Optional[str] = None,
-                            metadata_request: Optional[List[Dict]] = None):
+    def metadata_tml_export(self,
+                            metadata_ids: List[str],
+                            export_associated: bool = False,
+                            export_fqn: bool = False,
+                            edoc_format: Optional[str] = None,
+                            export_schema_version: Optional[str] = None,
+                            metadata_request: Optional[List[Dict]] = None,
+                            export_dependent: Optional[bool] = None,
+                            export_connection_as_dependent: Optional[bool] = None,
+                            all_orgs_override: Optional[bool] = None,
+                            export_options: Optional[Dict] = None
+                            ):
+
         endpoint = 'metadata/tml/export'
 
         request = {
@@ -505,6 +515,15 @@ class TSRestApiV2:
             for i in metadata_ids:
                 metadata_list.append({'identifier': i})
             request['metadata'] = metadata_list
+        if export_dependent is not None:
+            request['export_dependent'] = export_dependent
+        if export_connection_as_dependent is not None:
+            request['export_connection_as_dependent'] = export_connection_as_dependent
+        if all_orgs_override is not None:
+            request['all_orgs_override'] = all_orgs_override
+        if export_options is not None:
+            request['export_options'] = export_options
+
         return self.post_request(endpoint=endpoint, request=request)
 
     def metadata_tml_export_batch(self, request: Dict):
