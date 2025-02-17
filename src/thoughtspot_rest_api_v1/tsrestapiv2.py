@@ -810,6 +810,22 @@ class TSRestApiV2:
         endpoint = 'connection/update'
         return self.post_request(endpoint=endpoint, request=request)
 
+    def connection_delete_v2(self, connection_identifier: str):
+        endpoint = 'connection/{}/delete'.format(connection_identifier)
+        return self.post_request(endpoint=endpoint)
+
+    def connection_update_v2(self, connection_identifier: str, request: Dict):
+        endpoint = 'connection/{}/update'.format(connection_identifier)
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def connection_download_connection_metadata_changes(self, connection_identifier: str):
+        endpoint = 'connections/download-connection-metadata-changes/{}'.format(connection_identifier)
+        return self.post_request(endpoint=endpoint)
+
+    def connection_fetch_connection_diff_status(self, connection_identifier: str):
+        endpoint = 'connections/fetch-connection-diff-status/{}'.format(connection_identifier)
+        return self.post_request(endpoint=endpoint)
+
 #
 # /roles/ endpoints
 #
