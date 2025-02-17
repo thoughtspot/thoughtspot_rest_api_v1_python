@@ -210,6 +210,57 @@ class TSRestApiV2:
         response.raise_for_status()
         return response.json()
 
+    # V2 API Bearer token can be used with V1 /session/login/token for Trusted Auth flow
+    # or used with each API call (no session object) or used with V2 /auth/session/login to create session
+    # additional_request_parameters allows setting new arbitrary keys and data structures to
+    # be appended along with the existing defined method arguments
+    def auth_token_custom(self, username: str, password: Optional[str] = None, org_id: Optional[int] = None,
+                        secret_key: Optional[str] = None, validity_time_in_sec: int = 300,
+                        persist_option: str = 'NONE', reset_option: Optional[List[str]] = None,
+                        auto_create: bool = False, display_name: Optional[str] = None,
+                        email: Optional[str] = None, groups: Optional[List[str]] = None,
+                        additional_request_parameters: Optional[Dict] = None) -> Dict:
+        endpoint = 'auth/token/custom'
+
+        url = self.base_url + endpoint
+
+        json_post_data = {
+            'username': username,
+            'validity_time_in_sec': validity_time_in_sec
+        }
+
+        if secret_key is not None:
+            json_post_data['secret_key'] = secret_key
+
+        elif username is not None and password is not None:
+            json_post_data['password'] = password
+        else:
+            raise Exception("If using username/password, must include both")
+
+        if org_id is not None:
+            json_post_data['org_id'] = org_id
+
+        # User provisioning options
+        if auto_create is True:
+            if display_name is not None and email is not None:
+                json_post_data['auto_create'] = True
+                json_post_data['display_name'] = display_name
+                json_post_data['email'] = email
+                if groups is not None:
+                    group_objects = {}
+                    json_post_data['group_identifiers'] = group_identifiers
+            else:
+                raise Exception("If using auto_create=True, must include display_name and email")
+
+        if additional_request_parameters is not None:
+            for param in additional_request_parameters:
+                json_post_data[param] = additional_request_parameters[param]
+
+        response = self.requests_session.post(url=url, json=json_post_data)
+
+        response.raise_for_status()
+        return response.json()
+
     def auth_token_revoke(self) -> bool:
         endpoint = 'auth/token/revoke'
 
@@ -219,6 +270,10 @@ class TSRestApiV2:
         # HTTP 204 - success, no content
         response.raise_for_status()
         return True
+
+    def auth_token_validate(self, token: str):
+        endpoint = 'auth/token/validate'
+        self.post_request(endpoint=endpoint, request={"token": token})
 
     #
     # Generic wrappers for the basic HTTP methods
@@ -270,6 +325,10 @@ class TSRestApiV2:
     #
     def auth_session_user(self):
         endpoint = 'auth/session/user'
+        return self.get_request(endpoint=endpoint)
+
+    def auth_session_token(self):
+        endpoint = 'auth/session/token'
         return self.get_request(endpoint=endpoint)
 
     #
@@ -863,4 +922,9 @@ class TSRestApiV2:
         }
 
         return self.post_request(endpoint=endpoint, request=request)
+
+    def ai_analytical_questions(self, request: Dict):
+        endpoint = 'ai/analytical-questions'
+        return self.post_request(endpoint=endpoint, request=request)
+
 
