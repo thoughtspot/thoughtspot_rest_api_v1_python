@@ -247,8 +247,10 @@ class TSRestApiV2:
                 json_post_data['display_name'] = display_name
                 json_post_data['email'] = email
                 if groups is not None:
-                    group_objects = {}
-                    json_post_data['group_identifiers'] = group_identifiers
+                    group_objects = []
+                    for group in groups:
+                        group_objects.append({'identifier': group})
+                    json_post_data['groups'] = group_objects
             else:
                 raise Exception("If using auto_create=True, must include display_name and email")
 
@@ -260,6 +262,13 @@ class TSRestApiV2:
 
         response.raise_for_status()
         return response.json()
+
+    # If you want to use a request object rather than the hardcoded Python arguments
+    # of the other methods above
+    def auth_token_direct_request(self, token_type: str, request: Dict):
+        endpoint = 'auth/token/' + token_type.lower()
+
+        self.post_request(endpoint=endpoint, request=request)
 
     def auth_token_revoke(self) -> bool:
         endpoint = 'auth/token/revoke'
