@@ -387,6 +387,28 @@ class TSRestApiV2:
         }
         return self.post_request(endpoint=endpoint, request=request)
 
+    def users_activate(self, user_identifier: str, auth_token: str, password: str, properties: Optional[str] = None):
+        endpoint = 'users/activate'
+        request = {
+            'user_identifier': user_identifier,
+            'auth_token': auth_token,
+            'password': password
+        }
+        if properties is not None:
+            request['properties'] = properties
+
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def users_deactivate(self, user_identifier: str, base_url: str):
+        endpoint = 'users/deactivate'
+        request = {
+            'user_identifier': user_identifier,
+            'base_url': base_url
+        }
+
+        return self.post_request(endpoint=endpoint, request=request)
+
+
     #
     # /system/ endpoints
     #
@@ -679,6 +701,10 @@ class TSRestApiV2:
 
         return self.post_request(endpoint=endpoint, request=request)
 
+    # EA in 10.6 for obj_id
+    def metadata_headers_update(self, request: Dict):
+        endpoint = 'metadata/headers/update'
+        return self.post_request(endpoint=endpoint, request=request)
 
 #
 # /reports/ endpoints
