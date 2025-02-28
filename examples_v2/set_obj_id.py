@@ -109,3 +109,46 @@ def export_tml_with_obj_id(guid:Optional[str] = None,
             f.write(yaml_tml[0]['edoc'])
 
     return yaml_tml
+
+def retrieve_dev_org_objects_for_mapping(org_name: Optional[str] = None, org_id: Optional[int] = None):
+
+    if org_id is None:
+        org_req = {
+            "org_identifier": org_name
+        }
+        org_resp = ts.orgs_search(request=org_req)
+        if len(org_resp) == 1:
+            org_id = org_resp[0]["id"]
+        else:
+            raise Exception("No org with that org_name was found, please try again or provide org_id")
+
+    ts2 = TSRestApiV2(server_url=server)
+    try:
+        auth_token_response = ts2.auth_token_full(username=username, password=password,
+                                                 validity_time_in_sec=3000, org_id=org_id)
+        ts.bearer_token = auth_token_response['token']
+    except requests.exceptions.HTTPError as e:
+        print(e)
+        print(e.response.content)
+        exit()
+
+    types = ["LOGICAL_TABLE", "LIVEBOARD", "ANSWER"]
+    search_req = {
+        "metadata": {
+            "record_offset": 0,
+            "record_size": -1,
+            "include_headers": True,
+            "metadata":[
+                {
+                "type": "LOGICAL_TABLE"
+                }
+            ]
+        },
+        "sort_options": {
+            "field_name": "CREATED",
+            "order": "DESC"
+        }
+    }
+
+    search_resp = ts2.metadata_search(request=search_req)
+    print(json.dumps(search_resp, indent=2))
