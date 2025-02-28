@@ -63,7 +63,9 @@ def set_one_object():
     print(json.dumps(resp, indent=2))
 
 
-def export_tml_with_obj_id(guid:Optional[str] = None, obj_id: Optional[str] = None):
+def export_tml_with_obj_id(guid:Optional[str] = None,
+                           obj_id: Optional[str] = None,
+                           save_to_disk=True):
     # Example of metadata search using obj_identifier (the property may be updated?)
     if obj_id is not None:
         search_req = {
@@ -79,6 +81,7 @@ def export_tml_with_obj_id(guid:Optional[str] = None, obj_id: Optional[str] = No
         tables = ts.metadata_search(request=search_req)
         if len(tables) == 1:
             guid = tables[0]['metadata_id']
+            obj_id = tables[0]['metadata_header']['objId']
 
         # print(json.dumps(log_tables, indent=2))
 
@@ -95,10 +98,14 @@ def export_tml_with_obj_id(guid:Optional[str] = None, obj_id: Optional[str] = No
 
     yaml_tml = ts.metadata_tml_export(metadata_ids=[guid], edoc_format='YAML',
                                       export_options=exp_opt)
-    print(yaml_tml[0]['edoc'])
-    print("-------")
 
-    # Save the file with {obj_id}.{type}.{tml}
-    filename = "{}.table.tml".format(table['metadata_header']['objId'])
-    with open(file=filename, mode='w') as f:
-        f.write(yaml_tml[0]['edoc'])
+    if save_to_disk is True:
+        print(yaml_tml[0]['edoc'])
+        print("-------")
+
+        # Save the file with {obj_id}.{type}.{tml}
+        filename = "{}.table.tml".format(obj_id)
+        with open(file=filename, mode='w') as f:
+            f.write(yaml_tml[0]['edoc'])
+
+    return yaml_tml
