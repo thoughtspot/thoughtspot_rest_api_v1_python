@@ -134,21 +134,51 @@ def retrieve_dev_org_objects_for_mapping(org_name: Optional[str] = None, org_id:
 
     types = ["LOGICAL_TABLE", "LIVEBOARD", "ANSWER"]
     search_req = {
-        "metadata": {
-            "record_offset": 0,
-            "record_size": -1,
-            "include_headers": True,
-            "metadata":[
-                {
-                "type": "LOGICAL_TABLE"
-                }
-            ]
-        },
+        "record_offset": 0,
+        "record_size": -1,
+        "include_headers": True,
+        "include_details": True,
+        "metadata":[
+            {
+            "type": "LOGICAL_TABLE"
+            }
+        ]
+        ,
         "sort_options": {
             "field_name": "CREATED",
             "order": "DESC"
         }
     }
 
-    search_resp = ts2.metadata_search(request=search_req)
-    print(json.dumps(search_resp, indent=2))
+    # Tables - split out Worksheets/ Models / Views from actual Table Objects
+    try:
+        tables_resp = ts2.metadata_search(request=search_req)
+    except requests.exceptions.HTTPError as e:
+        print(e)
+        print(e.response.content)
+        exit()
+
+    # print(json.dumps(tables_resp, indent=2))
+
+    final_guid_obj_id_map = {}
+
+    for table in tables_resp:
+        ds_type = table["metadata_header"]["type"]
+
+        guid = table["metadata_id"]
+        # Real tables
+        if ds_type in ['ONE_TO_ONE_LOGICAL']:
+            detail = table["metadata_detail"]
+            db_table_details = detail["logicalTableContent"]["tableMappingInfo"]
+
+            obj_id = "{}__{}__{}".format(db_table_details["databaseName"], db_table_details["schemaName"],
+                                         db_table_details["tableName"])
+        else:
+            obj_id = table["metadata_name"].replace(" ", "")   # Need more transformation
+
+        final_guid_obj_id_map[guid] = obj_id
+
+    # print(json.dumps(final_guid_obj_id_map, indent=2))
+
+    return final_guid_obj_id_map
+
