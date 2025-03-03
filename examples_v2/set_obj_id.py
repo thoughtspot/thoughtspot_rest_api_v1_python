@@ -204,7 +204,7 @@ def find_duplicate_obj_ids(initial_map: Dict) -> Dict:
     cnt = Counter(initial_map.values())
 
     if len(initial_map) == len(cnt):
-        return []
+        return {}
     else:
         duplicate_obj_ids = []
         for c in cnt:
