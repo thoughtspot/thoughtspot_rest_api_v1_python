@@ -200,7 +200,7 @@ def retrieve_dev_org_objects_for_mapping(org_name: Optional[str] = None, org_id:
 
     return final_guid_obj_id_map
 
-def list_duplicate_obj_ids(initial_map: Dict):
+def find_duplicate_obj_ids(initial_map: Dict) -> Dict:
     cnt = Counter(initial_map.values())
 
     if len(initial_map) == len(cnt):
@@ -210,4 +210,9 @@ def list_duplicate_obj_ids(initial_map: Dict):
         for c in cnt:
             if cnt[c] > 1:
                 duplicate_obj_ids.append(c)
-        return duplicate_obj_ids
+        dup_map = {}
+
+        for m in initial_map:
+            if initial_map[m] in duplicate_obj_ids:
+                dup_map[m] = initial_map[m]
+        return dup_map
