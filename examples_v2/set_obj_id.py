@@ -2,6 +2,9 @@ import json
 import os
 import requests.exceptions
 from typing import Optional, Dict, List
+from urllib import parse
+import re
+from collections import Counter
 
 from src.thoughtspot_rest_api_v1 import TSRestApiV2, TSTypesV2, ReportTypes, TSRestApiV1
 
@@ -166,15 +169,30 @@ def retrieve_dev_org_objects_for_mapping(org_name: Optional[str] = None, org_id:
         ds_type = table["metadata_header"]["type"]
 
         guid = table["metadata_id"]
+
+        # Special property for certain system items that exist across all orgs - skip, cannot reset except in Org 0
+        if "belongToAllOrgs" in table["metadata_header"]:
+            if table["metadata_header"]["belongToAllOrgs"] is True:
+                continue
+
         # Real tables
         if ds_type in ['ONE_TO_ONE_LOGICAL']:
             detail = table["metadata_detail"]
             db_table_details = detail["logicalTableContent"]["tableMappingInfo"]
 
+            # Assumes a "{db}__{schema}__{tableName}" naming convention, but
+            # {tsConnection}__{table} may make more sense across a number of Orgs with identical 'schemas' with
+            # differing names
+            # Essentially you want identical, unique obj_id for "the same table" across Orgs
             obj_id = "{}__{}__{}".format(db_table_details["databaseName"], db_table_details["schemaName"],
                                          db_table_details["tableName"])
         else:
-            obj_id = table["metadata_name"].replace(" ", "")   # Need more transformation
+            # For non-table objects, obj_ids just need to be URL safe strings
+            # This is an example of a basic transformation from the Display Name to a URL safe string
+            obj_id = table["metadata_name"].replace(" ", "_")   # Need more transformation
+            obj_id = parse.quote(obj_id)
+            # After parse quoting, there characters are in form %XX , replace with _ or blank space
+            obj_id = re.sub(r"%..", "", obj_id)
 
         final_guid_obj_id_map[guid] = obj_id
 
@@ -182,3 +200,14 @@ def retrieve_dev_org_objects_for_mapping(org_name: Optional[str] = None, org_id:
 
     return final_guid_obj_id_map
 
+def list_duplicate_obj_ids(initial_map: Dict):
+    cnt = Counter(initial_map.values())
+
+    if len(initial_map) == len(cnt):
+        return []
+    else:
+        duplicate_obj_ids = []
+        for c in cnt:
+            if cnt[c] > 1:
+                duplicate_obj_ids.append(c)
+        return duplicate_obj_ids
