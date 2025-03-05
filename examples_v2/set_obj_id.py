@@ -142,8 +142,23 @@ def retrieve_dev_org_objects_for_mapping(org_name: Optional[str] = None, org_id:
         "include_headers": True,
         "include_details": True,
         "metadata":[
+            {"type": "LOGICAL_TABLE"},{"type": "LIVEBOARD"},{"type": "ANSWER"}
+        ]
+        ,
+        "sort_options": {
+            "field_name": "CREATED",
+            "order": "DESC"
+        }
+    }
+
+    conn_req = {
+        "record_offset": 0,
+        "record_size": -1,
+        "include_headers": False,
+        "include_details": False,
+        "metadata": [
             {
-            "type": "LOGICAL_TABLE"
+                "type": "CONNECTION"
             }
         ]
         ,
@@ -161,6 +176,26 @@ def retrieve_dev_org_objects_for_mapping(org_name: Optional[str] = None, org_id:
         print(e.response.content)
         exit()
 
+    # Connection names for mapping and use in obj_id naming schema for Tables
+    try:
+        conn_resp = ts2.metadata_search(request=conn_req)
+    except requests.exceptions.HTTPError as e:
+        print(e)
+        print(e.response.content)
+        exit()
+
+    conn_map = {}
+    for conn in conn_resp:
+        # Create URL safe portion of obj_id for Connection
+        # Assuming No Duplicate Connection Names in Org (fix this first if you don't have)
+        # Define whatever automatic transformations to create URL safe
+        # but aesthetically pleasing first transform from the existing object names
+        c_obj_id = conn["metadata_name"].replace(" ", "")
+        c_obj_id = parse.quote(c_obj_id)
+        # obj_id = obj_id.replace("%3A", "_")
+        # After parse quoting, there characters are in form %XX , replace with _ or blank space
+        c_obj_id = re.sub(r"%..", "", c_obj_id)
+        conn_map[conn["metadata_id"]] = c_obj_id
     # print(json.dumps(tables_resp, indent=2))
 
     final_guid_obj_id_map = {}
