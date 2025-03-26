@@ -3,6 +3,7 @@ from typing import Optional, Dict, List, Union
 import json
 
 import requests
+from charset_normalizer.utils import identify_sig_or_bom
 from requests_toolbelt.adapters.socket_options import TCPKeepAliveAdapter
 
 class ReportTypes:
@@ -209,6 +210,66 @@ class TSRestApiV2:
         response.raise_for_status()
         return response.json()
 
+    # V2 API Bearer token can be used with V1 /session/login/token for Trusted Auth flow
+    # or used with each API call (no session object) or used with V2 /auth/session/login to create session
+    # additional_request_parameters allows setting new arbitrary keys and data structures to
+    # be appended along with the existing defined method arguments
+    def auth_token_custom(self, username: str, password: Optional[str] = None, org_id: Optional[int] = None,
+                        secret_key: Optional[str] = None, validity_time_in_sec: int = 300,
+                        persist_option: str = 'NONE', reset_option: Optional[List[str]] = None,
+                        auto_create: bool = False, display_name: Optional[str] = None,
+                        email: Optional[str] = None, groups: Optional[List[str]] = None,
+                        additional_request_parameters: Optional[Dict] = None) -> Dict:
+        endpoint = 'auth/token/custom'
+
+        url = self.base_url + endpoint
+
+        json_post_data = {
+            'username': username,
+            'validity_time_in_sec': validity_time_in_sec
+        }
+
+        if secret_key is not None:
+            json_post_data['secret_key'] = secret_key
+
+        elif username is not None and password is not None:
+            json_post_data['password'] = password
+        else:
+            raise Exception("If using username/password, must include both")
+
+        if org_id is not None:
+            json_post_data['org_id'] = org_id
+
+        # User provisioning options
+        if auto_create is True:
+            if display_name is not None and email is not None:
+                json_post_data['auto_create'] = True
+                json_post_data['display_name'] = display_name
+                json_post_data['email'] = email
+                if groups is not None:
+                    group_objects = []
+                    for group in groups:
+                        group_objects.append({'identifier': group})
+                    json_post_data['groups'] = group_objects
+            else:
+                raise Exception("If using auto_create=True, must include display_name and email")
+
+        if additional_request_parameters is not None:
+            for param in additional_request_parameters:
+                json_post_data[param] = additional_request_parameters[param]
+
+        response = self.requests_session.post(url=url, json=json_post_data)
+
+        response.raise_for_status()
+        return response.json()
+
+    # If you want to use a request object rather than the hardcoded Python arguments
+    # of the other methods above
+    def auth_token_direct_request(self, token_type: str, request: Dict):
+        endpoint = 'auth/token/' + token_type.lower()
+
+        self.post_request(endpoint=endpoint, request=request)
+
     def auth_token_revoke(self) -> bool:
         endpoint = 'auth/token/revoke'
 
@@ -218,6 +279,10 @@ class TSRestApiV2:
         # HTTP 204 - success, no content
         response.raise_for_status()
         return True
+
+    def auth_token_validate(self, token: str):
+        endpoint = 'auth/token/validate'
+        self.post_request(endpoint=endpoint, request={"token": token})
 
     #
     # Generic wrappers for the basic HTTP methods
@@ -271,6 +336,10 @@ class TSRestApiV2:
         endpoint = 'auth/session/user'
         return self.get_request(endpoint=endpoint)
 
+    def auth_session_token(self):
+        endpoint = 'auth/session/token'
+        return self.get_request(endpoint=endpoint)
+
     #
     # /users/ endpoints
     #
@@ -317,6 +386,28 @@ class TSRestApiV2:
             'user_identifiers': user_identifiers
         }
         return self.post_request(endpoint=endpoint, request=request)
+
+    def users_activate(self, user_identifier: str, auth_token: str, password: str, properties: Optional[str] = None):
+        endpoint = 'users/activate'
+        request = {
+            'user_identifier': user_identifier,
+            'auth_token': auth_token,
+            'password': password
+        }
+        if properties is not None:
+            request['properties'] = properties
+
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def users_deactivate(self, user_identifier: str, base_url: str):
+        endpoint = 'users/deactivate'
+        request = {
+            'user_identifier': user_identifier,
+            'base_url': base_url
+        }
+
+        return self.post_request(endpoint=endpoint, request=request)
+
 
     #
     # /system/ endpoints
@@ -457,24 +548,56 @@ class TSRestApiV2:
         }
         return self.post_request(endpoint=endpoint, request=request)
 
-    def metadata_tml_import(self, metadata_tmls: List[str], import_policy: str = 'PARTIAL', create_new: bool = False):
+    def metadata_tml_import(self,
+                            metadata_tmls: List[str],
+                            import_policy: str = 'PARTIAL',
+                            create_new: bool = False,
+                            all_orgs_context: Optional[bool] = None,
+                            skip_cdw_validation_for_tables: Optional[bool] = None,
+                            skip_diff_check: Optional[bool] = None,
+                            enable_large_metadata_validation: Optional[bool] = None
+                            ):
         endpoint = 'metadata/tml/import'
         request = {
             'metadata_tmls': metadata_tmls,
             'import_policy': import_policy,
             'create_new': create_new
         }
+        if all_orgs_context is not None:
+            request['all_orgs_context'] = all_orgs_context
+        if skip_cdw_validation_for_tables is not None:
+            request['cdw_validation_for_tables'] = skip_cdw_validation_for_tables
+        if skip_diff_check is not None:
+            request['skip_diff_check'] = skip_diff_check
+        if enable_large_metadata_validation is not None:
+            request['enable_large_metadata_validation'] = enable_large_metadata_validation
+
+
         return self.post_request(endpoint=endpoint, request=request)
 
-    def metadata_tml_async_import(self, metadata_tmls: List[str], import_policy: str = 'PARTIAL',
-                                  create_new: bool = False, all_orgs_context: bool = False,
-                                  skip_cdw_validation_for_tables: bool = False):
+    def metadata_tml_async_import(self, metadata_tmls: List[str],
+                                  import_policy: str = 'PARTIAL',
+                                  create_new: bool = False,
+                                  all_orgs_context: Optional[bool] = None,
+                                  skip_cdw_validation_for_tables: Optional[bool] = None,
+                                  skip_diff_check: Optional[bool] = None,
+                                  enable_large_metadata_validation: Optional[bool] = None
+                                  ):
         endpoint = 'metadata/tml/async/import'
         request = {
             'metadata_tmls': metadata_tmls,
             'import_policy': import_policy,
             'create_new': create_new
         }
+        if all_orgs_context is not None:
+            request['all_orgs_context'] = all_orgs_context
+        if skip_cdw_validation_for_tables is not None:
+            request['cdw_validation_for_tables'] = skip_cdw_validation_for_tables
+        if skip_diff_check is not None:
+            request['skip_diff_check'] = skip_diff_check
+        if enable_large_metadata_validation is not None:
+            request['enable_large_metadata_validation'] = enable_large_metadata_validation
+
         return self.post_request(endpoint=endpoint, request=request)
 
     def metadata_tml_async_status(self, request: Dict):
@@ -483,9 +606,19 @@ class TSRestApiV2:
 
     # Out of convenience, providing a simple List[str] input for getting these by GUID. metadata_request will override
     # if you need the deeper functionality with names / types
-    def metadata_tml_export(self, metadata_ids: List[str], export_associated: bool = False, export_fqn: bool = False,
-                            edoc_format: Optional[str] = None, export_schema_version: Optional[str] = None,
-                            metadata_request: Optional[List[Dict]] = None):
+    def metadata_tml_export(self,
+                            metadata_ids: List[str],
+                            export_associated: bool = False,
+                            export_fqn: bool = False,
+                            edoc_format: Optional[str] = None,
+                            export_schema_version: Optional[str] = None,
+                            metadata_request: Optional[List[Dict]] = None,
+                            export_dependent: Optional[bool] = None,
+                            export_connection_as_dependent: Optional[bool] = None,
+                            all_orgs_override: Optional[bool] = None,
+                            export_options: Optional[Dict] = None
+                            ):
+
         endpoint = 'metadata/tml/export'
 
         request = {
@@ -505,6 +638,15 @@ class TSRestApiV2:
             for i in metadata_ids:
                 metadata_list.append({'identifier': i})
             request['metadata'] = metadata_list
+        if export_dependent is not None:
+            request['export_dependent'] = export_dependent
+        if export_connection_as_dependent is not None:
+            request['export_connection_as_dependent'] = export_connection_as_dependent
+        if all_orgs_override is not None:
+            request['all_orgs_override'] = all_orgs_override
+        if export_options is not None:
+            request['export_options'] = export_options
+
         return self.post_request(endpoint=endpoint, request=request)
 
     def metadata_tml_export_batch(self, request: Dict):
@@ -526,6 +668,42 @@ class TSRestApiV2:
             for i in metadata_ids:
                 metadata_list.append({'identifier': i})
             request['metadata'] = metadata_list
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def metadata_copyobject(self, identifier: str, object_type: Optional[str] = None,
+                            title: Optional[str] = None, description: Optional[str] = None):
+        endpoint = 'metadata/copyobject'
+        request = {
+            identifier : identifier
+        }
+        if object_type is not None:
+            request['type'] = object_type
+        if title is not None:
+            request['title'] = title
+        if description is not None:
+            request['description'] = description
+
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def metadata_worksheets_convert(self, worksheet_ids: Optional[List[str]] = None,
+                                    exclude_worksheet_ids: Optional[List[str]] = None,
+                                    convert_all: bool = False,
+                                    apply_changes: bool = False):
+        endpoint = 'metadata/worksheets/convert'
+        request = {
+            'convert_all': convert_all,
+            'apply_changes': apply_changes
+        }
+        if worksheet_ids is not None:
+            request['worksheet_ids'] = worksheet_ids
+        if exclude_worksheet_ids is not None:
+            request['exclude_worksheet_ids'] = exclude_worksheet_ids
+
+        return self.post_request(endpoint=endpoint, request=request)
+
+    # EA in 10.6 for obj_id
+    def metadata_headers_update(self, request: Dict):
+        endpoint = 'metadata/headers/update'
         return self.post_request(endpoint=endpoint, request=request)
 
 #
@@ -658,6 +836,22 @@ class TSRestApiV2:
         endpoint = 'connection/update'
         return self.post_request(endpoint=endpoint, request=request)
 
+    def connection_delete_v2(self, connection_identifier: str):
+        endpoint = 'connections/{}/delete'.format(connection_identifier)
+        return self.post_request(endpoint=endpoint)
+
+    def connection_update_v2(self, connection_identifier: str, request: Dict):
+        endpoint = 'connections/{}/update'.format(connection_identifier)
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def connection_download_connection_metadata_changes(self, connection_identifier: str):
+        endpoint = 'connections/download-connection-metadata-changes/{}'.format(connection_identifier)
+        return self.post_request(endpoint=endpoint)
+
+    def connection_fetch_connection_diff_status(self, connection_identifier: str):
+        endpoint = 'connections/fetch-connection-diff-status/{}'.format(connection_identifier)
+        return self.post_request(endpoint=endpoint)
+
 #
 # /roles/ endpoints
 #
@@ -779,4 +973,9 @@ class TSRestApiV2:
         }
 
         return self.post_request(endpoint=endpoint, request=request)
+
+    def ai_analytical_questions(self, request: Dict):
+        endpoint = 'ai/analytical-questions'
+        return self.post_request(endpoint=endpoint, request=request)
+
 
