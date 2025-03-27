@@ -1,0 +1,10 @@
+# Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
+version: v1.25.1
+# ignores vulnerabilities until expiry date; change duration by modifying expiry date
+ignore:
+  'snyk:lic:pip:certifi:MPL-2.0':
+    - '*':
+        reason: None Given
+        expires: 2025-04-26T20:33:41.647Z
+        created: 2025-03-27T20:33:41.649Z
+patch: {}
