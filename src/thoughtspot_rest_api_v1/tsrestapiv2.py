@@ -706,6 +706,27 @@ class TSRestApiV2:
         endpoint = 'metadata/headers/update'
         return self.post_request(endpoint=endpoint, request=request)
 
+    def metadata_update_obj_id(self, new_obj_id: str, guid: Optional[str], current_obj_id: Optional[str],
+                               request_override: Optional[Dict] = None):
+        endpoint = 'metadata/update-obj-id'
+        if request_override is not None:
+            request = request_override
+        else:
+            request = {
+                "metadata": [
+                    {"new_obj_id" : new_obj_id}
+                ]
+            }
+            if guid is not None:
+                request["metadata"][0]["metadata_identifier"] = guid
+            elif current_obj_id is not None:
+                request["metadata"][0]["current_obj_id"] = current_obj_id
+            else:
+                raise Exception("Must provide one of guid or current_obj_id")
+
+        return self.post_request(endpoint=endpoint, request=request)
+
+
 #
 # /reports/ endpoints
 #
