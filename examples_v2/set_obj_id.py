@@ -60,11 +60,27 @@ def create_multi_obj_id_update_request(guid_obj_id_map: Dict):
 
 def set_one_object():
     # Simple example of setting a Table object to have a Full Qualified Name as the obj_id
-    update_req = create_obj_id_update_request(guid='43ab8a16-473a-44dc-9c78-4346eeb51f6c', obj_id='Conn.DB_Name.TableName')
-
-    resp = ts.metadata_headers_update(request=update_req)
+    resp = ts.metadata_update_obj_id(new_obj_id='Conn.DB_Name.TableName', guid='43ab8a16-473a-44dc-9c78-4346eeb51f6c')
     print(json.dumps(resp, indent=2))
 
+def set_multiple_objects():
+    # Simple example of setting multiple at once using request format
+
+    req = {
+        "metadata": [
+            {
+                "new_obj_id": "Table_A",
+                "metadata_identifier": "43ab8a16-473a-44dc-9c78-4346eeb51f6c"
+            },
+            {
+                "new_obj_id": "Table_B",
+                "metadata_identifier": "4346eeb51f6c-9c78-473a-44dc-43ab8a16"
+            },
+        ]
+    }
+
+    resp = ts.metadata_update_obj_id(request_override=req)
+    print(json.dumps(resp, indent=2))
 
 def export_tml_with_obj_id(guid:Optional[str] = None,
                            obj_id: Optional[str] = None,
