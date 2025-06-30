@@ -22,7 +22,6 @@ except requests.exceptions.HTTPError as e:
     print(e)
     print(e.response.content)
     exit()
-
 def create_obj_id_update_request(guid: str, obj_id: str):
     update_req = {
         "headers_update":
@@ -38,6 +37,7 @@ def create_obj_id_update_request(guid: str, obj_id: str):
             )
     }
     return update_req
+
 
 # { 'guid' : 'obj_id' }
 def create_multi_obj_id_update_request(guid_obj_id_map: Dict):
@@ -98,16 +98,23 @@ def export_tml_with_obj_id(guid:Optional[str] = None,
         "include_obj_id": True
     }
 
-
     yaml_tml = ts.metadata_tml_export(metadata_ids=[guid], edoc_format='YAML',
                                       export_options=exp_opt)
+
+    # Get obj_id from the TML
+    lines = yaml_tml[0]['edoc'].splitlines()
+    if obj_id is None:
+        if lines[0].find('obj_id: ') != -1:
+            obj_id = lines[0].replace('obj_id: ', "")
+
+    obj_type = lines[1].replace(":", "")
 
     if save_to_disk is True:
         print(yaml_tml[0]['edoc'])
         print("-------")
 
         # Save the file with {obj_id}.{type}.{tml}
-        filename = "{}.table.tml".format(obj_id)
+        filename = "{}.{}.tml".format(obj_id, obj_type)
         with open(file=filename, mode='w') as f:
             f.write(yaml_tml[0]['edoc'])
 

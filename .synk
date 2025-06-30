@@ -1,0 +1,4 @@
+# .snyk file
+ignore:
+  certifi@MPL-2.0:
+    - "*"

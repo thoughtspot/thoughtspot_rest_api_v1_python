@@ -18,7 +18,7 @@ org_id = 0  # Set to org_id in multi-tenant environment
 ts: TSRestApiV2 = TSRestApiV2(server_url=server)
 
 # Simple function for translating {key: List} arguments into the full ABAC syntax for Full Access Token
-# parameters : {name: value ... }
+# parameters : {name: [value] ... }
 # filters: {{name}: [{values}... }
 def create_abac_section(parameters, filters, persist_all=False):
 
