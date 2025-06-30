@@ -706,7 +706,8 @@ class TSRestApiV2:
         endpoint = 'metadata/headers/update'
         return self.post_request(endpoint=endpoint, request=request)
 
-    def metadata_update_obj_id(self, new_obj_id: str, guid: Optional[str], current_obj_id: Optional[str],
+    def metadata_update_obj_id(self, new_obj_id: Optional[str] = None, guid: Optional[str] = None,
+                               current_obj_id: Optional[str] = None,
                                request_override: Optional[Dict] = None):
         endpoint = 'metadata/update-obj-id'
         if request_override is not None:
