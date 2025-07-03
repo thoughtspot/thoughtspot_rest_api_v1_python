@@ -1629,7 +1629,6 @@ class TSRestApiV1:
         url = self.base_url + endpoint
         response = self.requests_session.put(url=url, data=post_data)
         response.raise_for_status()
-        return response.json()
 
     def user_groups_get(self, user_guid: str):
         endpoint = 'user/{}/groups'.format(user_guid)
@@ -1649,7 +1648,6 @@ class TSRestApiV1:
 
         response = self.requests_session.post(url=url, params=url_params)
         response.raise_for_status()
-        return response.json()
 
     # Adds to existing group membership?
     def user_groups_put(self, user_guid: str, group_guids: List[str]):
