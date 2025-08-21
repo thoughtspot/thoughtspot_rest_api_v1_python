@@ -1000,4 +1000,7 @@ class TSRestApiV2:
         endpoint = 'ai/analytical-questions'
         return self.post_request(endpoint=endpoint, request=request)
 
+#
+# /template/variables endpoints
+#
 
