@@ -1004,3 +1004,23 @@ class TSRestApiV2:
 # /template/variables endpoints
 #
 
+    def template_variables_create(self, request: Dict):
+        endpoint = 'template/variables/create'
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def template_variables_delete(self, identifier: str):
+        endpoint = 'template/variables/{}/delete'.format(identifier)
+        return self.post_request(endpoint=endpoint)
+
+    def template_variables_search(self, request: Dict):
+        endpoint = 'template/variables/search'
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def template_variables_update(self, identifier: str, request: Dict):
+        endpoint = 'template/variables/{}/update'.format(identifier)
+        return self.post_request(endpoint=endpoint, request=request)
+
+    # Allows updating multiple values at once
+    def template_variables_values_update(self, request: Dict):
+        endpoint = 'template/variables/update'
+        return self.post_request(endpoint=endpoint, request=request)
