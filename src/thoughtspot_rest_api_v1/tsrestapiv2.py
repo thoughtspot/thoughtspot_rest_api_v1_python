@@ -759,6 +759,14 @@ class TSRestApiV2:
         endpoint = 'security/metadata/share'
         return self.post_request(endpoint=endpoint, request=request)
 
+    def security_metadata_publish(self, request: Dict):
+        endpoint = 'security/metadata/publish'
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def security_metadata_unpublish(self, request: Dict):
+        endpoint = 'security/metadata/unpublish'
+        return self.post_request(endpoint=endpoint, request=request)
+
 #
 # /data/
 #
@@ -913,6 +921,10 @@ class TSRestApiV2:
         return self.post_request(endpoint=endpoint)
 
 #
+# /customization/email
+#
+
+#
 # /schedules/ endpoints
 #
     def schedules_search(self, request: Dict):
@@ -1024,3 +1036,4 @@ class TSRestApiV2:
     def template_variables_values_update(self, request: Dict):
         endpoint = 'template/variables/update'
         return self.post_request(endpoint=endpoint, request=request)
+
