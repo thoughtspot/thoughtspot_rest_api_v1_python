@@ -47,8 +47,11 @@ class TSRestApiV2:
         # X-Requested-By             is necessary for all calls.
         # Accept: application/json   isn't necessary with requests (default: Accept: */*) but might be in other frameworks
         #
+        self.__accept_language = "en-US"
         # This sets the header on any subsequent call
-        self.api_headers = {'X-Requested-By': 'ThoughtSpot', 'Accept': 'application/json', 'Accept-Language': 'en_US'}
+        self.api_headers = {'X-Requested-By': 'ThoughtSpot',
+                            'Accept': 'application/json',
+                            'Accept-Language': self.__accept_language}
         self.requests_session.headers.update(self.api_headers)
 
         # Will be set after initial request
@@ -75,6 +78,16 @@ class TSRestApiV2:
     def bearer_token(self, bearer_token):
         self.__bearer_token = bearer_token
         self.api_headers['Authorization'] = 'Bearer {}'.format(bearer_token)
+        self.requests_session.headers.update(self.api_headers)
+
+    @property
+    def accept_language(self):
+        return self.__accept_language
+
+    @accept_language.setter
+    def accept_language(self, accept_language_code):
+        self.__accept_language = accept_language_code
+        self.api_headers['Accept-Language'] = accept_language_code
         self.requests_session.headers.update(self.api_headers)
 
     #
