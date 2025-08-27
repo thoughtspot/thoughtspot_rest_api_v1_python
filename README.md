@@ -2,6 +2,10 @@
 
 `thoughtspot_rest_api_v1` library implements the ThoughtSpot public REST APIs as directly as possible. It is not a "full SDK" with representation of each request and response type, but rather uses Python's Lists and Dicts for input and output.
 
+When using ThoughtSpot Cloud, always chose the V2.0 REST API via the `TSRestApiV2` class.
+
+Older Software versions of ThoughtSpot may have functionality that is only available via the `TSRestApiV1` class, which is the best existing implementation of the V1 API.
+
 Each API endpoint is represented by a single method within the `TSRestApiV1` or `TSRestApiV2` class.
 
 Method and argument names closely match to the documented API endpoints, with a few minor changes are taken to make certain parameters more obvious for an end user, or to align with Pythonic conventions ('id' parameters in the API itself are written as 'guid' or '{object-name}_id' for example)
@@ -15,8 +19,10 @@ Method and argument names closely match to the documented API endpoints, with a 
 
 ---
 
-## Learning from the source code
-If you want to use the library as a reference for how a REST API endpoint is called correctly, look at the `/src/thoughtspot_rest_api_v1/tsrestapiv1.py` file. It contains the definition of all the ENUMs and the `TSRestApiV1` class. Similarly, the `TSRestApiV2` class is defined in the `/src/thoughtspot_rest_api_v1/tsrestapiv2.py` file.
+## Learning from the source code for V1
+At this point, if you have a need to use the V1 REST API, please use the TSRestApiV1 class. If you have some need for using the V1 REST API outside of Pyython, the library can be used a reference for how a V1 REST API endpoint is called correctly, look at the `/src/thoughtspot_rest_api_v1/tsrestapiv1.py` file. It contains the definition of all the ENUMs and the `TSRestApiV1` class. 
+
+Similarly, the `TSRestApiV2` class is defined in the `/src/thoughtspot_rest_api_v1/tsrestapiv2.py` file.
 
 The `TSRestApiV1` class uses the *requests* library to create an internal requests.Session object when the REST API sign-in command is run. This fulfils the ThoughtSpot REST API V1 requirement for session cookie details to be passed in every request.
 
@@ -52,62 +58,28 @@ $ python3 -m pip install --upgrade
 ## Importing the library
     from thoughtspot_rest_api_v1 import *
 
-This will bring the `TSRestApiV1` class, as well as the following enumerations:  `TSTypes`, `MetadataNames`, `MetadataSorts`, `MetadataSubtypes`, `MetadataCategories`, `ShareModes`, `Privileges`.
+This will bring the `TSRestApiV1` and `TSRestApiV2` classes, as well as the following enumerations:  `TSTypes`, `MetadataNames`, `MetadataSorts`, `MetadataSubtypes`, `MetadataCategories`, `ShareModes`, `Privileges`.
 
-There is also a `TSRestApiV2` class, with enumerations: `TSTypesV2`, `ReportTypes`, to use the subset of REST API V2 capabilities that do not exist in the V1 API.
+There is also a `TSRestApiV2` class, with enumerations: `TSTypesV2`, `ReportTypes`.
 
 The `UserDetails`, `GroupsDetails` and `LiveboardDetails` classes are also imported automatically from `details_objects.py` to provide easy access to useful properties from the very complex responses from the `metadata/details` endpoint.
 
-### Modifying the TSRestApiV1 requests.Session object (SSL errors, etc.)
+### Modifying the requests.Session object (SSL errors, etc.)
 The REST API commands are all handled via the `requests` module, using a `requests.Session` object. 
 
 The session object used by all methods is accessible via:
 
-    TSRestApiV1.requests_session
+    TSRestApiV1.requests_session  # or
+    TSRestApiV2.requests_session
 
 A common issue within organizations is SSL certificates not being available / included within the certificate store used by Python. One way around this issue is to use the `verify=False` argument in requests (this is not recommended, but may be the only easy path forward. Check with your security team and never use with ThoughtSpot Cloud or from outside your protected network).
 
 This will set the Session object to `verify=False` for all calls:
 
-    ts: TSRestApiV1 = TSRestApiV1(server_url=server)
+    ts: TSRestApiV2 = TSRestApiV2(server_url=server)
     ts.requests_session.verify = False
 
 If you find there are other options you need to set on the Session object for your particular situation, you can use the same technique to apply other changes.
-
-
-## Logging into the REST API
-You create a TSRestApiV1 object with the `server_url` argument, then use the `session_login()` method with username and password to log in. After login succeeds, the TSRestApiV1 object has an open requests.Session object which maintains the necessary cookies to use the REST API continuously .
-
-
-    username = os.getenv('username')  # or type in yourself
-    password = os.getenv('password')  # or type in yourself
-    server = os.getenv('server')      # or type in yourself
-
-    ts: TSRestApiV1 = TSRestApiV1(server_url=server)
-    try:
-        ts.session_login(username=username, password=password)
-    except requests.exceptions.HTTPError as e:
-        print(e)
-        print(e.response.content)
-
-In all further examples, the `ts` variable represents a `TSRestApiV1` object after the `session_login()` method has been called successfully.
-
-## Logging out of the REST API
-The `session_logout()` method of the ThoughtSpot class will send the API request to end your TS session. After you do this, you may want to del the ThoughtSpot object if you are doing a lot of other work to end the request.Session object:
-    
-    ts.session_logout()
-    del ts
-
-## ENUM data structures
-The ThoughtSpot API has internal namings for many features, which require looking up in the reference guide. To help out, the tsrestapiv1.py file defines several ENUM style classes:
-
-- `TSTypes`: Combines MetadataNames and MetadataSubtypes into a single set of unique values, so that you don't need to worry about when to use Subtypes. The implementations of the /metadata/ endpoints read the values from this ENUM and issue the correct REST API command
-- `MetadataCategories`: Contains the options for the argument called 'category' in metadata calls
-- `MetadataSorts`: Contains the available sort options for the argument called 'sort' in metadata calls
-- `ShareModes`: The modes used in the JSON of the /security/share endpoint
-- `Privileges`: The name of the Privileges that Groups can have (and users can inherit) in ThoughtSpot
-- `MetadataTypes`: The namings used in the 'type' parameter of the /metadata/ endpoint calls, with simplified names that matches the names in the UI and standard ThoughtSpot documentation. For example, MetadataTypes.GROUP = 'USER_GROUP'
-- `MetadataSubtypes`: The available options for the 'subtype' argument used for certain metadata calls
 
 ## Logging into REST API V2
 REST API V2 allows for Bearer Token authentication, which is the preferred method rather than session cookie sign-in. You create a TSRestApiV2 object with the `server_url` argument.
@@ -127,6 +99,19 @@ Next request a Full Access token using `auth_token_full()`. Get the `token` valu
         print(e)
         print(e.response.content)
     ts.bearer_token = auth_token_response['token']
+
+If you have requested an auth token from the REST API Playground, you can simply set the `bearer_token` property directly
+
+    from thoughtspot_rest_api_v1 import *
+    
+    full_auth_token = '{token_from_playground}'
+    
+    ts: TSRestApiV2 = TSRestApiV2(server_url=server)
+    ts.beare_token = full_auth_token
+    
+    try:
+        users = ts.users_search(request={})
+        ...
 
 ### V2 Methods
 REST API V2 exclusively uses JSON for the request format. Because Python Dicts map nearly directly to JSON, many of the methods for endpoints simply have a 'request=' argument, with the expectation that you form the request per the Documentation / Playground however you see fit:
@@ -162,6 +147,43 @@ The /examples_v2/ directory of this repository contains examples of using the V2
 
 ## TML operations
 One primary use case of the REST APIs is to import and export ThoughtSpot Modeling Language (TML) files.
+
+# V1 API Legacy Documentation
+As mentioned above, there is no need to use the V1 REST API in ThoughtSpot Cloud. The documentation below remains for Software customers who have use cases that involve the V1 REST API.
+
+## Logging into the V1 REST API
+You create a TSRestApiV1 object with the `server_url` argument, then use the `session_login()` method with username and password to log in. After login succeeds, the TSRestApiV1 object has an open requests.Session object which maintains the necessary cookies to use the REST API continuously .
+
+
+    username = os.getenv('username')  # or type in yourself
+    password = os.getenv('password')  # or type in yourself
+    server = os.getenv('server')      # or type in yourself
+
+    ts: TSRestApiV1 = TSRestApiV1(server_url=server)
+    try:
+        ts.session_login(username=username, password=password)
+    except requests.exceptions.HTTPError as e:
+        print(e)
+        print(e.response.content)
+
+In all further examples, the `ts` variable represents a `TSRestApiV1` object after the `session_login()` method has been called successfully.
+
+## Logging out of the REST API
+The `session_logout()` method of the ThoughtSpot class will send the API request to end your TS session. After you do this, you may want to del the ThoughtSpot object if you are doing a lot of other work to end the request.Session object:
+    
+    ts.session_logout()
+    del ts
+
+## ENUM data structures
+The ThoughtSpot API has internal namings for many features, which require looking up in the reference guide. To help out, the tsrestapiv1.py file defines several ENUM style classes:
+
+- `TSTypes`: Combines MetadataNames and MetadataSubtypes into a single set of unique values, so that you don't need to worry about when to use Subtypes. The implementations of the /metadata/ endpoints read the values from this ENUM and issue the correct REST API command
+- `MetadataCategories`: Contains the options for the argument called 'category' in metadata calls
+- `MetadataSorts`: Contains the available sort options for the argument called 'sort' in metadata calls
+- `ShareModes`: The modes used in the JSON of the /security/share endpoint
+- `Privileges`: The name of the Privileges that Groups can have (and users can inherit) in ThoughtSpot
+- `MetadataTypes`: The namings used in the 'type' parameter of the /metadata/ endpoint calls, with simplified names that matches the names in the UI and standard ThoughtSpot documentation. For example, MetadataTypes.GROUP = 'USER_GROUP'
+- `MetadataSubtypes`: The available options for the 'subtype' argument used for certain metadata calls
 
 ### Disabling FQN export
 ThoughtSpot 8.9 adds the 'export_fqn' option to the `/metadata/tml/export` endpoint, which includes the GUID references to all related objects in an exported TML file. Because this is very useful, the library defaults to including the argument set to true in all TML Export methods.
