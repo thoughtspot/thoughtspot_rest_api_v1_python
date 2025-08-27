@@ -47,8 +47,11 @@ class TSRestApiV2:
         # X-Requested-By             is necessary for all calls.
         # Accept: application/json   isn't necessary with requests (default: Accept: */*) but might be in other frameworks
         #
+        self.__accept_language = "en-US"
         # This sets the header on any subsequent call
-        self.api_headers = {'X-Requested-By': 'ThoughtSpot', 'Accept': 'application/json', 'Accept-Language': 'en_US'}
+        self.api_headers = {'X-Requested-By': 'ThoughtSpot',
+                            'Accept': 'application/json',
+                            'Accept-Language': self.__accept_language}
         self.requests_session.headers.update(self.api_headers)
 
         # Will be set after initial request
@@ -75,6 +78,16 @@ class TSRestApiV2:
     def bearer_token(self, bearer_token):
         self.__bearer_token = bearer_token
         self.api_headers['Authorization'] = 'Bearer {}'.format(bearer_token)
+        self.requests_session.headers.update(self.api_headers)
+
+    @property
+    def accept_language(self):
+        return self.__accept_language
+
+    @accept_language.setter
+    def accept_language(self, accept_language_code):
+        self.__accept_language = accept_language_code
+        self.api_headers['Accept-Language'] = accept_language_code
         self.requests_session.headers.update(self.api_headers)
 
     #
@@ -759,6 +772,14 @@ class TSRestApiV2:
         endpoint = 'security/metadata/share'
         return self.post_request(endpoint=endpoint, request=request)
 
+    def security_metadata_publish(self, request: Dict):
+        endpoint = 'security/metadata/publish'
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def security_metadata_unpublish(self, request: Dict):
+        endpoint = 'security/metadata/unpublish'
+        return self.post_request(endpoint=endpoint, request=request)
+
 #
 # /data/
 #
@@ -913,6 +934,10 @@ class TSRestApiV2:
         return self.post_request(endpoint=endpoint)
 
 #
+# /customization/email
+#
+
+#
 # /schedules/ endpoints
 #
     def schedules_search(self, request: Dict):
@@ -1000,4 +1025,28 @@ class TSRestApiV2:
         endpoint = 'ai/analytical-questions'
         return self.post_request(endpoint=endpoint, request=request)
 
+#
+# /template/variables endpoints
+#
+
+    def template_variables_create(self, request: Dict):
+        endpoint = 'template/variables/create'
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def template_variables_delete(self, identifier: str):
+        endpoint = 'template/variables/{}/delete'.format(identifier)
+        return self.post_request(endpoint=endpoint)
+
+    def template_variables_search(self, request: Dict):
+        endpoint = 'template/variables/search'
+        return self.post_request(endpoint=endpoint, request=request)
+
+    def template_variables_update(self, identifier: str, request: Dict):
+        endpoint = 'template/variables/{}/update'.format(identifier)
+        return self.post_request(endpoint=endpoint, request=request)
+
+    # Allows updating multiple values at once
+    def template_variables_values_update(self, request: Dict):
+        endpoint = 'template/variables/update'
+        return self.post_request(endpoint=endpoint, request=request)
 
